@@ -1,7 +1,7 @@
 package Session;
 
 
-public class SessionManager {
+public class SessionManager implements ISessionManager {
 
     private T object;
 

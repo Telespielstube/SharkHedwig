@@ -1,29 +1,22 @@
 package Message.Identification;
 
-import java.io.Serializable;
+import static Misc.Constants.CHALLENGE_MESSAGE_FLAG;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.UUID;
+
 
 public class Challenge extends Identification {
 
     private UUID uuid;
     private SecureRandom challengeNumber;
-    private String messageFlag;
+    private int messageFlag = CHALLENGE_MESSAGE_FLAG;;
     private long timestamp;
 
     public Challenge() {}
-    public Challenge(UUID uuid, SecureRandom challengeNumber, String messageFlag, long timestamp) {
+    public Challenge(UUID uuid, SecureRandom challengeNumber, long timestamp) {
         this.uuid = uuid;
         this.challengeNumber = challengeNumber;
-        this.messageFlag = messageFlag;
-        this.timestamp = timestamp;
-    }
-
-    public Challenge(UUID uuid, String messageFlag, long timestamp) {
-        this.uuid = uuid;
-        this.messageFlag = messageFlag;
         this.timestamp = timestamp;
     }
 
@@ -38,5 +31,10 @@ public class Challenge extends Identification {
             throw new RuntimeException(e);
         }
         this.challengeNumber.nextBytes(new byte[128]);
+    }
+
+    @Override
+    public int getFlag() {
+        return this.messageFlag;
     }
 }

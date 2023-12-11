@@ -2,20 +2,12 @@ package Message;
 
 import Channel.Type;
 import net.sharksystem.asap.ASAPException;
-import net.sharksystem.asap.ASAPSecurityException;
-import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
-import net.sharksystem.asap.crypto.ASAPCryptoParameterStorage;
-import net.sharksystem.asap.utils.ASAPSerialization;
 
 import java.io.*;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Signature;
-import java.security.SignatureException;
-import java.util.Set;
 
 public interface IMessageHandler {
 
+    Object parseMessage(byte[] message, String senderE2E);
     /**
      * Prepares the passed message object for sending to other devices.
      *
@@ -49,39 +41,31 @@ public interface IMessageHandler {
      *
      * @return
      */
-     byte[] serializeMessage(byte[] byteMessage, CharSequence receiver);
-
-    /**
-     * Encrypts and signs the serialized byte message for a secure transmission.The used crypto algorithms are SHA-256 and RSA.
-     *
-     * @param byteMessage    the serialized byte message.
-     * @param receiver       the recipient of the message.
-     *
-     * @return               encrypted byte[] message.
-     */
-    byte[] encryptMessage(byte[] byteMessage, CharSequence receiver);
-
-    /**
-     * Method decryptes the deserialized message.
-     *
-     */
-    void decryptMessage(byte[] message);
-
-    /**
-     * After the message got deserialized the method checks the receiver of the message.
-     *
-     * @param message    byte[] deserialized message.
-     *
-     * @return           Receiver of the message.
-     */
-    CharSequence getReceiver();
-
-    /**
-     * Parses the byte message content to a message object.
-     *
-     * @param serializedMessage    byte array of the decrypted but still serialized Message.
-     *
-     * @return                     byte array of the deserialized message.
-     */
-    byte[] deserializeMessage(byte[] serializedMessage) throws IOException, ASAPException;
+//     byte[] serializeMessage(byte[] byteMessage, CharSequence receiver);
+//
+//    /**
+//     * Encrypts and signs the serialized byte message for a secure transmission.The used crypto algorithms are SHA-256 and RSA.
+//     *
+//     * @param byteMessage    the serialized byte message.
+//     * @param receiver       the recipient of the message.
+//     *
+//     * @return               encrypted byte[] message.
+//     */
+//    byte[] encryptMessage(byte[] byteMessage, CharSequence receiver);
+//
+//    /**
+//     * Method decryptes the deserialized message.
+//     *
+//     */
+//    boolean decryptMessage(byte[] message, String senderE2E);
+//
+//
+//    /**
+//     * Parses the byte message content to a message object.
+//     *
+//     * @param serializedMessage byte array of the decrypted but still serialized Message.
+//     * @param next
+//     * @return byte array of the deserialized message.
+//     */
+//    byte[] deserializeMessage(byte[] next) throws IOException, ASAPException;
 }

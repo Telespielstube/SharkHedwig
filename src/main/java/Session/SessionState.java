@@ -10,7 +10,7 @@ public enum SessionState {
 
     NoState {
         @Override
-        public int currentState() {
+        public int setState() {
             return NO_SESSION_FLAG;
         }
 
@@ -22,7 +22,7 @@ public enum SessionState {
 
     Identification {
         @Override
-        public int currentState() {
+        public int setState() {
             return IDENTIFICATION_FLAG;
         }
 
@@ -34,7 +34,7 @@ public enum SessionState {
 
     Request {
         @Override
-        public int currentState() {
+        public int setState() {
             return REQUEST_FLAG;
         }
         @Override
@@ -45,7 +45,7 @@ public enum SessionState {
 
     HndoverSate() {
         @Override
-        public int currentState() {
+        public int setState() {
             return HANDOVER_FLAG;
         }
 
@@ -55,6 +55,6 @@ public enum SessionState {
         }
     };
 
-    public abstract int currentState();
+    public abstract int setState();
     public abstract int nextState();
 }

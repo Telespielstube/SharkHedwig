@@ -1,20 +1,19 @@
 package Setup;
 
+import Message.IMessage;
 import Message.IMessageHandler;
+import Message.Identification.Challenge;
+import Message.Identification.Identification;
+import Message.Identification.Response;
 import Message.MessageHandler;
-import Session.Identification;
-import Session.SessionManager;
+import Session.SessionState;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeerFS;
 import net.sharksystem.asap.*;
 import net.sharksystem.pki.SharkPKIComponent;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
 
@@ -76,6 +75,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
             this.setupChannel();
             this.peer.getASAPStorage(APP_FORMAT).getOwner();
             this.setupLogger();
+            SessionState.NoState.setState(); // The initial state of the protocol is no state.
         } catch (IOException e) {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
         }
@@ -107,34 +107,42 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         }
     }
 
+    /**
+     * If an encounter occurs all messages are being exchanged.
+     *
+     * @param messages               a chunk of messages from the encountered device.
+     * @param senderE2E              The encountered device.
+     * @param list                   A List of all previous hops.
+     * @throws IOException           Is thrown after a read/write error occurs
+     *
+     */
     @Override
-    public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) throws IOException , ClassCastException {
+    public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) throws IOException {
         CharSequence uri = messages.getURI();
         this.messageHandler = new MessageHandler(sharkPKIComponent, this.peer);
-
+        IMessage message;
         if (uri != null) {
             if (uri.equals(Type.IDENTIFICATION.toString())) {
+                SessionState.Identification.setState();
                 for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
-                    try {
-                        this.deserialized = this.messageHandler.deserializeMessage(it.next());
-                    } catch (ASAPException e) {
-                        throw new RuntimeException(e);
+                    message = (IMessage) this.messageHandler.parseMessage(it.next(), senderE2E);
+                    if (message.getFlag() == CHALLENGE_MESSAGE_FLAG) {
+                        new Challenge(message.);
+                    } else if (message.getFlag() == RESPONSE_MESSAGE_FLAG) {
+                        new Response(message.);
                     }
-                    if (this.sharkPKIComponent.isOwner(this.messageHandler.getReceiver())) {
-                        this.messageHandler.decryptMessage(this.deserialized);
-                    }
-                    // Handle sender and hopList
+                    // and hopList
                 }
             }
-            if (uri.equals(Type.REQUEST.toString())) {
-                for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
-                    try {
-                        this.deserialized = this.messageHandler.deserializeMessage(it.next());
-                    } catch (ASAPException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
+//            if (uri.equals(Type.REQUEST.toString())) {
+//                for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
+//                    try {
+//                        this.deserialized = this.messageHandler.deserializeMessage(it.next());
+//                    } catch (ASAPException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
+//            }
         } else {
             System.err.println("Received message has no uri!");
         }

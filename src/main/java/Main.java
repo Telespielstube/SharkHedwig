@@ -7,10 +7,7 @@ import net.sharksystem.SharkException;
 
 import net.sharksystem.SharkPeerFS;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 
 import static Misc.Constants.*;
 
@@ -34,7 +31,7 @@ public class Main {
             sharkPeerFS = new SharkPeerFS(PEER_NAME, PEER_FOLDER + "/" + PEER_NAME);
             component.setupComponent(sharkPeerFS);
             sharkPeerFS.start();
-            SessionState.NoState.currentState();
+            SessionState.NoState.setState();
             userInterface = new UserInterface("Type \"Package\" to enter the necessary data for the shipping label.");
             ((UserInterface) userInterface).run(); // Unfortunately, this cast is necessary because we work with interfaces.
         } else {

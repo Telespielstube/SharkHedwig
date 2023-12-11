@@ -1,4 +1,4 @@
-package Message.Identification;
+package Message;
 
 public abstract class AckMessage {
 }

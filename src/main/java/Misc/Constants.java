@@ -30,9 +30,10 @@ public final class Constants {
     public static final int HANDOVER_FLAG = 3;
 
     /** Flags for setting the message type */
-    public static final int ACK_MESSAGE_FLAG = 0;
-    public static final int CHALLENGE_MESSAGE_FLAG = 1;
-    public static final int RESPONSE_MESSAGE_FLAG = 2;
-    public static final int REQUEST_INQUIRY = 3;
-    public static final int REQUEST_REPLY = 4;
+
+    public static final int CHALLENGE_MESSAGE_FLAG = 4;
+    public static final int RESPONSE_MESSAGE_FLAG = 5;
+    public static final int REQUEST_INQUIRY = 6;
+    public static final int REQUEST_REPLY = 7;
+    public static final int ACK_MESSAGE_FLAG = 8;
 }
