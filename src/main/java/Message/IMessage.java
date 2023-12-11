@@ -5,8 +5,6 @@ import java.util.UUID;
 
 /**
  * Message interface.
- *
- * @param <T>    Generic to work with all kinds of message objects.
  */
 public interface IMessage<T> extends Serializable {
 
@@ -17,6 +15,12 @@ public interface IMessage<T> extends Serializable {
      * @return    A 128-bit randomly created UUID.
      */
     UUID createUUID();
+    
+    UUID getUuid();
     int getFlag();
+
+    long getTimestamp();
+
+
 }
 

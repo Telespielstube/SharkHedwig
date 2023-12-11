@@ -12,19 +12,13 @@ import Message.Identification.Challenge;
  */
 public class MessageTest {
 
-    private final Challenge challenge = new Challenge();
-    @Test
-    public void testIfUUIDGetsGeneratedFromString() {
-        String uuid = challenge.createUUID().toString();
-        System.out.println("Generated UUID: " + uuid);
-        assertTrue(uuid,true);
-    }
+    private final Challenge challenge = new Challenge(UUID.randomUUID(), System.currentTimeMillis());
 
     @Test
     public void testIfTwoUUIDsDifferFromEachOther() {
         UUID uuid1 = challenge.createUUID();
         UUID uuid2 = challenge.createUUID();
-        assertFalse(uuid1.equals(uuid2));
+        assertNotEquals(uuid1, uuid2);
     }
     @Test
     public void checkIfUUIDVersionIsNumber4() {

@@ -15,8 +15,8 @@ public enum SessionState {
         }
 
         @Override
-        public int nextState() {
-            return IDENTIFICATION_FLAG;
+        public int getState() {
+            return NO_SESSION_FLAG;
         }
     },
 
@@ -27,8 +27,8 @@ public enum SessionState {
         }
 
         @Override
-        public int nextState() {
-            return REQUEST_FLAG;
+        public int getState() {
+            return IDENTIFICATION_FLAG;
         }
     },
 
@@ -38,23 +38,23 @@ public enum SessionState {
             return REQUEST_FLAG;
         }
         @Override
-        public int nextState() {
-            return HANDOVER_FLAG;
+        public int getState() {
+            return REQUEST_FLAG;
         }
     },
 
-    HndoverSate() {
+    HandoverSate() {
         @Override
         public int setState() {
             return HANDOVER_FLAG;
         }
 
         @Override
-        public int nextState() {
-            return NO_SESSION_FLAG;
+        public int getState() {
+            return HANDOVER_FLAG;
         }
     };
 
     public abstract int setState();
-    public abstract int nextState();
+    public abstract int getState();
 }

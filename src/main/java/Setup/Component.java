@@ -120,21 +120,22 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) throws IOException {
         CharSequence uri = messages.getURI();
         this.messageHandler = new MessageHandler(sharkPKIComponent, this.peer);
-        IMessage message;
+        IMessage<Identification> message;
         if (uri != null) {
-            if (uri.equals(Type.IDENTIFICATION.toString())) {
+            if (uri.equals(Type.IDENTIFICATION.toString()) ) {
                 SessionState.Identification.setState();
                 for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
-                    message = (IMessage) this.messageHandler.parseMessage(it.next(), senderE2E);
+                    message = this.messageHandler.parseMessage(it.next(), senderE2E);
                     if (message.getFlag() == CHALLENGE_MESSAGE_FLAG) {
-                        new Challenge(message.);
+                        new Challenge(message.getUuid(), message.getChallengeNumber(), message.getTimestamp());
                     } else if (message.getFlag() == RESPONSE_MESSAGE_FLAG) {
-                        new Response(message.);
+                     //   new Response();
                     }
                     // and hopList
                 }
             }
 //            if (uri.equals(Type.REQUEST.toString())) {
+//
 //                for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
 //                    try {
 //                        this.deserialized = this.messageHandler.deserializeMessage(it.next());
