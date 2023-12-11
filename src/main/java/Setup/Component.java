@@ -119,7 +119,6 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
 
         } else {
             System.err.println("Received message has no uri!");
-
         }
     }
 }

@@ -100,11 +100,11 @@ public class UserInterface implements IUserInterface, Runnable {
                     shippingLabelForm("Shipping label. Please fill in the required information.");
                 }
                 System.out.println("Creating shipping label");
-                IDeliveryContract deliveryContract = new DeliveryContract(new ShippingLabel(this.sender, this.origin,
-                        new Location(this.latitudeOrigin, this.longitudeOrigin),
-                        this.recipient, this.destination,
+                new DeliveryContract(new ShippingLabel(this.sender, this.origin,
+                        new Location(this.latitudeOrigin, this.longitudeOrigin), this.recipient, this.destination,
                         new Location(this.destination, this.latitudeDest, this.longitudeDest), this.packageWeight),
                         new TransitRecord());
-                SessionManager
-    }}}
+            }
+        }
+    }
 }
