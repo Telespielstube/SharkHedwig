@@ -17,18 +17,12 @@ import java.util.Set;
 public interface IMessageHandler {
 
     /**
-     * Handles the operation needed to work with the incoming messages.
-     * @param message
-     */
-     void handleIncomingMessage(byte[] message);
-
-    /**
      * Prepares the passed message object for sending to other devices.
      *
      * @param object    A Generic Message object. It accepts all Message object because we want one 
      *                  build methode not a methode for every message object.
      */
-    public <T> void buildOutgoingMessage(T object, Type uri, String appName);
+    <T> void buildOutgoingMessage(T object, Type uri, String appName);
 
     /**
      * Convert the passed message object to a byte array.
@@ -48,26 +42,6 @@ public interface IMessageHandler {
     Object byteArrayToObject(byte[] message);
 
     /**
-     * Signs a plain byte[] message. The used vrypto algorithms are SHA-256 and RSA.
-     *
-     * @param unsignedMessage    the plain serialized byte[] message.
-     *
-     * @return                   signed byte[] message.
-     */
-    public byte[] signMessage(byte[] unsignedMessage);
-
-    /**
-     * Verifies the signature of a signed message. Just because all protocol messages are signed every message needs
-     * to go through this methode.
-     *
-     * @param signedMessage             byte array representation of the message.
-     * @param signatureToBeVerified     is the signature
-     *
-     * @return                          bool value if message is verified or failed.
-     */
-     boolean verifySignature(byte[] signedMessage, byte[] signatureToBeVerified);
-
-    /**
      * Serializes the passed byte message.
      *
      * @param byteMessage
@@ -78,7 +52,7 @@ public interface IMessageHandler {
      byte[] serializeMessage(byte[] byteMessage, CharSequence receiver);
 
     /**
-     * Encrypts the serialized byte message for a secure transmission.
+     * Encrypts and signs the serialized byte message for a secure transmission.The used crypto algorithms are SHA-256 and RSA.
      *
      * @param byteMessage    the serialized byte message.
      * @param receiver       the recipient of the message.
@@ -88,13 +62,19 @@ public interface IMessageHandler {
     byte[] encryptMessage(byte[] byteMessage, CharSequence receiver);
 
     /**
-     * First operation the received message needs to go through. Decrypts the received message
+     * Method decryptes the deserialized message.
      *
-     * @param message    byte[] encrypted message.
-     *
-     * @return           decrypted byte array of message.
      */
-    byte[] decryptMessage(byte[] message);
+    void decryptMessage(byte[] message);
+
+    /**
+     * After the message got deserialized the method checks the receiver of the message.
+     *
+     * @param message    byte[] deserialized message.
+     *
+     * @return           Receiver of the message.
+     */
+    CharSequence getReceiver();
 
     /**
      * Parses the byte message content to a message object.

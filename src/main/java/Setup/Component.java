@@ -2,6 +2,8 @@ package Setup;
 
 import Message.IMessageHandler;
 import Message.MessageHandler;
+import Session.Identification;
+import Session.SessionManager;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -25,6 +27,8 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     private ASAPPeer peer;
     private SharkPKIComponent sharkPKIComponent;
     private Channel channel;
+    private IMessageHandler messageHandler;
+    private byte[] deserialized;
 
     public Component() {}
     public Component(SharkPKIComponent pkiComponent) {
@@ -106,17 +110,31 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     @Override
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) throws IOException , ClassCastException {
         CharSequence uri = messages.getURI();
-        byte[] identificationMsg;
+        this.messageHandler = new MessageHandler(sharkPKIComponent, this.peer);
+
         if (uri != null) {
             if (uri.equals(Type.IDENTIFICATION.toString())) {
                 for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
-                    IMessageHandler messageHandler = (IMessageHandler) new MessageHandler(sharkPKIComponent, this.peer); // Again, Interface cast is mandatory
-                    messageHandler.handleIncomingMessage(it.next());
+                    try {
+                        this.deserialized = this.messageHandler.deserializeMessage(it.next());
+                    } catch (ASAPException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if (this.sharkPKIComponent.isOwner(this.messageHandler.getReceiver())) {
+                        this.messageHandler.decryptMessage(this.deserialized);
+                    }
                     // Handle sender and hopList
                 }
             }
-            //   if (uri.equals(Type.REQUEST.toString()) {}
-
+            if (uri.equals(Type.REQUEST.toString())) {
+                for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
+                    try {
+                        this.deserialized = this.messageHandler.deserializeMessage(it.next());
+                    } catch (ASAPException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
         } else {
             System.err.println("Received message has no uri!");
         }

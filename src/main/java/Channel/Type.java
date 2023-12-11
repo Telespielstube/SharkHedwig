@@ -11,7 +11,7 @@ package Channel;
  *                     between the two devices.
  *
  */
-public enum Type {
+public enum Type implements CharSequence {
     REQUEST,
     HANDOVER,
     IDENTIFICATION

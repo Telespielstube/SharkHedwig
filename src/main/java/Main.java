@@ -1,6 +1,7 @@
 import HedwigUI.IUserInterface;
 import HedwigUI.UserInterface;
 import Misc.ErrorLogger;
+import Session.SessionState;
 import Setup.Component;
 import net.sharksystem.SharkException;
 
@@ -33,6 +34,7 @@ public class Main {
             sharkPeerFS = new SharkPeerFS(PEER_NAME, PEER_FOLDER + "/" + PEER_NAME);
             component.setupComponent(sharkPeerFS);
             sharkPeerFS.start();
+            SessionState.NoState.currentState();
             userInterface = new UserInterface("Type \"Package\" to enter the necessary data for the shipping label.");
             ((UserInterface) userInterface).run(); // Unfortunately, this cast is necessary because we work with interfaces.
         } else {

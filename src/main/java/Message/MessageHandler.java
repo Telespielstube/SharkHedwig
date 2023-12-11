@@ -21,9 +21,13 @@ import Channel.Type;
 public class MessageHandler implements IMessageHandler {
 
     private ASAPPeer peer;
+    ASAPCryptoAlgorithms.EncryptedMessagePackage encryptedMessagePackage;
     private SharkPKIComponent sharkPKIComponent;
     private ByteArrayInputStream inputStream;
-    private Object receivedMessageObject;
+    private byte[] signedMessage;
+    private byte[] deserialized;
+    private byte[] decryptedMessage;
+    private byte[] encryptedMessage;
 
     public MessageHandler() {}
     public MessageHandler(SharkPKIComponent sharkPKIComponent, ASAPPeer peer) {
@@ -31,16 +35,15 @@ public class MessageHandler implements IMessageHandler {
         this.peer = peer;
     }
 
-    public void handleIncomingMessage(byte[] message) {
-        byte[] decryptedMessage = decryptMessage(message);
-        byte[] deserializedMessage = deserializeMessage(decryptedMessage);
-        this.receivedMessageObject = byteArrayToObject(deserializedMessage);
-    }
-
     public <T> void buildOutgoingMessage(T object, Type uri, String appName) {
         byte[] byteMessage = objectToByteArray(object);
-        byte[] serializedMessage = serializeMessage(byteMessage, "Placeholder");
-       // this.peer.sendASAPMessage(APP_FORMAT, uri, encryptedMessage);
+        byte[] serializedMessage = serializeMessage(byteMessage, "PlaceholderForReceiver");
+        encryptMessage(serializedMessage, "PlaceholderForReceiver");
+        try {
+            this.peer.sendASAPMessage(APP_FORMAT, uri, this.signedMessage);
+        } catch (ASAPException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public <T> byte[] objectToByteArray(T object) {
@@ -64,29 +67,6 @@ public class MessageHandler implements IMessageHandler {
         }
     }
 
-    public byte[] signMessage(byte[] unsignedMessage) {
-        byte[] signedMessage;
-        try {
-            signedMessage = ASAPCryptoAlgorithms.sign(unsignedMessage, sharkPKIComponent.getASAPKeyStore());
-        } catch (ASAPSecurityException e) {
-            throw new RuntimeException(e);
-        }
-        return signedMessage;
-    }
-
-    public boolean verifySignature(byte[] signedMessage, byte[] signatureToBeVerified) {
-        boolean verified = false;
-        try {
-            Signature signature = Signature.getInstance(ASAPCryptoParameterStorage.DEFAULT_ASYMMETRIC_SIGNATURE_ALGORITHM);
-            signature.initVerify(sharkPKIComponent.getPublicKey());
-            signature.update(signedMessage);
-            verified = signature.verify(signatureToBeVerified);
-        } catch (NoSuchAlgorithmException | ASAPSecurityException | InvalidKeyException | SignatureException e) {
-            throw new RuntimeException(e);
-        }
-        return verified;
-    }
-
     public byte[] serializeMessage(byte[] byteMessage, CharSequence receiver) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Set<CharSequence> recipients = new HashSet<>();
@@ -101,41 +81,40 @@ public class MessageHandler implements IMessageHandler {
         return outputStream.toByteArray();
     }
 
-    public byte[] encryptMessage(byte[] byteMessage, CharSequence receiver) {
+    private void encryptMessage(byte[] byteMessage, CharSequence receiver) {
         try {
-            return ASAPCryptoAlgorithms.produceEncryptedMessagePackage(byteMessage, receiver, sharkPKIComponent.getASAPKeyStore());
+            this.encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(byteMessage, receiver, sharkPKIComponent.getASAPKeyStore());
+            this.signedMessage = ASAPCryptoAlgorithms.sign(this.encryptedMessage, sharkPKIComponent.getASAPKeyStore());
         } catch (ASAPSecurityException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public byte[] decryptMessage(byte[] message) {
-        ASAPCryptoAlgorithms.EncryptedMessagePackage encryptedMessagePackage;
-        byte[] decryptedMessage = null;
+    public void decryptMessage(byte[] message) {
         try {
-            encryptedMessagePackage = ASAPCryptoAlgorithms.parseEncryptedMessagePackage(message);
-            if (!sharkPKIComponent.isOwner(encryptedMessagePackage.getReceiver())) {
-
-            }
-            decryptedMessage = ASAPCryptoAlgorithms.decryptPackage(encryptedMessagePackage, sharkPKIComponent);
-        } catch (IOException | ASAPException e) {
+            this.encryptedMessagePackage = ASAPCryptoAlgorithms.parseEncryptedMessagePackage(message);
+            this.decryptedMessage = ASAPCryptoAlgorithms.decryptPackage(this.encryptedMessagePackage, this.sharkPKIComponent.getASAPKeyStore());
+            ASAPCryptoAlgorithms.verify(this.decryptedMessage, this.sender, sharkPKIComponent.getPublicKey() );
+        } catch (ASAPException | IOException e) {
             throw new RuntimeException(e);
         }
-        return decryptedMessage;
+    }
+
+        public CharSequence getReceiver() {
+        return this.encryptedMessagePackage.getReceiver();
     }
 
     public byte[] deserializeMessage(byte[] serializedMessage)  {
         this.inputStream = new ByteArrayInputStream(serializedMessage);
-        byte[] messageContent = null;
         String sender;
         Set<CharSequence> receiverList;
         try {
-            messageContent = ASAPSerialization.readByteArray(this.inputStream);
-            sender = ASAPSerialization.readCharSequenceParameter(this.inputStream);
+            this.deserialized = ASAPSerialization.readByteArray(this.inputStream);
+            this.sender = ASAPSerialization.readCharSequenceParameter(this.inputStream);
             receiverList = ASAPSerialization.readCharSequenceSetParameter(this.inputStream);
         } catch (IOException | ASAPException e) {
             throw new RuntimeException(e);
         }
-        return messageContent;
+        return this.deserialized;
     }
 }
