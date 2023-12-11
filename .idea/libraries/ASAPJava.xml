@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="ASAPJava">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Java-workspace/ASAPjars/ASAPJava.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Java-workspace/ASAPjars/SharkPeer.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Java-workspace/ASAPjars/SharkPKI.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
