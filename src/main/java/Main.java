@@ -24,8 +24,8 @@ public class Main {
     public static void main(String[] args) throws SharkException, IOException {
         ErrorLogger.redirectErrorStream();
         SharkPeerFS sharkPeerFS;
-        Component component = new Component();
         IUserInterface userInterface;
+        Component component = new Component();
         System.err.print("This goes to file");
         if (Misc.Utilities.checkDroneID()) {
             sharkPeerFS = new SharkPeerFS(PEER_NAME, PEER_FOLDER + "/" + PEER_NAME);

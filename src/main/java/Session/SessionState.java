@@ -3,8 +3,12 @@ package Session;
 import static Misc.Constants.*;
 
 /**
- * This is an enum class to handle the multiple states of the protocol (State machine pattern). This is probably a nice and clean methode to avoid
+ * This is an enum class to handle the multiple states of the protocol (State machine pattern). This is a clean methode to avoid
  * global variables, which are difficult to handle and which we want to avoid with a primary focus on a secure protocol.
+ * Every state has three methods to set the next state, get the current state and check if a state is completed.
+ * The different states are:
+ * - NoState: This is the initial state when no message exchange is going on.
+ *
  */
 public enum SessionState {
 
@@ -18,6 +22,10 @@ public enum SessionState {
         public int nextState() {
             return IDENTIFICATION_FLAG;
         }
+        @Override
+        public boolean stateCompleted() {
+            return true;
+        }
     },
 
     Identification {
@@ -30,6 +38,10 @@ public enum SessionState {
         public int nextState() {
             return REQUEST_FLAG;
         }
+        @Override
+        public boolean stateCompleted() {
+            return true;
+        }
     },
 
     Request {
@@ -40,6 +52,10 @@ public enum SessionState {
         @Override
         public int nextState() {
             return HANDOVER_FLAG;
+        }
+        @Override
+        public boolean stateCompleted() {
+            return true;
         }
     },
 
@@ -53,8 +69,15 @@ public enum SessionState {
         public int nextState() {
             return NO_SESSION_FLAG;
         }
+
+        @Override
+        public boolean stateCompleted() {
+            return true;
+        }
     };
 
     public abstract int getState();
     public abstract int nextState();
+
+    public abstract boolean stateCompleted();
 }

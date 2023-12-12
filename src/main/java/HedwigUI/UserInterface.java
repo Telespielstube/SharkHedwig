@@ -2,13 +2,10 @@ package HedwigUI;
 
 import java.text.DecimalFormat;
 import java.util.Scanner;
-
 import Location.Location;
 import DeliveryContract.*;
-import Session.SessionManager;
 
 import static Misc.Constants.PACKAGE;
-import static Misc.Utilities.hasCarriage;
 
 public class UserInterface implements IUserInterface, Runnable {
 
@@ -21,7 +18,6 @@ public class UserInterface implements IUserInterface, Runnable {
     private double longitudeOrigin = 0.0;
     private double latitudeDest = 0.0;
     private double longitudeDest = 0.0;
-    private boolean isTransferor = false;
 
     /**
      * Constructer prints out a helpful text on how to interact with the protocol.
@@ -29,14 +25,6 @@ public class UserInterface implements IUserInterface, Runnable {
      */
     public UserInterface(String infoText) {
         System.out.println(infoText);
-    }
-
-    public void setTransferorFlag(boolean isTransferor) {
-        this.isTransferor = isTransferor;
-    }
-
-    public boolean getTransferor() {
-        return this.isTransferor;
     }
 
     public String readUserInput() {
@@ -113,8 +101,8 @@ public class UserInterface implements IUserInterface, Runnable {
                         new Location(this.latitudeOrigin, this.longitudeOrigin), this.recipient, this.destination,
                         new Location(this.destination, this.latitudeDest, this.longitudeDest), this.packageWeight),
                         new TransitRecord());
-
             }
+            DeviceState.Transferor.setTransferorState(true);
         }
     }
 }

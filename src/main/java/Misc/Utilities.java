@@ -17,7 +17,7 @@ public class Utilities {
      * Sets a global boolean variable if the mobile device has carriage. Initial variable state is false.
      * The variable gets set to 'true' if the shipping label form is filled out correctly.
      */
-    public static boolean hasCarriage = false;
+
 
     /**
      * !! Attention this is just an example class to show how a simple ID verification works.
