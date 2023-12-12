@@ -1,5 +1,6 @@
 package SessionTest;
 
+import Message.AckMessage;
 import Message.Contract.Contract;
 import Message.Identification.Challenge;
 import Message.Identification.Response;
@@ -17,6 +18,7 @@ public class SessionManagerTest {
     private final Challenge challenge = new Challenge(UUID.randomUUID(), System.currentTimeMillis());
     private final Response response = new Response(UUID.randomUUID(), System.currentTimeMillis());
     private final Contract contract = new Contract();
+    private final AckMessage ackMessage = new AckMessage();
     @Test
     public void testIfChallengeObjectIsPutIntoTheRightSession() {
         assertTrue(sessionManager.handleSession(challenge));
@@ -30,5 +32,10 @@ public class SessionManagerTest {
     @Test
     public void testIfContractObjectIsPutIntoTheRightSession() {
         assertTrue(sessionManager.handleSession(contract));
+    }
+
+    @Test
+    public void returnTrueIfAckMessageIsTypeOfIMessage() {
+        assertTrue(sessionManager.handleSession(ackMessage));
     }
 }

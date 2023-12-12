@@ -11,6 +11,7 @@ public class Request extends AbstractRequest {
     private double flightRange = 0.0;
     private double maxFreightWeight = 0.0;
 
+    public Request() {}
     public Request(UUID uuid, int messageFlag, long timestamp, double flightRange, double maxFreightWeight, Location currentLocation) {
         this.uuid = uuid;
         this.messageFlag = messageFlag;

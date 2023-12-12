@@ -11,6 +11,7 @@ public class RequestReply extends AbstractRequest {
     private double actualFreightWeight = 0.0;
     private Location packageDestination = null;
 
+    public RequestReply() {}
     public RequestReply(UUID uuid, int messageFlag, long timestamp, double actualFreightWeight, Location packageDestination ) {
         this.uuid = uuid;
         this.messageFlag = messageFlag;

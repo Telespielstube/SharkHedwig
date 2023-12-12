@@ -4,7 +4,7 @@ import static Misc.Constants.PARALLEL_OF_LATITUDE;
 import static Misc.Constants.PARALLEL_OF_LONGITUDE;
 import static java.lang.Math.sqrt;
 
-public class GeoCalcuation {
+public class GeoCalcuation implements ILocation {
 
     public GeoCalcuation() {}
 

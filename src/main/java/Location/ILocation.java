@@ -1,5 +1,8 @@
 package Location;
 
+/**
+ * Interface for all thing geo locations.
+ */
 public interface ILocation {
 
     /**

@@ -35,5 +35,7 @@ public final class Constants {
     public static final int RESPONSE_MESSAGE_FLAG = 5;
     public static final int REQUEST_MESSAGE_FLAG = 6;
     public static final int REQUEST_REPLY_MESSAGE_FLAG = 7;
-    public static final int ACK_MESSAGE_FLAG = 8;
+    public static final int CONTRACT_MESSAGE_FLAG = 8;
+    public static final int PICK_UP_MESSAGE_FLAG = 9;
+    public static final int ACK_MESSAGE_FLAG = 10;
 }

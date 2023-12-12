@@ -10,12 +10,15 @@ public class AckMessage implements IMessage {
     private UUID uuid;
     private int messageFlag = ACK_MESSAGE_FLAG;
     private long timestamp;
+    private String messageToConfirm;
     private boolean isAck = false;
 
-    public AckMessage(UUID uuid, int messageFlag, long timestamp, boolean isAck) {
+    public AckMessage() {}
+    public AckMessage(UUID uuid, int messageFlag, long timestamp, String messageToConfirm, boolean isAck) {
         this.uuid = uuid;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
+        this.messageToConfirm = messageToConfirm;
         this.isAck = isAck;
     }
     public UUID createUUID() {
@@ -54,5 +57,13 @@ public class AckMessage implements IMessage {
 
     public void setAck(boolean isAck) {
         this.isAck = isAck;
+    }
+
+    public void setMessageToConfirm(String messageToConfirm) {
+        this.messageToConfirm = messageToConfirm;
+    }
+
+    public String getMessageToConfirm() {
+        return this.messageToConfirm;
     }
 }
