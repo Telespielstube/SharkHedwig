@@ -8,27 +8,23 @@ package HedwigUI;
  */
 public enum DeviceState {
     Transferor {
-        public boolean setTransferorState(boolean isTransferor) {
+        public boolean isActive() {
             return true;
         }
-
-        @Override
-        public boolean getCurrentState() {
-            return true;
+        public boolean isInactive() {
+            return false;
         }
     },
     Transferee {
-        @Override
-        public boolean setTransferorState(boolean isTransferor) {
-            return false;
+        public boolean isActive() {
+            return true;
         }
-
-        @Override
-        public boolean getCurrentState() {
+        public boolean isInactive() {
             return false;
         }
     };
 
-    public abstract boolean setTransferorState(boolean isTransferor);
-    public abstract boolean getCurrentState();
+    public abstract boolean isActive();
+    public abstract boolean isInactive();
+
 }
