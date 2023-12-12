@@ -4,9 +4,7 @@ import net.sharksystem.asap.*;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;
 import java.io.*;
-
-import static Misc.Constants.APP_FORMAT;
-import Channel.Type;
+import Channel.*;
 
 public class MessageHandler implements IMessageHandler {
 
@@ -34,7 +32,7 @@ public class MessageHandler implements IMessageHandler {
         return object;
     }
 
-    public <T> byte[] buildOutgoingMessage(T object, Type uri, String recipient, SharkPKIComponent sharkPKIComponent ) {
+    public <T> byte[] buildOutgoingMessage(T object, Channel uri, String recipient, SharkPKIComponent sharkPKIComponent ) {
         byte[] unencryptedByteMessage = objectToByteArray(object);
         try {
             this.encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(unencryptedByteMessage, recipient, sharkPKIComponent.getASAPKeyStore());

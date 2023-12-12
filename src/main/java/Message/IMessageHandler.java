@@ -1,10 +1,7 @@
 package Message;
 
-import Channel.Type;
-import net.sharksystem.asap.ASAPException;
+import Channel.Channel;
 import net.sharksystem.pki.SharkPKIComponent;
-
-import java.io.*;
 
 public interface IMessageHandler {
 
@@ -15,7 +12,7 @@ public interface IMessageHandler {
      * @param object    A Generic Message object. It accepts all Message object because we want one 
      *                  build methode not a methode for every message object.
      */
-    <T> byte[] buildOutgoingMessage(T object, Type uri, String appName, SharkPKIComponent sharkPKIComponent);
+    <T> byte[] buildOutgoingMessage(T object, Channel uri, String appName, SharkPKIComponent sharkPKIComponent);
 
    // void sendMessage(APP_FORMAT, String uri.toString(), byte[] signedMessage);
     /**

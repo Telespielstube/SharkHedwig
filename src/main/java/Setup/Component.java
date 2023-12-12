@@ -16,8 +16,6 @@ import Channel.*;
 import Misc.SessionLogger;
 import static Misc.Constants.*;
 import Message.*;
-import Message.Identification.*;
-import Message.Request.*;
 import Session.*;
 import HedwigUI.DeviceState;
 
@@ -25,14 +23,12 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
 
     private ASAPPeer peer;
     private SharkPKIComponent sharkPKIComponent;
-    private Channel channel;
     private IMessageHandler messageHandler;
     private ISessionManager sessionManager;
 
     public Component() {}
     public Component(SharkPKIComponent pkiComponent) {
         this.sharkPKIComponent = pkiComponent;
-        this.channel = new Channel();
         this.messageHandler = new MessageHandler();
         this.sessionManager = new SessionManager();
     }
@@ -88,8 +84,8 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
      * Setting up all component channels. Multiple channels allow us to better control incoming and outgoing messages.
      */
     private void setupChannel() throws RuntimeException, IOException, ASAPException {
-        for (Type type : Type.values()) {
-            this.peer.getASAPStorage(APP_FORMAT).createChannel(this.channel.getChannelSchema() + type);
+        for (Channel type : Channel.values()) {
+            this.peer.getASAPStorage(APP_FORMAT).createChannel(type.getChannelType());
         }
     }
 
@@ -123,7 +119,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         boolean invalid = false;
         IMessage message;
         if (uri != null) {
-            if ( (uri.equals(Type.IDENTIFICATION.toString()) && (DeviceState.Transferor.isActive())) ) {
+            if ( (uri.equals(Channel.Identification.toString()) && (DeviceState.Transferor.isActive())) ) {
                 for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
                     message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
                     if (!this.sessionManager.handleSession(message)) {
@@ -131,7 +127,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
                     }
                 }
             }
-            if (uri.equals(Type.REQUEST.toString()))  {
+            if (uri.equals(Channel.Request.toString()))  {
                 for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
                     message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
                     if (!this.sessionManager.handleSession(message)) {
@@ -139,7 +135,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
                     }
                 }
             }
-            if (uri.equals(Type.HANDOVER.toString()))  {
+            if (uri.equals(Channel.Contract.toString()))  {
                 for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
                     message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
                     if (!this.sessionManager.handleSession(message)) {

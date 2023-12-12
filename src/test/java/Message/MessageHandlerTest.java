@@ -1,19 +1,14 @@
 package Message;
 
-import Channel.Type;
 import Message.Identification.Challenge;
 import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.asap.ASAPSecurityException;
-import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
-import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.asap.crypto.InMemoASAPKeyStore;
 import net.sharksystem.pki.SharkPKIComponent;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
-import java.security.SecureRandom;
 
 import static org.junit.Assert.assertEquals;
 
