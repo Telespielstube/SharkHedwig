@@ -5,6 +5,7 @@ import Message.Identification.Challenge;
 import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
+import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.asap.crypto.InMemoASAPKeyStore;
 import net.sharksystem.pki.SharkPKIComponent;
 import org.junit.Before;
@@ -25,12 +26,14 @@ public class MessageHandlerTest {
     private final String ALICE_ID = "ALICE_44";
     private final String BOB_ID = "BOB_12";
     private final Challenge challenge = new Challenge(UUID.randomUUID(), System.currentTimeMillis());
-    private MessageHandler messageHandler = new MessageHandler((SharkPKIComponent) aliceKeyStorage, asapPeer);
+    private MessageHandler messageHandler = new MessageHandler();
+    private SharkPKIComponent sharkPKIComponent;
 
     @Before
     public void setupASAPKeyStores() throws ASAPSecurityException {
         this.aliceKeyStorage = new InMemoASAPKeyStore(ALICE_ID);
         this.bobKeyStorage = new InMemoASAPKeyStore(BOB_ID);
+        this.sharkPKIComponent.getASAPKeyStore();
 
 
         // simulate key exchange
@@ -43,5 +46,10 @@ public class MessageHandlerTest {
         byte[] byteMessage = messageHandler.objectToByteArray(challenge);
         Object object = messageHandler.byteArrayToObject(byteMessage);
         assertEquals(object.getClass(), challenge.getClass());
+    }
+
+    @Test
+    public void testIfObjectGetsBuild() {
+        messageHandler.buildOutgoingMessage(challenge, Type.IDENTIFICATION, "Peter", sharkPKIComponent);
     }
 }

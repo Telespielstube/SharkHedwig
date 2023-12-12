@@ -28,4 +28,19 @@ public interface IUserInterface {
      * @return  True if the user confirmed their input data.
      */
     boolean acceptInput();
+
+    /**
+     * This methode sets the transferor id to true or false.
+     *
+     * @param isTransferor    Is set to true if the user has created a shipping label.
+     *                        Set to false if user has not chreated a shipping label.
+     */
+    void setTransferorState(boolean isTransferor);
+
+    /**
+     * Returns the transferor state of the device.
+     *
+     * @return    true if device is set as transferor device. False if device has no carriage to deliver.
+     */
+    boolean getTransferorState();
 }

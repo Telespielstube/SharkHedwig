@@ -1,18 +1,17 @@
-package Message.Identification;
+package Message.Request;
 
-import Message.IMessage;
+import com.sun.xml.internal.ws.wsdl.writer.document.Message;
 
 import java.security.SecureRandom;
 import java.util.UUID;
 
 import static Misc.Constants.CHALLENGE_MESSAGE_FLAG;
 
-public abstract class Identification implements IMessage {
-
-    protected UUID uuid;
-    protected SecureRandom challengeNumber;
-    protected int messageFlag = CHALLENGE_MESSAGE_FLAG;;
-    protected long timestamp;
+public abstract class Request implements Message {
+    private UUID uuid;
+    private SecureRandom challengeNumber;
+    private int messageFlag = CHALLENGE_MESSAGE_FLAG;;
+    private long timestamp;
 
     public UUID createUUID() {
         return UUID.randomUUID();
@@ -26,14 +25,6 @@ public abstract class Identification implements IMessage {
         this.uuid = uuid;
     }
 
-    public int getFlag() {
-        return this.messageFlag;
-    }
-
-    public void setFlag(int flag) {
-        this.messageFlag = flag;
-    }
-
     public long getTimestamp() {
         return this.timestamp;
     }
@@ -42,4 +33,12 @@ public abstract class Identification implements IMessage {
         this.timestamp = timestamp;
     }
 
+    public int getFlag() {
+        return this.messageFlag;
+    }
+
+    public void setFlag(int flag) {
+        this.messageFlag = flag;
+    }
 }
+

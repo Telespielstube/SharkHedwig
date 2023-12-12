@@ -1,12 +1,6 @@
 package Setup;
 
-import Message.IMessage;
-import Message.IMessageHandler;
-import Message.Identification.Challenge;
-import Message.Identification.Identification;
-import Message.Identification.Response;
-import Message.MessageHandler;
-import Session.SessionState;
+import Session.SessionManager;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -20,6 +14,11 @@ import java.util.List;
 import Channel.*;
 import Misc.SessionLogger;
 import static Misc.Constants.*;
+import Message.IMessageHandler;
+import Message.Identification.*;
+import Message.MessageHandler;
+import Message.Request.Request;
+import Session.SessionState;
 
 public class Component implements SharkComponent, ASAPMessageReceivedListener {
 
@@ -75,13 +74,12 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
             this.setupChannel();
             this.peer.getASAPStorage(APP_FORMAT).getOwner();
             this.setupLogger();
-            SessionState.NoState.setState(); // The initial state of the protocol is no state.
+            SessionState.NoState.getState(); // The initial state of the protocol is no state.
         } catch (IOException e) {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
         }
         new PKIManager(CA_ID, sharkPKIComponent);
     }
-
 
     /**
      * Setting up all component channels. Multiple channels allow us to better control incoming and outgoing messages.
@@ -119,33 +117,56 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     @Override
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) throws IOException {
         CharSequence uri = messages.getURI();
-        this.messageHandler = new MessageHandler(sharkPKIComponent, this.peer);
-        IMessage<Identification> message;
+        this.messageHandler = new MessageHandler();
         if (uri != null) {
-            if (uri.equals(Type.IDENTIFICATION.toString()) ) {
-                SessionState.Identification.setState();
+            if (uri.equals(Type.IDENTIFICATION.toString() && ) ) {
+                SessionState.NoState.nextState();
+                Identification message;
                 for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
-                    message = this.messageHandler.parseMessage(it.next(), senderE2E);
-                    if (message.getFlag() == CHALLENGE_MESSAGE_FLAG) {
-                        new Challenge(message.getUuid(), message.getChallengeNumber(), message.getTimestamp());
+                    message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
+                    if ( (message.getFlag() == CHALLENGE_MESSAGE_FLAG) ) {
+                         new SessionManager( new Challenge(message.getUuid(), ((Challenge) message).getChallengeNumber(), message.getTimestamp() );
                     } else if (message.getFlag() == RESPONSE_MESSAGE_FLAG) {
-                     //   new Response();
+                         new SessionManager(new Response(message.getUuid(), message.getTimestamp()) );
                     }
                     // and hopList
                 }
             }
-//            if (uri.equals(Type.REQUEST.toString())) {
-//
-//                for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
-//                    try {
-//                        this.deserialized = this.messageHandler.deserializeMessage(it.next());
-//                    } catch (ASAPException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }
-//            }
+            if (uri.equals(Type.REQUEST.toString())) {
+                SessionState.Identification.nextState();
+                Request message;
+                for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
+                    message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
+                    if (message.getFlag() == CHALLENGE_MESSAGE_FLAG) {
+                      //  new Inquiry(message.getUuid(), message.getTimestamp()));
+                    } else if (message.getFlag() == RESPONSE_MESSAGE_FLAG) {
+                       // new Response();
+                    }
+                    // and hopList
+
+                }
+            }
+            if (uri.equals(Type.HANDOVER.toString())) {
+                SessionState.Handover.getState();
+                Identification message;
+                for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
+                    message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
+                    if (message.getFlag() == CHALLENGE_MESSAGE_FLAG) {
+                     //   new Challenge(message.getUuid(), message.getChallengeNumber(), message.getTimestamp()));
+                    } else if (message.getFlag() == RESPONSE_MESSAGE_FLAG) {
+                     //   new Response();
+                    }
+                    // and hopList
+
+                }
+            }
         } else {
             System.err.println("Received message has no uri!");
         }
     }
+
+//    public void sendMessage() {
+//            this.peer.sendASAPMessage(APP_FORMAT, uri.toString(), signedMessage);
+//        }
+
 }
