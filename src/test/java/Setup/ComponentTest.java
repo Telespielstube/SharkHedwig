@@ -1,7 +1,7 @@
 package Setup;
 
 import Message.Identification.*;
-import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
+import Message.Request.Request;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -12,13 +12,14 @@ public class ComponentTest {
 
     private final Challenge challenge = new Challenge(UUID.randomUUID(), System.currentTimeMillis());
     private final Response response = new Response(UUID.randomUUID(), System.currentTimeMillis());
+   // private final Request request = new Request();
     @Test
     public void returnTrueIfChallengeMessageIsOfTypeIdentification() {
-        assertTrue(challenge instanceof Identification);
+        assertTrue(challenge instanceof AbstractIdentification);
     }
 
     @Test
     public void returnTrueIfResponseMessageIsOfTypeIdentification() {
-        assertTrue(response instanceof Identification);
+        assertTrue(response instanceof AbstractIdentification);
     }
 }

@@ -1,44 +1,48 @@
 package Message.Request;
 
-import com.sun.xml.internal.ws.wsdl.writer.document.Message;
+import Location.Location;
 
-import java.security.SecureRandom;
 import java.util.UUID;
 
-import static Misc.Constants.CHALLENGE_MESSAGE_FLAG;
+import static Misc.Constants.REQUEST_MESSAGE_FLAG;
 
-public abstract class Request implements Message {
-    private UUID uuid;
-    private SecureRandom challengeNumber;
-    private int messageFlag = CHALLENGE_MESSAGE_FLAG;;
-    private long timestamp;
+public class Request extends AbstractRequest {
 
-    public UUID createUUID() {
-        return UUID.randomUUID();
-    }
+    private double flightRange = 0.0;
+    private double maxFreightWeight = 0.0;
 
-    public UUID getUuid() {
-        return this.uuid;
-    }
-
-    public void setUuid(UUID uuid) {
+    public Request(UUID uuid, int messageFlag, long timestamp, double flightRange, double maxFreightWeight, Location currentLocation) {
         this.uuid = uuid;
-    }
-
-    public long getTimestamp() {
-        return this.timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
+        this.messageFlag = messageFlag;
         this.timestamp = timestamp;
+        this.flightRange = flightRange;
+        this.maxFreightWeight = maxFreightWeight;
+        this.currentLocation = currentLocation;
     }
 
-    public int getFlag() {
-        return this.messageFlag;
+    @Override
+    public int getMessageFlag() {
+        return this.messageFlag = REQUEST_MESSAGE_FLAG;
     }
 
-    public void setFlag(int flag) {
-        this.messageFlag = flag;
+    @Override
+    public void setMessageFlag(int messageFlag) {
+        this.messageFlag = messageFlag;
+    }
+
+    public double getFlightRange() {
+        return this.flightRange;
+    }
+
+    public void setFlightRange(double flightRange) {
+        this.flightRange = flightRange;
+    }
+
+    public double getMaxFreightWeight() {
+        return this.maxFreightWeight;
+    }
+
+    public void setMaxFreightWeight(double maxFreightWeight) {
+        this.maxFreightWeight = maxFreightWeight;
     }
 }
-

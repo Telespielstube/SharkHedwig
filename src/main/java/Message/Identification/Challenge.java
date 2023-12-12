@@ -1,21 +1,24 @@
 package Message.Identification;
 
-import static Misc.Constants.CHALLENGE_MESSAGE_FLAG;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.UUID;
 
+import static Misc.Constants.CHALLENGE_MESSAGE_FLAG;
 
-public class Challenge extends Identification {
 
+public class Challenge extends AbstractIdentification {
+
+    private SecureRandom challengeNumber;
     public Challenge(UUID uuid, long timestamp) {
         this.uuid = uuid;
         this.timestamp = timestamp;
     }
 
-    public Challenge(UUID uuid, SecureRandom challengeNumber, long timestamp) {
+    public Challenge(UUID uuid, SecureRandom challengeNumber, int messageFlag, long timestamp) {
         this.uuid = uuid;
         this.challengeNumber = challengeNumber;
+        this.messageFlag = messageFlag;
         this.timestamp = timestamp;
     }
 
@@ -38,5 +41,14 @@ public class Challenge extends Identification {
 
     public void setChallengeNumber(SecureRandom challengeNumber) {
         this.challengeNumber = challengeNumber;
+    }
+
+
+    public int getMessageFlag() {
+        return this.messageFlag = CHALLENGE_MESSAGE_FLAG;
+    }
+
+    public void setMessageFlag(int messageFlag) {
+        this.messageFlag = messageFlag;
     }
 }

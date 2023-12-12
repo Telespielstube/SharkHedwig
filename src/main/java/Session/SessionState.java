@@ -15,12 +15,12 @@ public enum SessionState {
     NoState {
         @Override
         public int getState() {
-            return NO_SESSION_FLAG;
+            return NO_SESSION;
         }
 
         @Override
         public int nextState() {
-            return IDENTIFICATION_FLAG;
+            return IDENTIFICATION_SESSION;
         }
         @Override
         public boolean stateCompleted() {
@@ -31,12 +31,12 @@ public enum SessionState {
     Identification {
         @Override
         public int getState() {
-            return IDENTIFICATION_FLAG;
+            return IDENTIFICATION_SESSION;
         }
 
         @Override
         public int nextState() {
-            return REQUEST_FLAG;
+            return REQUEST_SESSION;
         }
         @Override
         public boolean stateCompleted() {
@@ -47,11 +47,11 @@ public enum SessionState {
     Request {
         @Override
         public int getState() {
-            return REQUEST_FLAG;
+            return REQUEST_SESSION;
         }
         @Override
         public int nextState() {
-            return HANDOVER_FLAG;
+            return CONTRACT_SESSION;
         }
         @Override
         public boolean stateCompleted() {
@@ -62,12 +62,12 @@ public enum SessionState {
     Handover() {
         @Override
         public int getState() {
-            return HANDOVER_FLAG;
+            return CONTRACT_SESSION;
         }
 
         @Override
         public int nextState() {
-            return NO_SESSION_FLAG;
+            return NO_SESSION;
         }
 
         @Override

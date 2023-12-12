@@ -116,35 +116,36 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) throws IOException {
         CharSequence uri = messages.getURI();
         IMessageHandler messageHandler = new MessageHandler();
+        ISessionManager sessionManager = new SessionManager();
         if (uri != null) {
             if ( (uri.equals(Type.IDENTIFICATION.toString()) && (DeviceState.Transferor.getCurrentState())) ) {
                 SessionState.NoState.nextState();
-                Identification message;
+                AbstractIdentification message;
                 for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
                     message = messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
-                    if ( (message.getFlag() == CHALLENGE_MESSAGE_FLAG) ) {
-                         new SessionManager( new Challenge(message.getUuid(), ((Challenge) message).getChallengeNumber(), message.getTimestamp() );
-                    } else if (message.getFlag() == RESPONSE_MESSAGE_FLAG) {
-                         new SessionManager(new Response(message.getUuid(), message.getTimestamp()) );
-                    }
+                    sessionManager.handleSession(message);
+//                    if ( (message.getMessageFlag() == CHALLENGE_MESSAGE_FLAG) ) {
+//                         sessionManager.handleSession(new Challenge(message.getUuid(), ((Challenge) message).getChallengeNumber(), message.getMessageFlag(), message.getTimestamp()));
+//                    } else if (message.getMessageFlag() == RESPONSE_MESSAGE_FLAG) {
+//                         sessionManager.handleSession(new Response(message.getUuid(), message.getTimestamp()) );
+//                    }
                     // and hopList
                 }
             }
-            ;
-            if ( (uri.equals(Type.REQUEST.toString())) && (SessionState.Identification.stateCompleted()) ) {
-                SessionState.Identification.nextState();
-                Request message;
-                for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
-                    message = messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
-                    if (message.getFlag() == CHALLENGE_MESSAGE_FLAG) {
-                      //  new Inquiry(message.getUuid(), message.getTimestamp()));
-                    } else if (message.getFlag() == RESPONSE_MESSAGE_FLAG) {
-                       // new Response();
-                    }
-                    // and hopList
-
-                }
-            }
+//            if ( (uri.equals(Type.REQUEST.toString())) && (SessionState.Identification.stateCompleted()) ) {
+//                SessionState.Identification.nextState();
+//                AbstractRequest message;
+//                for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
+//                    message = messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
+//                    if (message.getFlag() == CHALLENGE_MESSAGE_FLAG) {
+//                        new Inquiry(message.getUuid(), message.getTimestamp()));
+//                    } else if (message.getFlag() == RESPONSE_MESSAGE_FLAG) {
+//                        new Response();
+//                    }
+//                    // and hopList
+//
+//                }
+//            }
 //            if ( (uri.equals(Type.HANDOVER.toString()) && (SessionState.Request.stateCompleted())) ) {
 //                SessionState.Request.nextState();
 //                Identification message;

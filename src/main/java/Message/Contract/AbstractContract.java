@@ -1,19 +1,15 @@
-package Message.Identification;
+package Message.Contract;
 
 import Message.IMessage;
 
 import java.security.SecureRandom;
 import java.util.UUID;
 
-import static Misc.Constants.CHALLENGE_MESSAGE_FLAG;
-
-public abstract class Identification implements IMessage {
+public abstract class AbstractContract implements IMessage {
 
     protected UUID uuid;
-    protected SecureRandom challengeNumber;
-    protected int messageFlag = CHALLENGE_MESSAGE_FLAG;;
+    protected int messageFlag = 0;
     protected long timestamp;
-
     public UUID createUUID() {
         return UUID.randomUUID();
     }
@@ -26,14 +22,6 @@ public abstract class Identification implements IMessage {
         this.uuid = uuid;
     }
 
-    public int getFlag() {
-        return this.messageFlag;
-    }
-
-    public void setFlag(int flag) {
-        this.messageFlag = flag;
-    }
-
     public long getTimestamp() {
         return this.timestamp;
     }
@@ -41,5 +29,6 @@ public abstract class Identification implements IMessage {
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
-
+    public abstract int getMessageFlag();
+    public abstract void setMessageFlag(int messageFlag);
 }
