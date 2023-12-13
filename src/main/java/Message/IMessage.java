@@ -26,11 +26,12 @@ public interface IMessage extends Serializable {
      */
     UUID getUuid();
 
-    /** Returns the message flag.
+    /**
+     * Returns the message flag.
      *
-     * @return    Message flag.
+     * @return Message flag.
      */
-    int getMessageFlag();
+    MessageFlag getMessageFlag();
 
     /**
      * Sets the appropriate message flag in the concrete class implementation.

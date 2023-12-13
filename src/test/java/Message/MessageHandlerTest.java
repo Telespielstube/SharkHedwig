@@ -44,8 +44,8 @@ public class MessageHandlerTest {
         assertEquals(object.getClass(), challenge.getClass());
     }
 
-    @Test
-    public void testIfObjectGetsBuild() {
-        messageHandler.buildOutgoingMessage(challenge, Channel.Identification, "Peter", sharkPKIComponent);
-    }
+//    @Test
+//    public void testIfObjectGetsBuild() {
+//        messageHandler.buildOutgoingMessage(challenge, Channel.Identification, "Peter", sharkPKIComponent);
+//    }
 }

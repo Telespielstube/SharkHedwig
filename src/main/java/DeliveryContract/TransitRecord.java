@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 /**
- * This class describes the properties of an entry in the transfer list. All previous
- * transfer points are noted in this list
+ * Class to add a new entry to the list of all previous handovers of this package.
  */
 public class TransitRecord {
 
@@ -54,7 +53,7 @@ public class TransitRecord {
     public void writeRecordToFile() {
         try (FileWriter fileWriter = new FileWriter("./TransitRecordList.txt")) {
             for (TransitEntry entry : this.transitRecord) {
-                fileWriter.write(entry.toString());
+                fileWriter.append(entry.toString());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

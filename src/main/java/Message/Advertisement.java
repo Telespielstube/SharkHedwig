@@ -27,8 +27,8 @@ public class Advertisement implements IMessage {
         return null;
     }
 
-    public int getMessageFlag() {
-        return this.messageFlag.getFlag();
+    public MessageFlag getMessageFlag() {
+        return this.messageFlag;
     }
 
     public void setMessageFlag(MessageFlag messageFlag) {

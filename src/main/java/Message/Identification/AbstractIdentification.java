@@ -32,7 +32,7 @@ public abstract class AbstractIdentification implements IMessage {
         this.timestamp = timestamp;
     }
 
-    public abstract int getMessageFlag();
+    public abstract MessageFlag getMessageFlag();
     public abstract void setMessageFlag(MessageFlag messageFlag);
 
 }

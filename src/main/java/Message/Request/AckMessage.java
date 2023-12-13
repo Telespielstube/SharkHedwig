@@ -17,8 +17,8 @@ public class AckMessage extends AbstractIdentification {
         this.isAck = isAck;
     }
 
-    public int getMessageFlag() {
-        return this.messageFlag.getFlag();
+    public MessageFlag getMessageFlag() {
+        return this.messageFlag;
     }
 
     public void setMessageFlag(MessageFlag messageFlag) {

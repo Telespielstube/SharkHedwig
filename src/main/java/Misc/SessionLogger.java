@@ -16,14 +16,8 @@ import static Misc.Constants.LOG_FOLDER;
  *
  * @param <T>   Generic to pass either a RequestLog or a ContragLog object.
  */
-public class SessionLogger<T> {
-    UUID logID = null;
-    Date timestamp = null;
-    long transferorID = 0;
-    long transfereeID = 0;
-    String messageType = "";
-    byte[] signatureTransferor = null;
-    byte[] signatureTransferee = null;
+public class SessionLogger {
+
 
     /** Creates the logging folder for request and contract sessions.
      *

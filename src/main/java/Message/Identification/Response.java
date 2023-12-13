@@ -27,8 +27,8 @@ public class Response extends AbstractIdentification {
         this.responseNumber = responseNumber;
     }
 
-    public int getMessageFlag() {
-        return this.messageFlag.getFlag();
+    public MessageFlag getMessageFlag() {
+        return this.messageFlag;
     }
 
     public void setMessageFlag(MessageFlag messageFlag) {

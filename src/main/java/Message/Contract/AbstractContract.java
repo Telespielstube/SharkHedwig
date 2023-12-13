@@ -3,7 +3,6 @@ package Message.Contract;
 import Message.IMessage;
 import Message.MessageFlag;
 
-import java.security.SecureRandom;
 import java.util.UUID;
 
 public abstract class AbstractContract implements IMessage {
@@ -30,6 +29,6 @@ public abstract class AbstractContract implements IMessage {
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
-    public abstract int getMessageFlag();
+    public abstract MessageFlag getMessageFlag();
     public abstract void setMessageFlag(MessageFlag messageFlag);
 }

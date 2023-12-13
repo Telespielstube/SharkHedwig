@@ -32,16 +32,17 @@ public class MessageHandler implements IMessageHandler {
         return object;
     }
 
-    public <T> byte[] buildOutgoingMessage(T object, Channel uri, String recipient, SharkPKIComponent sharkPKIComponent ) {
+    public <T> byte[] buildOutgoingMessage(T object, String uri, String recipient ) {
         byte[] unencryptedByteMessage = objectToByteArray(object);
         try {
-            this.encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(unencryptedByteMessage, recipient, sharkPKIComponent.getASAPKeyStore());
+            this.encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(unencryptedByteMessage, recipient, this.sharkPKIComponent.getASAPKeyStore());
             this.signedMessage = ASAPCryptoAlgorithms.sign(this.encryptedMessage, this.sharkPKIComponent.getASAPKeyStore());
         } catch (ASAPException e) {
             throw new RuntimeException(e);
         }
         return this.signedMessage;
     }
+
 
     public <T> byte[] objectToByteArray(T object) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

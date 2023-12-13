@@ -43,7 +43,7 @@ public abstract class AbstractRequest implements IMessage {
         this.currentLocation = location;
     }
 
-    public abstract int getMessageFlag();
+    public abstract MessageFlag getMessageFlag();
     public abstract void setMessageFlag(MessageFlag messageFlag);
 
 }

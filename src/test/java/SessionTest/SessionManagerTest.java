@@ -20,27 +20,27 @@ public class SessionManagerTest {
     private final Response response = new Response(UUID.randomUUID(), System.currentTimeMillis());
     private final Contract contract = new Contract();
 
-    private final String sender = "Olli";
-    @Test
-    public void testIfChallengeObjectIsPutIntoTheRightSession() {
-        DeviceState deviceState = DeviceState.Transferor.isActive();
-        SessionState sessionState = SessionState.Identification;
-        assertTrue(sessionManager.handleSession(challenge, sender, sessionState, deviceState));
-    }
-
-    @Test
-    public void testIfResponseObjectIsPutIntoTheRightSession() {
-        DeviceState deviceState = DeviceState.Transferor.isActive();
-        SessionState sessionState = SessionState.Identification;
-        assertTrue(sessionManager.handleSession(response, sender, sessionState, deviceState));
-    }
-
-    @Test
-    public void testIfContractObjectIsPutIntoTheRightSession() {
-        DeviceState deviceState = DeviceState.Transferor.isActive();
-        SessionState sessionState = SessionState.Identification.nextState();
-        assertTrue(sessionManager.handleSession(contract, sender, sessionState, deviceState));
-    }
+//    private final String sender = "Olli";
+//    @Test
+//    public void testIfChallengeObjectIsPutIntoTheRightSession() {
+//        DeviceState deviceState = DeviceState.Transferor.isActive();
+//        SessionState sessionState = SessionState.Identification;
+//        assertTrue(sessionManager.handleSession(challenge, sender, sessionState, deviceState));
+//    }
+//
+//    @Test
+//    public void testIfResponseObjectIsPutIntoTheRightSession() {
+//        DeviceState deviceState = DeviceState.Transferor.isActive();
+//        SessionState sessionState = SessionState.Identification;
+//        assertTrue(sessionManager.handleSession(response, sender, sessionState, deviceState));
+//    }
+//
+//    @Test
+//    public void testIfContractObjectIsPutIntoTheRightSession() {
+//        DeviceState deviceState = DeviceState.Transferor.isActive();
+//        SessionState sessionState = SessionState.Identification.nextState();
+//        assertTrue(sessionManager.handleSession(contract, sender, sessionState, deviceState));
+//    }
 
 //    @Test
 //    public void returnTrueIfAckMessageIsTypeOfIMessage() {

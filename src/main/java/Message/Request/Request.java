@@ -20,8 +20,8 @@ public class Request extends AbstractRequest {
         this.currentLocation = currentLocation;
     }
 
-    public int getMessageFlag() {
-        return this.messageFlag.getFlag();
+    public MessageFlag getMessageFlag() {
+        return this.messageFlag;
     }
 
     public void setMessageFlag(MessageFlag messageFlag) {

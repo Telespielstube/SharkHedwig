@@ -18,8 +18,8 @@ public class Contract extends AbstractContract {
         this.transitRecord = transitRecord;
     }
 
-    public int getMessageFlag() {
-        return this.messageFlag.getFlag();
+    public MessageFlag getMessageFlag() {
+        return this.messageFlag;
     }
 
     public void setMessageFlag(MessageFlag messageFlag) {

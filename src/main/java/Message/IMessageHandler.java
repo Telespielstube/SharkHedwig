@@ -12,7 +12,7 @@ public interface IMessageHandler {
      * @param object    A Generic Message object. It accepts all Message object because we want one 
      *                  build methode not a methode for every message object.
      */
-    <T> byte[] buildOutgoingMessage(T object, Channel uri, String appName, SharkPKIComponent sharkPKIComponent);
+    <T> byte[] buildOutgoingMessage(T object, String uri, String appName);
 
    // void sendMessage(APP_FORMAT, String uri.toString(), byte[] signedMessage);
     /**

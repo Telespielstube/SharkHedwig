@@ -15,8 +15,8 @@ public class PickUp extends AbstractContract {
         this.pickUpLocation = pickUpLocation;
     }
 
-    public int getMessageFlag() {
-        return this.messageFlag.getFlag();
+    public MessageFlag getMessageFlag() {
+        return this.messageFlag;
     }
 
     public void setMessageFlag(MessageFlag messageFlag) {

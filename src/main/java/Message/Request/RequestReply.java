@@ -19,8 +19,8 @@ public class RequestReply extends AbstractRequest {
         this.packageDestination = packageDestination;
     }
 
-    public int getMessageFlag() {
-        return this.messageFlag.getFlag();
+    public MessageFlag getMessageFlag() {
+        return this.messageFlag;
     }
 
     public void setMessageFlag(MessageFlag messageFlag) {

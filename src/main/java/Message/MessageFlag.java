@@ -17,6 +17,8 @@ public enum MessageFlag {
     MessageFlag(int flag) {
         this.flag = flag;
     }
+
+    //Not sure if this is needed!!!!
     public int getFlag() {
         return Integer.parseInt(String.valueOf(this.flag));
     }

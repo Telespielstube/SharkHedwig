@@ -1,8 +1,7 @@
 package Channel;
 
-import Message.Request.Request;
+import Setup.AppConstant;
 
-import static Misc.Constants.SCHEME;
 /**
  * An enumeration of all channels the protocols needs to go through before a package is exchange.
  *
@@ -17,28 +16,28 @@ import static Misc.Constants.SCHEME;
  *
  */
 public enum Channel {
-    Ping {
+    Advertisement {
         @Override
         public String getChannelType() {
-            return SCHEME + Ping;
+            return AppConstant.Scheme.getAppConstant() + Advertisement;
         }
     },
     Identification{
         @Override
         public String getChannelType() {
-            return SCHEME + Identification;
+            return AppConstant.Scheme.getAppConstant() + Identification;
         }
     },
     Request {
         @Override
         public String getChannelType() {
-            return SCHEME + Request;
+            return AppConstant.Scheme.getAppConstant() + Request;
         }
     },
     Contract {
         @Override
         public String getChannelType() {
-            return SCHEME + Contract;
+            return AppConstant.Scheme.getAppConstant() + Contract;
         }
     };
 

@@ -1,6 +1,5 @@
 package Message.Identification;
 
-import Message.IMessage;
 import Message.MessageFlag;
 
 import java.util.UUID;
@@ -17,8 +16,8 @@ public class AckMessage extends AbstractIdentification {
         this.isAck = isAck;
     }
 
-    public int getMessageFlag() {
-        return this.messageFlag.getFlag();
+    public MessageFlag getMessageFlag() {
+        return this.messageFlag;
     }
 
     public void setMessageFlag(MessageFlag messageFlag) {
