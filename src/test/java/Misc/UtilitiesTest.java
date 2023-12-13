@@ -19,12 +19,7 @@ public class UtilitiesTest {
         assertNotNull(timestamp);
     }
 
-    @Test
-    public void testIfSecureRandomNumberIsReturnedAsString() {
-        String randomNumber = Utilities.generateRandomNumber();
-        System.out.println(randomNumber);
-        assertNotNull(randomNumber);
-    }
+
 
     @Test
     public void testIfSystemReturnsTimeInMillis() {

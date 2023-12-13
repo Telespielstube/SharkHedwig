@@ -1,10 +1,9 @@
 package Message.Request;
 
 import Location.Location;
+import Message.MessageFlag;
 
 import java.util.UUID;
-
-import static Misc.Constants.REQUEST_MESSAGE_FLAG;
 
 public class Request extends AbstractRequest {
 
@@ -12,7 +11,7 @@ public class Request extends AbstractRequest {
     private double maxFreightWeight = 0.0;
 
     public Request() {}
-    public Request(UUID uuid, int messageFlag, long timestamp, double flightRange, double maxFreightWeight, Location currentLocation) {
+    public Request(UUID uuid, MessageFlag messageFlag, long timestamp, double flightRange, double maxFreightWeight, Location currentLocation) {
         this.uuid = uuid;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
@@ -21,13 +20,11 @@ public class Request extends AbstractRequest {
         this.currentLocation = currentLocation;
     }
 
-    @Override
     public int getMessageFlag() {
-        return this.messageFlag = REQUEST_MESSAGE_FLAG;
+        return this.messageFlag.getFlag();
     }
 
-    @Override
-    public void setMessageFlag(int messageFlag) {
+    public void setMessageFlag(MessageFlag messageFlag) {
         this.messageFlag = messageFlag;
     }
 

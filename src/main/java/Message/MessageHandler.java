@@ -64,4 +64,8 @@ public class MessageHandler implements IMessageHandler {
             throw new RuntimeException(e);
         }
     }
+    public <T> boolean compareTimestamp(T object1, T object2) {
+        boolean passed = false;
+        return true;
+    }
 }

@@ -12,19 +12,21 @@ public class SessionManager implements ISessionManager {
 
     private SessionState state;
     private DeviceState deviceState;
+    private SessionState nextState;
     private IIdentificationSession identificationSession;
     public SessionManager() {}
 
     public <T> boolean handleSession(T message, String sender, SessionState state, DeviceState deviceState) {
         this.state = state;
+        this.nextState = state;
         this.deviceState = deviceState;
 
         if ( (message instanceof IMessage) && (this.state.equals(SessionState.NoSession) ) &&
                 (deviceState.equals(DeviceState.Transferor) ) &&
-                 ((IMessage) message).getMessageFlag() == MessageFlag.Advertisement.getFlag() ) {
-            new Advertisement(((IMessage) message).getUuid(), ((IMessage) message).getMessageFlag(), ((IMessage) message).getTimestamp());
+                ((IMessage) message).getMessageFlag() == MessageFlag.Advertisement.getFlag() ) {
             identificationSession = (IIdentificationSession) new IdentificationSession();
-           // identificationSession.initializeSession();
+            identificationSession.initializeSession(sender);
+            this.nextState.nextState();
         }
 //        if ( (message instanceof AbstractIdentification) && ( ((AbstractIdentification) message).getMessageFlag() == CHALLENGE_MESSAGE_FLAG) ) {
 //            new Challenge(((AbstractIdentification) message).getUuid(), ((Challenge) message).getChallengeNumber(),

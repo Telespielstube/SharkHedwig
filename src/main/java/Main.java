@@ -30,7 +30,7 @@ public class Main {
         sharkPeerFS = new SharkPeerFS(AppConstant.PeerName.getAppConstant(),AppConstant.PeerFolder.getAppConstant() + "/" + AppConstant.PeerName.getAppConstant() );
         new Component().setupComponent(sharkPeerFS);
         sharkPeerFS.start();
-        userInterface = new UserInterface("Type \"Package\" to enter the necessary data for the shipping label.");
+        userInterface = new UserInterface("Type \"cargo\" to enter the necessary data for the shipping label.");
         ((UserInterface) userInterface).run(); // Unfortunately, this cast is necessary because we work with interfaces.
     }
 }

@@ -159,8 +159,8 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         System.err.println("Received message has no uri!");
         }
 
-//    public void sendMessage() {
-//            this.peer.sendASAPMessage(APP_FORMAT, uri.toString(), signedMessage);
-//        }
+    public void sendMessage(Channel uri, byte[] signedMessage) throws ASAPException {
+            this.peer.sendASAPMessage(AppConstant.AppFormat.getAppConstant(), uri.toString(), signedMessage);
+        }
 
 }

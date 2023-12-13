@@ -1,5 +1,7 @@
 package Message;
 
+import sun.plugin2.message.Message;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -35,7 +37,7 @@ public interface IMessage extends Serializable {
      *
      * @param messageFlag    Integer value of the message type.
      */
-    void setMessageFlag(int messageFlag);
+    void setMessageFlag(MessageFlag messageFlag);
     /**
      * Returns a timestamp in UNIX format
      *

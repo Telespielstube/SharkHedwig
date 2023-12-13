@@ -1,11 +1,12 @@
 package Misc;
 
+import Setup.AppConstant;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
 import static Misc.Constants.LOG_FOLDER;
-import static Misc.Constants.PEER_FOLDER;
 
 /**
  * This class has only one purpose. It readirects the standard error stream to a file instead of the cli. This makes
@@ -14,10 +15,11 @@ import static Misc.Constants.PEER_FOLDER;
 public class ErrorLogger {
 
     public static void redirectErrorStream() {
+        String errorLog = "errorLog.txt";
         try {
-            System.setErr(new PrintStream(new FileOutputStream("./" + PEER_FOLDER + "/" + LOG_FOLDER + "/" + "errorlog.txt")));
+            System.setErr(new PrintStream(new FileOutputStream("./" + AppConstant.PeerFolder.getAppConstant() + "/" + AppConstant.LogFolder + "/" + errorLog)));
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 }

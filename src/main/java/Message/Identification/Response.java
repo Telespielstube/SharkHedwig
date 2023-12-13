@@ -1,10 +1,9 @@
 package Message.Identification;
 
+import Message.MessageFlag;
+
 import java.security.SecureRandom;
 import java.util.UUID;
-
-import static Misc.Constants.CHALLENGE_MESSAGE_FLAG;
-import static Misc.Constants.RESPONSE_MESSAGE_FLAG;
 
 public class Response extends AbstractIdentification {
 
@@ -14,7 +13,7 @@ public class Response extends AbstractIdentification {
         this.timestamp = timestamp;
     }
 
-    public Response(UUID uuid, SecureRandom responseNumber, int messageFlag, long timestamp) {
+    public Response(UUID uuid, SecureRandom responseNumber, MessageFlag messageFlag, long timestamp) {
         this.uuid = uuid;
         this.responseNumber = responseNumber;
         this.messageFlag = messageFlag;
@@ -29,10 +28,10 @@ public class Response extends AbstractIdentification {
     }
 
     public int getMessageFlag() {
-        return this.messageFlag = RESPONSE_MESSAGE_FLAG;
+        return this.messageFlag.getFlag();
     }
 
-    public void setMessageFlag(int messageFlag) {
+    public void setMessageFlag(MessageFlag messageFlag) {
         this.messageFlag = messageFlag;
     }
 }

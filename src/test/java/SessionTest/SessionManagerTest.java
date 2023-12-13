@@ -1,7 +1,6 @@
 package SessionTest;
 
 import HedwigUI.DeviceState;
-import Message.AckMessage;
 import Message.Contract.Contract;
 import Message.Identification.Challenge;
 import Message.Identification.Response;
@@ -20,7 +19,7 @@ public class SessionManagerTest {
     private final Challenge challenge = new Challenge(UUID.randomUUID(), System.currentTimeMillis());
     private final Response response = new Response(UUID.randomUUID(), System.currentTimeMillis());
     private final Contract contract = new Contract();
-    private final AckMessage ackMessage = new AckMessage();
+
     private final String sender = "Olli";
     @Test
     public void testIfChallengeObjectIsPutIntoTheRightSession() {

@@ -8,10 +8,10 @@ import java.util.UUID;
 public class Advertisement implements IMessage {
 
     private UUID uuid;
-    private int messageFlag;
+    private MessageFlag messageFlag;
     private long timestamp;
 
-    public Advertisement(UUID uuid, int messageFlag, long timestamp) {
+    public Advertisement(UUID uuid, MessageFlag messageFlag, long timestamp) {
         this.uuid = uuid;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
@@ -27,14 +27,12 @@ public class Advertisement implements IMessage {
         return null;
     }
 
-    @Override
     public int getMessageFlag() {
-        return 0;
+        return this.messageFlag.getFlag();
     }
 
-    @Override
-    public void setMessageFlag(int messageFlag) {
-
+    public void setMessageFlag(MessageFlag messageFlag) {
+        this.messageFlag = messageFlag;
     }
 
     @Override

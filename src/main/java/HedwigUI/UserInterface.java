@@ -5,7 +5,6 @@ import java.util.Scanner;
 import Location.Location;
 import DeliveryContract.*;
 
-import static Misc.Constants.PACKAGE;
 
 public class UserInterface implements IUserInterface, Runnable {
 
@@ -18,6 +17,7 @@ public class UserInterface implements IUserInterface, Runnable {
     private double longitudeOrigin = 0.0;
     private double latitudeDest = 0.0;
     private double longitudeDest = 0.0;
+    private String cargo = "cargo";
 
     /**
      * Constructer prints out a helpful text on how to interact with the protocol.
@@ -90,7 +90,7 @@ public class UserInterface implements IUserInterface, Runnable {
     public void run() {
         while (true) {
             String input = readUserInput();
-            if (input.equalsIgnoreCase(PACKAGE)) {
+            if (input.equalsIgnoreCase(cargo)) {
                 shippingLabelForm("Shipping label. Please fill in the required information.");
                 checkFormData("Please read very carefully because this is not reversible at a later date.");
                 if (!acceptInput()) {

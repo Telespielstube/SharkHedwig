@@ -5,7 +5,10 @@ public enum AppConstant {
     PeerFolder("HedwigStorage"),
     PeerName("hedwig123"),
     CaId("caID"),
-    Scheme("sn2://");
+    Scheme("sn2://"),
+    LogFolder("Logger"),
+    RequestLogFile("Requests"),
+    ContractLogFile("Contracts");
 
     private final String name;
 

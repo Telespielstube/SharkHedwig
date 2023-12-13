@@ -9,25 +9,25 @@ public class SessionStateTest {
 
     @Test
     public void testIfNoStateIsActive() {
-        SessionState state = SessionState.NoSession.getState();
-        assertEquals(SessionState.NoSession.getState(), state);
+        SessionState state = SessionState.NoSession.currentState();
+        assertEquals(SessionState.NoSession.currentState(), state);
     }
 
     @Test
     public void checkIfNextStateAfterNoStateIsIdentificationState() {
         SessionState state = SessionState.NoSession.nextState();
-        assertEquals(SessionState.Identification.getState(), state);
+        assertEquals(SessionState.Identification.nextState(), state);
     }
 
     @Test
     public void checkIfNextStateAfterIdentificationIsHandoverState() {
         SessionState state = SessionState.Request.nextState();
-        assertEquals(SessionState.Handover.getState(), state);
+        assertEquals(SessionState.Handover.currentState(), state);
     }
 
     @Test
     public void checkIfNextStateAfterHandoverIsNoState() {
         SessionState state = SessionState.Handover.nextState();
-        assertEquals(SessionState.NoSession.getState(), state);
+        assertEquals(SessionState.NoSession.currentState(), state);
     }
 }

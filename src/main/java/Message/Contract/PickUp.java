@@ -1,6 +1,7 @@
 package Message.Contract;
 
 import Location.Location;
+import Message.MessageFlag;
 
 import java.util.UUID;
 
@@ -9,19 +10,17 @@ public class PickUp extends AbstractContract {
     private Location pickUpLocation;
     public PickUp() {}
 
-    public PickUp(UUID uuid, int messageFlag, long timestamp, Location pickUpLocation) {
+    public PickUp(UUID uuid, MessageFlag messageFlag, long timestamp, Location pickUpLocation) {
         this.messageFlag = messageFlag;
         this.pickUpLocation = pickUpLocation;
     }
 
-    @Override
     public int getMessageFlag() {
-        return 0;
+        return this.messageFlag.getFlag();
     }
 
-    @Override
-    public void setMessageFlag(int messageFlag) {
-
+    public void setMessageFlag(MessageFlag messageFlag) {
+        this.messageFlag = messageFlag;
     }
 
     public Location getPickUpLocation() {

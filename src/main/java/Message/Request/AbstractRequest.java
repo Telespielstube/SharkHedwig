@@ -5,13 +5,13 @@ import java.util.UUID;
 
 import Message.IMessage;
 import Location.Location;
-import static Misc.Constants.CHALLENGE_MESSAGE_FLAG;
-import static Misc.Constants.RESPONSE_MESSAGE_FLAG;
+import Message.MessageFlag;
+import sun.plugin2.message.Message;
 
 public abstract class AbstractRequest implements IMessage {
     protected UUID uuid;
     protected SecureRandom challengeNumber;
-    protected int messageFlag = 0;
+    protected MessageFlag messageFlag;
     protected long timestamp;
     protected Location currentLocation;
 
@@ -44,7 +44,7 @@ public abstract class AbstractRequest implements IMessage {
     }
 
     public abstract int getMessageFlag();
-    public abstract void setMessageFlag(int messageFlag);
+    public abstract void setMessageFlag(MessageFlag messageFlag);
 
 }
 

@@ -31,4 +31,13 @@ public interface IMessageHandler {
      * @return           The object containing the message content.
      */
     Object byteArrayToObject(byte[] message);
+
+    /**
+     * Compares the timestamp of two Message object. To check if the message response is older than 5 seconds.
+     *
+     * @param object1    Message that was just received.
+     * @param object2    Message in the storage.
+     * @param <T>        Generic to be able to compare alll kinds of messages.
+     */
+    <T> boolean compareTimestamp(T object1, T object2);
 }

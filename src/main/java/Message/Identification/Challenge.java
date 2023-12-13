@@ -1,11 +1,10 @@
 package Message.Identification;
 
+import Message.MessageFlag;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.UUID;
-
-import static Misc.Constants.CHALLENGE_MESSAGE_FLAG;
-
 
 public class Challenge extends AbstractIdentification {
 
@@ -15,24 +14,11 @@ public class Challenge extends AbstractIdentification {
         this.timestamp = timestamp;
     }
 
-    public Challenge(UUID uuid, SecureRandom challengeNumber, int messageFlag, long timestamp) {
+    public Challenge(UUID uuid, SecureRandom challengeNumber, MessageFlag messageFlag, long timestamp) {
         this.uuid = uuid;
         this.challengeNumber = challengeNumber;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
-    }
-
-    /**
-     * Generates are cryptographically strong random number. The getInstanceStrong() uses the strongest crypto
-     * algorithms available on the system.
-     */
-    public void generateChallengeNumber() {
-        try {
-            this.challengeNumber = SecureRandom.getInstanceStrong();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-        this.challengeNumber.nextBytes(new byte[128]);
     }
 
     public SecureRandom getChallengeNumber() {
@@ -45,10 +31,10 @@ public class Challenge extends AbstractIdentification {
 
 
     public int getMessageFlag() {
-        return this.messageFlag = CHALLENGE_MESSAGE_FLAG;
+        return this.messageFlag.getFlag();
     }
 
-    public void setMessageFlag(int messageFlag) {
+    public void setMessageFlag(MessageFlag messageFlag) {
         this.messageFlag = messageFlag;
     }
 }

@@ -2,8 +2,7 @@ package Message.Contract;
 
 import java.util.UUID;
 import DeliveryContract.*;
-
-import static Misc.Constants.REQUEST_MESSAGE_FLAG;
+import Message.MessageFlag;
 
 public class Contract extends AbstractContract {
 
@@ -11,7 +10,7 @@ public class Contract extends AbstractContract {
     private TransitRecord transitRecord = null;
 
     public Contract() {}
-    public Contract(UUID uuid, int messageFlag, long timestamp, ShippingLabel shippingLabel, TransitRecord transitRecord) {
+    public Contract(UUID uuid, MessageFlag messageFlag, long timestamp, ShippingLabel shippingLabel, TransitRecord transitRecord) {
         this.uuid = uuid;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
@@ -19,13 +18,11 @@ public class Contract extends AbstractContract {
         this.transitRecord = transitRecord;
     }
 
-    @Override
     public int getMessageFlag() {
-        return this.messageFlag = REQUEST_MESSAGE_FLAG;
+        return this.messageFlag.getFlag();
     }
 
-    @Override
-    public void setMessageFlag(int messageFlag) {
+    public void setMessageFlag(MessageFlag messageFlag) {
         this.messageFlag = messageFlag;
     }
 

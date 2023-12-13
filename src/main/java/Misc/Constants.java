@@ -5,9 +5,6 @@ package Misc;
  */
 public final class Constants {
 
-    /** User Interface relevant*/
-    public static final String PACKAGE = "package";
-
     /** Constants for the log files. */
     public static final String LOG_FOLDER = "Logger";
     public static final String REQUEST_LOGFILE = "Requests";
