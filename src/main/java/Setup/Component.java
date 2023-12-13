@@ -119,7 +119,10 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         boolean invalid = false;
         IMessage message;
         if (uri != null) {
-            if ( (uri.equals(Channel.Identification.toString()) && (DeviceState.Transferor.isActive())) ) {
+//            if ( (uri.equals(Channel.Ping.toString()) && DeviceState.Transferee.isActive()) )  {
+//
+//            }
+            if ( (uri.equals(Channel.Identification.toString()))) {
                 for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
                     message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
                     if (!this.sessionManager.handleSession(message)) {

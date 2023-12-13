@@ -51,10 +51,6 @@ public class UserInterfaceTest {
         assertFalse(ui.acceptInput());
     }
 
-    @Test
-    public void returnTrueIfTransferorRoleIsSetToTrue() {
-        assertTrue(DeviceState.Transferor.setTransferorState(true));
-    }
     @After
     public void resetSystemIn() {
         System.setIn(resetSystemIn);

@@ -1,5 +1,6 @@
 package Message;
 
+import Channel.Channel;
 import Message.Identification.Challenge;
 import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.asap.ASAPSecurityException;
@@ -45,6 +46,6 @@ public class MessageHandlerTest {
 
     @Test
     public void testIfObjectGetsBuild() {
-        messageHandler.buildOutgoingMessage(challenge, Type.IDENTIFICATION, "Peter", sharkPKIComponent);
+        messageHandler.buildOutgoingMessage(challenge, Channel.Identification, "Peter", sharkPKIComponent);
     }
 }
