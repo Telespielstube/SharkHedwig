@@ -65,14 +65,14 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         this.peer = asapPeer;
 
         try {
-            this.peer.setASAPRoutingAllowed(APP_FORMAT, true);
+            this.peer.setASAPRoutingAllowed(AppConstant.AppFormat.getAppConstant(), true);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        this.peer.addASAPMessageReceivedListener(APP_FORMAT, this);
+        this.peer.addASAPMessageReceivedListener(AppConstant.AppFormat.getAppConstant(), this);
         try {
             this.setupChannel();
-            this.peer.getASAPStorage(APP_FORMAT).getOwner();
+            this.peer.getASAPStorage(AppConstant.AppFormat.getAppConstant()).getOwner();
             this.setupLogger();
             // Set the states for the session and the device.
             this.sessionState = SessionState.NoSession.currentState();
@@ -80,7 +80,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         } catch (IOException e) {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
         }
-        new PKIManager(CA_ID, sharkPKIComponent);
+        new PKIManager(AppConstant.CaId.getAppConstant(), sharkPKIComponent);
     }
 
     /**
@@ -88,7 +88,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
      */
     private void setupChannel() throws RuntimeException, IOException, ASAPException {
         for (Channel type : Channel.values()) {
-            this.peer.getASAPStorage(APP_FORMAT).createChannel(type.getChannelType());
+            this.peer.getASAPStorage(AppConstant.AppFormat.getAppConstant()).createChannel(type.getChannelType());
         }
     }
 

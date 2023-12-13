@@ -1,10 +1,9 @@
 package Setup;
 
-import Misc.Constants;
 import net.sharksystem.ASAPFormats;
 import net.sharksystem.SharkComponent;
 
-@ASAPFormats(formats = {Constants.APP_FORMAT})
+@ASAPFormats(formats = {"hedwig"})
 public interface ComponentInterface extends SharkComponent {
 
     /** start the contract exchange session. 1. Identification 2. Delivery contract exchange. Every step runs automatically */

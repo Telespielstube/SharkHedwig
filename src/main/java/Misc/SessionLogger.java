@@ -1,5 +1,7 @@
 package Misc;
 
+import Setup.AppConstant;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -30,7 +32,7 @@ public class SessionLogger<T> {
      *
      */
     public static void createLogDirectory() throws IOException {
-        Files.createDirectories(Paths.get(PEER_FOLDER + "/" + LOG_FOLDER));
+        Files.createDirectories(Paths.get(AppConstant.PeerFolder.getAppConstant() + "/" + LOG_FOLDER));
     }
 
     /**
@@ -41,7 +43,7 @@ public class SessionLogger<T> {
      *
      */
     public static void createLoggerFile(String logFile) throws IOException {
-        File file = new File("./" + PEER_FOLDER + "/" + LOG_FOLDER + "/" + logFile);
+        File file = new File("./" + AppConstant.PeerFolder.getAppConstant() + "/" + LOG_FOLDER + "/" + logFile);
         if (file.createNewFile()) {
             System.out.println(logFile + " log file is created.");
         } else {

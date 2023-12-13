@@ -1,5 +1,7 @@
 package Message;
 
+import sun.plugin2.message.Message;
+
 public enum MessageFlag {
     Advertisement(0),
     Challenge(1),
@@ -14,5 +16,8 @@ public enum MessageFlag {
 
     MessageFlag(int flag) {
         this.flag = flag;
+    }
+    public int getFlag() {
+        return Integer.parseInt(String.valueOf(this.flag));
     }
 }
