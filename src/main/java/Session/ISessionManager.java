@@ -1,5 +1,7 @@
 package Session;
 
+import HedwigUI.DeviceState;
+
 public interface ISessionManager {
 
     /**
@@ -7,6 +9,6 @@ public interface ISessionManager {
      * @param object
      * @param <T>
      */
-    <T> boolean handleSession(T object);
+    <T> boolean handleSession(T object, String sender, SessionState sessionState, DeviceState deviceState);
 
 }

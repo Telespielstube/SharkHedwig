@@ -101,11 +101,7 @@ public class UserInterface implements IUserInterface, Runnable {
                         new Location(this.latitudeOrigin, this.longitudeOrigin), this.recipient, this.destination,
                         new Location(this.destination, this.latitudeDest, this.longitudeDest), this.packageWeight),
                         new TransitRecord());
-                DeviceState.Transferor.isActive();
-            } else {
-                DeviceState.Transferee.isActive();
             }
-
         }
     }
 }

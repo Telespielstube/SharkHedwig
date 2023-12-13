@@ -2,13 +2,16 @@ package Message;
 
 import java.util.UUID;
 
-public class Ping implements IMessage {
+/**
+ * The advertisement messages is a small message that only has the task of offering the recipient a service.
+ */
+public class Advertisement implements IMessage {
 
     private UUID uuid;
     private int messageFlag;
     private long timestamp;
 
-    public Ping(UUID uuid, int messageFlag, long timestamp) {
+    public Advertisement(UUID uuid, int messageFlag, long timestamp) {
         this.uuid = uuid;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;

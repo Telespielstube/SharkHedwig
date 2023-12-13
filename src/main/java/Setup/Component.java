@@ -8,7 +8,6 @@ import net.sharksystem.SharkPeerFS;
 import net.sharksystem.asap.*;
 import net.sharksystem.pki.SharkPKIComponent;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,6 +24,8 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     private SharkPKIComponent sharkPKIComponent;
     private IMessageHandler messageHandler;
     private ISessionManager sessionManager;
+    private SessionState sessionState;
+    private DeviceState deviceState;
 
     public Component() {}
     public Component(SharkPKIComponent pkiComponent) {
@@ -73,7 +74,9 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
             this.setupChannel();
             this.peer.getASAPStorage(APP_FORMAT).getOwner();
             this.setupLogger();
-            SessionState.NoState.getState(); // The initial state of the protocol is no state.
+            // Set the states for the session and the device.
+            this.sessionState = SessionState.NoSession.currentState();
+            this.deviceState = DeviceState.Transferee.isActive();
         } catch (IOException e) {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
         }
@@ -118,14 +121,19 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         CharSequence uri = messages.getURI();
         boolean invalid = false;
         IMessage message;
-        if (uri != null) {
-//            if ( (uri.equals(Channel.Ping.toString()) && DeviceState.Transferee.isActive()) )  {
-//
-//            }
+        while (uri != null) {
+            if ( uri.equals(Channel.Ping.toString()) && sessionState.equals(SessionState.NoSession) && deviceState.equals(DeviceState.Transferee)) {
+                for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
+                    message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
+                    if (!this.sessionManager.handleSession(message, senderE2E, this.sessionState, this.deviceState)) {
+                        invalid = true;
+                    }
+                }
+            }
             if ( (uri.equals(Channel.Identification.toString()))) {
                 for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
                     message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
-                    if (!this.sessionManager.handleSession(message)) {
+                    if (!this.sessionManager.handleSession(message, senderE2E, this.sessionState, this.deviceState)) {
                         invalid = true;
                     }
                 }
@@ -133,7 +141,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
             if (uri.equals(Channel.Request.toString()))  {
                 for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
                     message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
-                    if (!this.sessionManager.handleSession(message)) {
+                    if (!this.sessionManager.handleSession(message, senderE2E, this.sessionState, this.deviceState)) {
                         invalid = true;
                     }
                 }
@@ -141,16 +149,15 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
             if (uri.equals(Channel.Contract.toString()))  {
                 for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
                     message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
-                    if (!this.sessionManager.handleSession(message)) {
+                    if (!this.sessionManager.handleSession(message, senderE2E, this.sessionState, this.deviceState)) {
                         invalid = true;
                     }
                 }
             }
             System.err.println("Message has invalid format" + invalid);
-        } else {
-            System.err.println("Received message has no uri!");
         }
-    }
+        System.err.println("Received message has no uri!");
+        }
 
 //    public void sendMessage() {
 //            this.peer.sendASAPMessage(APP_FORMAT, uri.toString(), signedMessage);
