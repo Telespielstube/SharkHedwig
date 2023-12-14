@@ -15,10 +15,10 @@ import static org.junit.Assert.*;
 
 public class SessionManagerTest {
 
-    private final ISessionManager sessionManager = new SessionManager();
-    private final Challenge challenge = new Challenge(UUID.randomUUID(), System.currentTimeMillis());
-    private final Response response = new Response(UUID.randomUUID(), System.currentTimeMillis());
-    private final Contract contract = new Contract();
+//    private final ISessionManager sessionManager = new SessionManager();
+//    private final Challenge challenge = new Challenge(UUID.randomUUID(), System.currentTimeMillis());
+//    private final Response response = new Response(UUID.randomUUID(), System.currentTimeMillis());
+//    private final Contract contract = new Contract();
 
 //    private final String sender = "Olli";
 //    @Test

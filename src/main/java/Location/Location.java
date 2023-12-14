@@ -1,8 +1,6 @@
 package Location;
 
 import static java.lang.Math.sqrt;
-import static Misc.Constants.PARALLEL_OF_LATITUDE;
-import static Misc.Constants.PARALLEL_OF_LONGITUDE;
 
 /**
  * Location object to determine the current location of a mobile device or geo location.

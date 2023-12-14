@@ -9,19 +9,19 @@ import java.nio.file.Paths;
 /**
  * Saves communication sessions to disk to make them accessable for the future.
  *
- * @param <T>   Generic to pass either a RequestLog or a ContragLog object.
  */
 public class SessionLogger {
 
 
     /** Creates the logging folder for request and contract sessions.
      *
-     * @param directory        describes the name of the folder.
+     * @param peerFolder        Name of the Application folder.
+     * @param logFolder         Name of the log folder.
      * @throws IOException      is thrown when something is wrong in creating the folder.
      *
      */
-    public static void createLogDirectory() throws IOException {
-        Files.createDirectories(Paths.get(Constant.PeerFolder.getAppConstant() + "/" + Constant.LogFolder.getAppConstant()));
+    public static void createLogDirectory(String peerFolder, String logFolder) throws IOException {
+        Files.createDirectories(Paths.get(peerFolder + "/" + logFolder));
     }
 
     /**
@@ -31,8 +31,8 @@ public class SessionLogger {
      * @throws IOException      thrown if something went wrong while creating the log file.
      *
      */
-    public static void createLoggerFile(String logFile) throws IOException {
-        File file = new File("./" + Constant.PeerFolder.getAppConstant() + "/" + Constant.LogFolder.getAppConstant() + "/" + logFile);
+    public static void createLogFile(String peerFolder, String logFolder, String logFile) throws IOException {
+        File file = new File("./" + peerFolder + "/" + logFolder + "/" + logFile);
         if (file.createNewFile()) {
             System.out.println(logFile + " log file is created.");
         } else {
@@ -48,7 +48,7 @@ public class SessionLogger {
      * @return                  true if writing was successful.
      * @throws IOException
      */
-    public boolean writeEntry(LogEntry entry, String file) {
+    public static boolean writeEntry(LogEntry entry, String file) {
         try (FileOutputStream openWriteStream = new FileOutputStream(file)) {
             ObjectOutputStream writeLogEntry = new ObjectOutputStream(openWriteStream);
             writeLogEntry.writeObject(entry);

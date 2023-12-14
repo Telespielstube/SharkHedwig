@@ -96,9 +96,9 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     private void setupLogger() {
         String[] files = { Constant.RequestLog.getAppConstant(), Constant.ContractLog.getAppConstant() };
         try {
-            SessionLogger.createLogDirectory();
+            SessionLogger.createLogDirectory(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant());
             for (String logFile : files) {
-                SessionLogger.createLoggerFile(logFile);
+                SessionLogger.createLogFile(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant(), logFile);
             }
         } catch (IOException e) {
             throw new RuntimeException("Could not create logger files for request and contract sessions: " + e);

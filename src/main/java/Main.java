@@ -20,13 +20,13 @@ public class Main {
      *
      */
     public static void main(String[] args) throws SharkException, IOException {
-        ErrorLogger.redirectErrorStream();
         SharkPeerFS sharkPeerFS;
         IUserInterface userInterface;
-
+        ErrorLogger.redirectErrorStream(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant(), "errorLog.txt");
         sharkPeerFS = new SharkPeerFS(Constant.PeerName.getAppConstant(), Constant.PeerFolder.getAppConstant() + "/" + Constant.PeerName.getAppConstant() );
         new Component().setupComponent(sharkPeerFS);
         sharkPeerFS.start();
+        System.err.println("TestFile");
         userInterface = new UserInterface("Type \"cargo\" to enter the necessary data for the shipping label.");
         ((UserInterface) userInterface).run(); // Unfortunately, this cast is necessary because we work with interfaces.
     }
