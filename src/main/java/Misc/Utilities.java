@@ -14,16 +14,17 @@ public class Utilities {
      *
      * @return    timestamp as human readable String object.
      */
-    public static String getReadableTimestamp() {
+    public static String createReadableTimestamp() {
         Date date = new Date();
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(date);
     }
 
     /**
      * Returns the current time in milliseconds.
+     *
      * @return    time in milliseconds, between the current time and midnight, January 1, 1970.
      */
-    public static long getTimestamp() {
+    public static long createTimestamp() {
         return System.currentTimeMillis();
     }
 }

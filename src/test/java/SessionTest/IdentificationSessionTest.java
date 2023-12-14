@@ -16,7 +16,7 @@ public class IdentificationSessionTest {
 
     @Test
     public void testIfSecureRandomNumberIsReturnedAsString() {
-        IdentificationSession identificationSession = new IdentificationSession("Peter", messageHandler, peer, sharkPKIComponent);
+        IdentificationSession identificationSession = new IdentificationSession("Peter", sharkPKIComponent);
         System.out.println(identificationSession.generateRandomNumber());
         assertNotNull(identificationSession.generateRandomNumber());
     }

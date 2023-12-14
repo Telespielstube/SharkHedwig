@@ -1,14 +1,18 @@
 package Session.IdentificationSession;
 
 import Message.IMessageHandler;
+import Message.Identification.Challenge;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 
 public interface IIdentificationSession {
 
-    void initializeSession();
+    Challenge initSession();
 
-    <T> void parseMessage(T message);
+    /**
+     * Processes the mesage according to the session state.
+     */
+    <T> void processMessage(T message);
     /**
      * Generates a sceure random number. The SecureRandom class generates a number up to 128 bits.
      * Makes the chance of repeating smaller.
@@ -24,11 +28,6 @@ public interface IIdentificationSession {
      */
     byte[] encryptRandomNumber();
 
-    /**
-     * Returns the current time in milliseconds.
-     *
-     * @return    time in milliseconds, between the current time and midnight, January 1, 1970.
-     */
-    long createTimestamp();
+
 
 }

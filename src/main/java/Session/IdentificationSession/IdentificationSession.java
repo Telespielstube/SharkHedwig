@@ -3,6 +3,10 @@ package Session.IdentificationSession;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import Message.Identification.AbstractIdentification;
+import Message.Identification.AckMessage;
+import Message.Identification.Response;
+import Misc.Utilities;
 import Setup.Channel;
 import Message.IMessageHandler;
 import Message.Identification.Challenge;
@@ -23,26 +27,30 @@ public class IdentificationSession implements IIdentificationSession {
     private Challenge challenge;
     private byte[] challengeNumber;
 
-    public IdentificationSession(String sender, IMessageHandler messageHandler, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) {
+    public IdentificationSession(String sender, SharkPKIComponent sharkPKIComponent) {
         this.sender = sender;
-        this.messageHandler = messageHandler;
-        this.peer = peer;
         this.sharkPKIComponent = sharkPKIComponent;
     }
 
     @Override
-    public void initializeSession() {
-        this.challenge = new Challenge(this.challenge.createUUID(), encryptRandomNumber() , MessageFlag.Challenge, createTimestamp());
-        byte[] signedByteObject = this.messageHandler.buildOutgoingMessage(challenge, Channel.Identification.getChannelType(), sender);
-        try {
-            this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), Channel.Identification.getChannelType(), signedByteObject);
-        } catch (ASAPException e) {
-            throw new RuntimeException(e);
-        }
+    public Challenge initSession() {
+        return new Challenge(this.challenge.createUUID(), encryptRandomNumber() , MessageFlag.Challenge, Utilities.createTimestamp());
+
     }
 
-    public <T> void parseMessage(T message) {
+    public boolean compareNumber() {
 
+    }
+
+    public void processMessage(Object message) {
+        if (((Response) message).getMessageFlag().equals(MessageFlag.Response.getFlag())) {
+            Response response = (Response) message;
+            response.getResponseNumber();
+        }
+
+        if (((AckMessage) message).getMessageFlag().equals(MessageFlag.Ack.getFlag())) {
+
+    }
     }
 
     public byte[] generateRandomNumber() {
@@ -60,9 +68,5 @@ public class IdentificationSession implements IIdentificationSession {
             e.printStackTrace();
         }
         return encrypted;
-    }
-
-    public long createTimestamp() {
-        return System.currentTimeMillis();
     }
 }

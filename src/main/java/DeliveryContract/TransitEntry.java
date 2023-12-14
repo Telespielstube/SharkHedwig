@@ -36,7 +36,7 @@ public class TransitEntry {
         this.packageUUID = packageUUID;
         this.transferee = transferee;
         this.handoverLocation = handoverLocation;
-        this.timestamp = Utilities.getTimestamp();
+        this.timestamp = Utilities.createTimestamp();
         this.transferorSignature = transferorSignature;
         this.transfereeSignature = transfereeSignature;
     }
