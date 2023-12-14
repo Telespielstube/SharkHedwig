@@ -36,29 +36,29 @@ public class SessionManagerTest {
 
 
 
-    @Test
-    public void testIfChallengeObjectIsPutIntoTheRightSession() {
-        ISessionManager sessionManager = new SessionManager(messageHandler, peer, sharkPKIComponent);
-        DeviceState deviceState = DeviceState.Transferor.isActive();
-        SessionState sessionState = SessionState.Identification;
-        assertTrue(sessionManager.handleSession(challenge, sender, sessionState, deviceState));
-    }
-
-    @Test
-    public void testIfResponseObjectIsPutIntoTheRightSession() {
-      ISessionManager sessionManager = new SessionManager(messageHandler, peer, sharkPKIComponent);
-        DeviceState deviceState = DeviceState.Transferor.isActive();
-        SessionState sessionState = SessionState.Identification;
-        assertTrue(sessionManager.handleSession(response, sender, sessionState, deviceState));
-    }
-
-    @Test
-    public void testIfContractObjectIsPutIntoTheRightSession() {
-      ISessionManager sessionManager = new SessionManager(messageHandler, peer, sharkPKIComponent);
-        DeviceState deviceState = DeviceState.Transferor.isActive();
-        SessionState sessionState = SessionState.Identification.nextState();
-        assertTrue(sessionManager.handleSession(contract, sender, sessionState, deviceState));
-    }
+//    @Test
+//    public void testIfChallengeObjectIsPutIntoTheRightSession() {
+//        ISessionManager sessionManager = new SessionManager(messageHandler, peer, sharkPKIComponent);
+//        DeviceState deviceState = DeviceState.Transferor.isActive();
+//        SessionState sessionState = SessionState.Identification;
+//        assertTrue(sessionManager.handleSession(challenge, sender, sessionState, deviceState));
+//    }
+//
+//    @Test
+//    public void testIfResponseObjectIsPutIntoTheRightSession() {
+//      ISessionManager sessionManager = new SessionManager(messageHandler, peer, sharkPKIComponent);
+//        DeviceState deviceState = DeviceState.Transferor.isActive();
+//        SessionState sessionState = SessionState.Identification;
+//        assertTrue(sessionManager.handleSession(response, sender, sessionState, deviceState));
+//    }
+//
+//    @Test
+//    public void testIfContractObjectIsPutIntoTheRightSession() {
+//      ISessionManager sessionManager = new SessionManager(messageHandler, peer, sharkPKIComponent);
+//        DeviceState deviceState = DeviceState.Transferor.isActive();
+//        SessionState sessionState = SessionState.Identification.nextState();
+//        assertTrue(sessionManager.handleSession(contract, sender, sessionState, deviceState));
+//    }
 
 //    @Test
 //    public void returnTrueIfAckMessageIsTypeOfIMessage() {

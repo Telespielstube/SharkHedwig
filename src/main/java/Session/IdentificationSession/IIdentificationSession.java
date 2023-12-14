@@ -20,14 +20,4 @@ public interface IIdentificationSession {
      * @return    The secure random number converted to byte[] ready for encryption.
      */
     byte[] generateRandomNumber();
-
-    /**
-     * Encrypts the secure random number for the challenge-response methode.
-     *
-     * @return    Encrypted challenge number.
-     */
-    byte[] encryptRandomNumber();
-
-
-
 }

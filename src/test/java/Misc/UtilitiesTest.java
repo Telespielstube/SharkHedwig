@@ -14,7 +14,7 @@ public class UtilitiesTest {
 
     @Test
     public void testIfIDReadableTimestampIsReturned() {
-        String timestamp = Utilities.getReadableTimestamp();
+        String timestamp = Utilities.createReadableTimestamp();
         System.out.println(timestamp);
         assertNotNull(timestamp);
     }
@@ -23,6 +23,6 @@ public class UtilitiesTest {
 
     @Test
     public void testIfSystemReturnsTimeInMillis() {
-        assertEquals(System.currentTimeMillis(), Utilities.getTimestamp(), 0.1);
+        assertEquals(System.currentTimeMillis(), Utilities.createTimestamp(), 0.1);
     }
 }

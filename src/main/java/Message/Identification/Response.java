@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class Response extends AbstractIdentification {
 
-    private byte[] responseNumber;
+    private byte[] encryptedNumber;
     private byte[] decryptedNumber;
 
     public Response(UUID uuid, long timestamp) {
@@ -15,21 +15,27 @@ public class Response extends AbstractIdentification {
         this.timestamp = timestamp;
     }
 
-    public Response(UUID uuid, byte[] responseNumber, byte[] decryptedNumber, MessageFlag messageFlag, long timestamp) {
+    public Response(UUID uuid, byte[] encryptedNumber, byte[] decryptedNumber, MessageFlag messageFlag, long timestamp) {
         this.uuid = uuid;
-        this.responseNumber = responseNumber;
+        this.encryptedNumber = encryptedNumber;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
         this.decryptedNumber = decryptedNumber;
     }
 
-    public byte[] getResponseNumber() {
-        return this.responseNumber;
+    public byte[] getEncryptedNumber() {
+        return this.encryptedNumber;
     }
-    public void setResponseNumber(byte[] responseNumber) {
-        this.responseNumber = responseNumber;
+    public void setEncryptedNumber(byte[] responseNumber) {
+        this.encryptedNumber = responseNumber;
     }
 
+    public byte[] getDecryptedNumber() {
+        return this.decryptedNumber;
+    }
+    public void setDecryptedNumber(byte[] responseNumber) {
+        this.decryptedNumber = decryptedNumber;
+    }
     public MessageFlag getMessageFlag() {
         return this.messageFlag;
     }

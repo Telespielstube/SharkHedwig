@@ -13,6 +13,9 @@ import net.sharksystem.asap.ASAPException;
 import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.pki.SharkPKIComponent;
 
+import javax.crypto.NoSuchPaddingException;
+import java.security.NoSuchAlgorithmException;
+
 public class SessionManager implements ISessionManager {
 
     private SharkPKIComponent sharkPKIComponent;
@@ -47,7 +50,11 @@ public class SessionManager implements ISessionManager {
 
     public <T> void transferorIncoming(T message) {
         if (this.state.equals(SessionState.NoSession) && (((IMessage) message).getMessageFlag().equals(MessageFlag.Advertisement.getFlag()))) {
-            this.identification = new IdentificationSession(sender, this.sharkPKIComponent);
+            try {
+                this.identification = new IdentificationSession(sender, this.sharkPKIComponent);
+            } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
             this.messageObject = identification.initSession();
             this.state.nextState();
         }
@@ -57,22 +64,22 @@ public class SessionManager implements ISessionManager {
         }
         if (this.state.equals(SessionState.Request)) {
         }
-        if (this.state.equals(SessionState.Contract)) {
-            if (((AbstractContract) message).getMessageFlag().equals(MessageFlag.Request.getFlag())) {
-            }
-            if (((AbstractContract) message).getMessageFlag().equals(MessageFlag.Confirmation.getFlag())) {
-                identification.parseMessage(message);
-            }
-        }
+//        if (this.state.equals(SessionState.Contract)) {
+//            if (((AbstractContract) message).getMessageFlag().equals(MessageFlag.Request.getFlag())) {
+//            }
+//            if (((AbstractContract) message).getMessageFlag().equals(MessageFlag.Confirmation.getFlag())) {
+//                identification.parseMessage(message);
+//            }
+
     }
 
     public <T> void transfereeIncoming(T message) {
-        if (this.state.equals(SessionState.Identification) && ((AbstractIdentification) message).getMessageFlag().equals(MessageFlag.Challenge.getFlag())) {
-            identification.parseMessage(message);
-        } else {
-            identification.parseMessage(message);
-        }
-        this.state.nextState();
+//        if (this.state.equals(SessionState.Identification) && ((AbstractIdentification) message).getMessageFlag().equals(MessageFlag.Challenge.getFlag())) {
+//            identification.parseMessage(message);
+//        } else {
+//            identification.parseMessage(message);
+//        }
+//        this.state.nextState();
 //
 //        else if( ((AbstractIdentification) message).getMessageFlag().equals(MessageFlag.Response.getFlag() ) ) {
 //            new Response(((AbstractIdentification) message).getUuid(), ((Response) message).getResponseNumber(),
