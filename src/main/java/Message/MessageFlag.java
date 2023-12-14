@@ -9,8 +9,9 @@ public enum MessageFlag {
     Request(4),
     RequestReply(5),
     Contract(6),
-    PickUp(7),
-    Ack(8);
+    Confirmation(7),
+    PickUp(8),
+    Ack(9);
 
     private final int flag;
 

@@ -49,7 +49,7 @@ public enum SessionState {
         }
         @Override
         public SessionState nextState() {
-            return Handover;
+            return Contract;
         }
         @Override
         public boolean stateCompleted() {
@@ -57,10 +57,10 @@ public enum SessionState {
         }
     },
 
-    Handover() {
+    Contract() {
         @Override
         public SessionState currentState() {
-            return Handover;
+            return Contract;
         }
 
         @Override

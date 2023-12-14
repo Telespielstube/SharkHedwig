@@ -8,6 +8,7 @@ public interface IIdentificationSession {
 
     void initializeSession();
 
+    <T> void parseMessage(T message);
     /**
      * Generates a sceure random number. The SecureRandom class generates a number up to 128 bits.
      * Makes the chance of repeating smaller.
@@ -21,7 +22,7 @@ public interface IIdentificationSession {
      *
      * @return    Encrypted challenge number.
      */
-    public byte[] encryptRandomNumber();
+    byte[] encryptRandomNumber();
 
     /**
      * Returns the current time in milliseconds.

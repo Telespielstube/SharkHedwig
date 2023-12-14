@@ -13,6 +13,7 @@ public class LogFileTest {
         String tempError = "tempError.txt";
         ErrorLogger.redirectErrorStream(tempFolder,tempLog, tempError);
         System.err.println("Test");
+
     }
 
 }

@@ -1,12 +1,20 @@
 package SessionTest;
 
 import Session.SessionState;
+import Setup.DeviceState;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class SessionStateTest {
 
+    @Test
+    public void testIfStateVariableProceedsToNextState() {
+        SessionState state = SessionState.NoSession.currentState();
+
+        //state.nextState();
+        assertEquals("Identification", state.nextState().toString());
+    }
     @Test
     public void testIfNoStateIsActive() {
         SessionState state = SessionState.NoSession.currentState();
@@ -22,12 +30,12 @@ public class SessionStateTest {
     @Test
     public void checkIfNextStateAfterIdentificationIsHandoverState() {
         SessionState state = SessionState.Request.nextState();
-        assertEquals(SessionState.Handover.currentState(), state);
+        assertEquals(SessionState.Contract.currentState(), state);
     }
 
     @Test
     public void checkIfNextStateAfterHandoverIsNoState() {
-        SessionState state = SessionState.Handover.nextState();
+        SessionState state = SessionState.Contract.nextState();
         assertEquals(SessionState.NoSession.currentState(), state);
     }
 }

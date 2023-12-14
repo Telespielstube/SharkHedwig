@@ -1,8 +1,10 @@
 package SessionTest;
 
 import Message.Contract.Contract;
+import Message.Identification.AbstractIdentification;
 import Message.Identification.Challenge;
 import Message.Identification.Response;
+import Message.MessageFlag;
 import Message.MessageHandler;
 import Session.ISessionManager;
 import Session.SessionManager;
@@ -16,10 +18,9 @@ import net.sharksystem.pki.SharkPKIComponent;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class SessionManagerTest {
@@ -34,24 +35,9 @@ public class SessionManagerTest {
     private final String sender = "Olli";
 
 
-    @Before
-    public void setupComponent() throws SharkException {
-        Collection<CharSequence> formats = new ArrayList<>();
-        formats.add("sharkHedwig");
-        String testFolder = "tester123" + "/" + "tester_id";
-        SharkPeerFS testPeerFS = new SharkPeerFS("tester123", testFolder );
-        Component component = new Component(sharkPKIComponent);
-        component.setupComponent(testPeerFS);
-        testPeerFS.start();
-    }
 
     @Test
     public void testIfChallengeObjectIsPutIntoTheRightSession() {
-        try {
-            setupComponent();
-        } catch (SharkException e) {
-            throw new RuntimeException(e);
-        }
         ISessionManager sessionManager = new SessionManager(messageHandler, peer, sharkPKIComponent);
         DeviceState deviceState = DeviceState.Transferor.isActive();
         SessionState sessionState = SessionState.Identification;

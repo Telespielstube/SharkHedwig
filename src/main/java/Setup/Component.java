@@ -87,7 +87,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     /**
      * Setting up all component channels. Multiple channels allow us to better control incoming and outgoing messages.
      */
-    private void setupChannel()  {
+    public void setupChannel()  {
         for (Channel type : Channel.values()) {
             try {
                 this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).createChannel(type.getChannelType());
@@ -100,7 +100,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     /**
      * Setting up all things logging. The folder and the files to differentiate between request session and contract session.
      */
-    private void setupLogger() {
+    public void setupLogger() {
         String[] files = { Constant.RequestLog.getAppConstant(), Constant.ContractLog.getAppConstant() };
         try {
             SessionLogger.createLogDirectory(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant());

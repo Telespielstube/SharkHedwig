@@ -41,6 +41,10 @@ public class IdentificationSession implements IIdentificationSession {
         }
     }
 
+    public <T> void parseMessage(T message) {
+
+    }
+
     public byte[] generateRandomNumber() {
         SecureRandom secureRandom = new SecureRandom();
         BigInteger bigInt = BigInteger.valueOf(secureRandom.nextInt());
