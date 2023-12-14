@@ -1,15 +1,10 @@
 package Misc;
 
-import Setup.AppConstant;
+import Setup.Constant;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.UUID;
-import java.util.Date;
-
-import static Misc.Constants.*;
-import static Misc.Constants.LOG_FOLDER;
 
 /**
  * Saves communication sessions to disk to make them accessable for the future.
@@ -26,7 +21,7 @@ public class SessionLogger {
      *
      */
     public static void createLogDirectory() throws IOException {
-        Files.createDirectories(Paths.get(AppConstant.PeerFolder.getAppConstant() + "/" + LOG_FOLDER));
+        Files.createDirectories(Paths.get(Constant.PeerFolder.getAppConstant() + "/" + Constant.LogFolder.getAppConstant()));
     }
 
     /**
@@ -37,7 +32,7 @@ public class SessionLogger {
      *
      */
     public static void createLoggerFile(String logFile) throws IOException {
-        File file = new File("./" + AppConstant.PeerFolder.getAppConstant() + "/" + LOG_FOLDER + "/" + logFile);
+        File file = new File("./" + Constant.PeerFolder.getAppConstant() + "/" + Constant.LogFolder.getAppConstant() + "/" + logFile);
         if (file.createNewFile()) {
             System.out.println(logFile + " log file is created.");
         } else {

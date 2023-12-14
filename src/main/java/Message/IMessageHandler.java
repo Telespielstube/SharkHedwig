@@ -1,6 +1,5 @@
 package Message;
 
-import Channel.Channel;
 import net.sharksystem.pki.SharkPKIComponent;
 
 public interface IMessageHandler {

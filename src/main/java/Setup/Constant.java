@@ -1,18 +1,21 @@
 package Setup;
 
-public enum AppConstant {
+public enum Constant {
+    // Component related constants
     AppFormat("hedwig"),
     PeerFolder("HedwigStorage"),
     PeerName("hedwig123"),
     CaId("caID"),
     Scheme("sn2://"),
-    LogFolder("Logger"),
-    RequestLogFile("Requests"),
-    ContractLogFile("Contracts");
+
+    // Constants for the log files. */
+    LogFolder("Log"),
+    RequestLog("Request"),
+    ContractLog("ContractLog");
 
     private final String name;
 
-    AppConstant(String name) {
+    Constant(String name) {
         this.name = name;
     }
 

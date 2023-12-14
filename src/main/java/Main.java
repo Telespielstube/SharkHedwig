@@ -1,16 +1,13 @@
 import HedwigUI.IUserInterface;
 import HedwigUI.UserInterface;
 import Misc.ErrorLogger;
-import Session.SessionState;
-import Setup.AppConstant;
+import Setup.Constant;
 import Setup.Component;
 import net.sharksystem.SharkException;
 
 import net.sharksystem.SharkPeerFS;
 
 import java.io.IOException;
-
-import static Misc.Constants.*;
 
 public class Main {
     /**
@@ -27,7 +24,7 @@ public class Main {
         SharkPeerFS sharkPeerFS;
         IUserInterface userInterface;
 
-        sharkPeerFS = new SharkPeerFS(AppConstant.PeerName.getAppConstant(),AppConstant.PeerFolder.getAppConstant() + "/" + AppConstant.PeerName.getAppConstant() );
+        sharkPeerFS = new SharkPeerFS(Constant.PeerName.getAppConstant(), Constant.PeerFolder.getAppConstant() + "/" + Constant.PeerName.getAppConstant() );
         new Component().setupComponent(sharkPeerFS);
         sharkPeerFS.start();
         userInterface = new UserInterface("Type \"cargo\" to enter the necessary data for the shipping label.");

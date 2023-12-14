@@ -2,7 +2,7 @@ package DeliveryContract;
 
 import java.util.UUID;
 import Location.Location;
-import Setup.AppConstant;
+import Setup.Constant;
 
 /**
  * The shipping label object is a core function of the whole protocoll. The label is created after the user confirmed
@@ -34,7 +34,7 @@ public class ShippingLabel {
      */
     public ShippingLabel(String sender, String origin, Location locationOrigin, String recipient, String destination, Location locationDest, double packageWeight) {
         this.packageUUID = UUID.randomUUID();
-        this.transferorID = AppConstant.PeerName.getAppConstant();
+        this.transferorID = Constant.PeerName.getAppConstant();
         this.sender = sender;
         this.origin = origin;
         this.locationOrigin = locationOrigin;

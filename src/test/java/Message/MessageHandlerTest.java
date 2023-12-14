@@ -1,6 +1,5 @@
 package Message;
 
-import Channel.Channel;
 import Message.Identification.Challenge;
 import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.asap.ASAPSecurityException;

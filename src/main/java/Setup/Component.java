@@ -11,9 +11,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import Channel.*;
 import Misc.SessionLogger;
-import static Misc.Constants.*;
 import Message.*;
 import Session.*;
 import HedwigUI.DeviceState;
@@ -22,7 +20,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
 
     private ASAPPeer peer;
     private SharkPKIComponent sharkPKIComponent;
-    private IMessageHandler messageHandler;
+    private MessageHandler messageHandler;
     private ISessionManager sessionManager;
     private SessionState sessionState;
     private DeviceState deviceState;
@@ -31,7 +29,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     public Component(SharkPKIComponent pkiComponent) {
         this.sharkPKIComponent = pkiComponent;
         this.messageHandler = new MessageHandler();
-        this.sessionManager = new SessionManager();
+        this.sessionManager = new SessionManager(this.messageHandler, this.peer, this.sharkPKIComponent);
     }
 
     /**
@@ -65,14 +63,14 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         this.peer = asapPeer;
 
         try {
-            this.peer.setASAPRoutingAllowed(AppConstant.AppFormat.getAppConstant(), true);
+            this.peer.setASAPRoutingAllowed(Constant.AppFormat.getAppConstant(), true);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        this.peer.addASAPMessageReceivedListener(AppConstant.AppFormat.getAppConstant(), this);
+        this.peer.addASAPMessageReceivedListener(Constant.AppFormat.getAppConstant(), this);
         try {
             this.setupChannel();
-            this.peer.getASAPStorage(AppConstant.AppFormat.getAppConstant()).getOwner();
+            this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).getOwner();
             this.setupLogger();
             // Set the states for the session and the device.
             this.sessionState = SessionState.NoSession.currentState();
@@ -80,7 +78,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         } catch (IOException e) {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
         }
-        new PKIManager(AppConstant.CaId.getAppConstant(), sharkPKIComponent);
+        new PKIManager(Constant.CaId.getAppConstant(), sharkPKIComponent);
     }
 
     /**
@@ -88,7 +86,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
      */
     private void setupChannel() throws RuntimeException, IOException, ASAPException {
         for (Channel type : Channel.values()) {
-            this.peer.getASAPStorage(AppConstant.AppFormat.getAppConstant()).createChannel(type.getChannelType());
+            this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).createChannel(type.getChannelType());
         }
     }
 
@@ -96,7 +94,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
      * Setting up all things logging. The folder and the files to differentiate between request session and contract session.
      */
     private void setupLogger() {
-        String[] files = {REQUEST_LOGFILE, CONTRACT_LOGFILE};
+        String[] files = { Constant.RequestLog.getAppConstant(), Constant.ContractLog.getAppConstant() };
         try {
             SessionLogger.createLogDirectory();
             for (String logFile : files) {
@@ -143,15 +141,16 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         IMessage message;
         for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
             message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
-            if (!this.sessionManager.handleSession(message, senderE2E, this.messageHandler, this.sessionState, this.deviceState)) {
+            if (!this.sessionManager.handleSession(message, senderE2E, this.sessionState, this.deviceState)) {
                 invalid = true;
             }
         }
         return invalid;
     }
 
-    public void sendMessage(Channel uri, byte[] signedMessage) throws ASAPException {
-        this.peer.sendASAPMessage(AppConstant.AppFormat.getAppConstant(), uri.toString(), signedMessage);
+    public void sendASAPMessage(Channel uri, byte[] signedMessage) throws ASAPException {
+        this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), uri.toString(), signedMessage);
+
     }
 
 }

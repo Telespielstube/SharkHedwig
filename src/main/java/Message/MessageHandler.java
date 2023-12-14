@@ -4,7 +4,6 @@ import net.sharksystem.asap.*;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;
 import java.io.*;
-import Channel.*;
 
 public class MessageHandler implements IMessageHandler {
 

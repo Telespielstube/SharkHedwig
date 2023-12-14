@@ -1,6 +1,4 @@
-package Channel;
-
-import Setup.AppConstant;
+package Setup;
 
 /**
  * An enumeration of all channels the protocols needs to go through before a package is exchange.
@@ -19,25 +17,25 @@ public enum Channel {
     Advertisement {
         @Override
         public String getChannelType() {
-            return AppConstant.Scheme.getAppConstant() + Advertisement;
+            return Constant.Scheme.getAppConstant() + Advertisement;
         }
     },
     Identification{
         @Override
         public String getChannelType() {
-            return AppConstant.Scheme.getAppConstant() + Identification;
+            return Constant.Scheme.getAppConstant() + Identification;
         }
     },
     Request {
         @Override
         public String getChannelType() {
-            return AppConstant.Scheme.getAppConstant() + Request;
+            return Constant.Scheme.getAppConstant() + Request;
         }
     },
     Contract {
         @Override
         public String getChannelType() {
-            return AppConstant.Scheme.getAppConstant() + Contract;
+            return Constant.Scheme.getAppConstant() + Contract;
         }
     };
 
