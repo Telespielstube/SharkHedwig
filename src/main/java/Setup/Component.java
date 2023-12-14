@@ -1,6 +1,7 @@
 package Setup;
 
 
+import DeliveryContract.DeliveryContract;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -14,7 +15,6 @@ import java.util.List;
 import Misc.SessionLogger;
 import Message.*;
 import Session.*;
-import HedwigUI.DeviceState;
 
 public class Component implements SharkComponent, ASAPMessageReceivedListener {
 
@@ -61,7 +61,6 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     @Override
     public void onStart(ASAPPeer asapPeer) throws SharkException {
         this.peer = asapPeer;
-
         try {
             this.peer.setASAPRoutingAllowed(Constant.AppFormat.getAppConstant(), true);
         } catch (IOException e) {
@@ -72,9 +71,13 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
             this.setupChannel();
             this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).getOwner();
             this.setupLogger();
+
             // Set the states for the session and the device.
             this.sessionState = SessionState.NoSession.currentState();
-            this.deviceState = DeviceState.Transferee.isActive();
+            if (!DeliveryContract.contractCreated) {
+                this.deviceState = DeviceState.Transferee.isActive();
+            }
+            this.deviceState = DeviceState.Transferor.isActive();
         } catch (IOException e) {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
         }
@@ -84,9 +87,13 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     /**
      * Setting up all component channels. Multiple channels allow us to better control incoming and outgoing messages.
      */
-    private void setupChannel() throws RuntimeException, IOException, ASAPException {
+    private void setupChannel()  {
         for (Channel type : Channel.values()) {
-            this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).createChannel(type.getChannelType());
+            try {
+                this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).createChannel(type.getChannelType());
+            } catch (IOException | ASAPException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -118,7 +125,6 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) throws IOException {
         CharSequence uri = messages.getURI();
         boolean invalid = false;
-        IMessage message;
         while (uri != null) {
             if ( uri.equals(Channel.Advertisement.getChannelType()) ) {
                 invalid = isInvalid(messages, senderE2E, invalid);

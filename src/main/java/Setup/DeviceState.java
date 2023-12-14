@@ -1,4 +1,4 @@
-package HedwigUI;
+package Setup;
 
 /**
  * Enum class to set the role of the device. The initial state of the protocol is Transferee.

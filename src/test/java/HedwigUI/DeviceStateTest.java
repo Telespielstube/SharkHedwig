@@ -1,11 +1,11 @@
 package HedwigUI;
 
-import org.junit.Before;
+import Setup.DeviceState;
 import org.junit.Test;
 
 
-import static HedwigUI.DeviceState.Transferor;
-import static HedwigUI.DeviceState.Transferee;
+import static Setup.DeviceState.Transferor;
+import static Setup.DeviceState.Transferee;
 import static org.junit.Assert.*;
 
 public class DeviceStateTest {

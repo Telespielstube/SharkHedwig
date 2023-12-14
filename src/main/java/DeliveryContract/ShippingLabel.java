@@ -11,7 +11,7 @@ import Setup.Constant;
  */
 public class ShippingLabel {
 
-    private final UUID packageUUID;
+    private UUID packageUUID;
     private String transferorID = null;
     private String sender = null;
     private String origin = null;
@@ -21,6 +21,7 @@ public class ShippingLabel {
     private Location locationOrigin = null;
     private Location locationDest = null;
 
+    public ShippingLabel() {}
     /**
      * Creates the shipping label object from the user input data, the uuid and the PEER_NAME.
      *

@@ -1,17 +1,17 @@
 package SessionTest;
 
-import HedwigUI.DeviceState;
 import Message.Contract.Contract;
 import Message.Identification.Challenge;
 import Message.Identification.Response;
 import Session.ISessionManager;
 import Session.SessionManager;
 import Session.SessionState;
+import Setup.DeviceState;
 import org.junit.Test;
 
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class SessionManagerTest {
 
@@ -19,7 +19,7 @@ public class SessionManagerTest {
 //    private final Challenge challenge = new Challenge(UUID.randomUUID(), System.currentTimeMillis());
 //    private final Response response = new Response(UUID.randomUUID(), System.currentTimeMillis());
 //    private final Contract contract = new Contract();
-
+//
 //    private final String sender = "Olli";
 //    @Test
 //    public void testIfChallengeObjectIsPutIntoTheRightSession() {

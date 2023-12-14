@@ -11,7 +11,7 @@ import java.util.Vector;
  */
 public class TransitRecord {
 
-    private final Vector<TransitEntry> transitRecord;
+    private Vector<TransitEntry> transitRecord = null;
 
     /**
      * The TransitRecord object is a dynamic vector where TransitEnry objects are added.

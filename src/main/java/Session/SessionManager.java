@@ -1,16 +1,8 @@
 package Session;
 
 
-import HedwigUI.DeviceState;
+import Setup.DeviceState;
 import Message.*;
-import Message.Contract.AbstractContract;
-import Message.Contract.Contract;
-import Message.Identification.AbstractIdentification;
-import Message.Identification.Challenge;
-import Message.Identification.Response;
-import Message.Request.AbstractRequest;
-import Message.Request.Request;
-import Message.Request.RequestReply;
 import Session.IdentificationSession.IIdentificationSession;
 import Session.IdentificationSession.IdentificationSession;
 import net.sharksystem.asap.ASAPPeer;

@@ -1,7 +1,6 @@
 package Session;
 
-import HedwigUI.DeviceState;
-import Message.IMessageHandler;
+import Setup.DeviceState;
 
 public interface ISessionManager {
 
