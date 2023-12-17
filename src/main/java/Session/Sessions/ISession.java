@@ -10,7 +10,7 @@ public interface ISession {
      * Unpacks the generic Message object to the according Message for this session it can be Challenge,
      * Response or an Ack message.
      */
-    <T> Object unpackMessage(Object message);
+    Object unpackMessage(Object message);
 
     /**
      * Compares two timestamps. The passed timestamp relates to the received message and the tother timestamps

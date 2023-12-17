@@ -15,7 +15,7 @@ import Message.MessageFlag;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.pki.SharkPKIComponent;
 
-public class Identification implements ISession {
+public class Identification extends AbstractSession {
 
     private SharkPKIComponent sharkPKIComponent;
     private Response responseReply;
@@ -24,8 +24,7 @@ public class Identification implements ISession {
     private String sender;
     private Cipher cipher;
     private byte[] secureNumber;
-    private SortedMap<Long, Object> messageList;
-    private long timeOffset = 5000;
+
 
     public Identification(String sender, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.sender = sender;
@@ -45,15 +44,6 @@ public class Identification implements ISession {
         }
 
         return this.challenge;
-    }
-
-
-    public boolean compareTimestamp(long timestamp) {
-        boolean valid = false;
-        if (this.messageList.lastKey() - timestamp < this.timeOffset) {
-            valid = true;
-        }
-        return valid;
     }
 
     /**
@@ -128,13 +118,5 @@ public class Identification implements ISession {
         BigInteger bigInt = BigInteger.valueOf(secureRandom.nextInt());
         this.secureNumber =  bigInt.toByteArray();
         return this.secureNumber;
-    }
-
-    public boolean isSessionComplete() {
-        boolean isComplete = false;
-        if (messageList.isEmpty()) {
-            isComplete = true;
-        }
-        return isComplete;
     }
 }
