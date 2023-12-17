@@ -35,7 +35,7 @@ public enum Channel {
     Contract {
         @Override
         public String getChannelType() {
-            return Constant.Scheme.getAppConstant() + Contract;
+            return Constant.Scheme.getAppConstant() + Contract.toString();
         }
     };
 

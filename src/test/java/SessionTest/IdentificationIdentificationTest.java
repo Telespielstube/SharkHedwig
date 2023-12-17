@@ -1,8 +1,7 @@
 package SessionTest;
 
 import Message.MessageHandler;
-import Misc.Utilities;
-import Session.IdentificationSession.IdentificationSession;
+import Session.Sessions.Identification;
 import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.pki.SharkPKIComponent;
 import org.junit.Before;
@@ -18,14 +17,14 @@ import static Misc.Utilities.decryptNumber;
 import static Misc.Utilities.encryptRandomNumber;
 import static org.junit.Assert.*;
 
-public class IdentificationSessionTest {
+public class IdentificationIdentificationTest {
 
     private final MessageHandler messageHandler = new MessageHandler();
     private ASAPPeer peer;
     private SharkPKIComponent sharkPKIComponent;
-    private final IdentificationSession identTest = new IdentificationSession("Peter", sharkPKIComponent);
+    private final Identification identTest = new Identification("Peter", sharkPKIComponent);
     private KeyPair pair;
-    public IdentificationSessionTest() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public IdentificationIdentificationTest() throws NoSuchPaddingException, NoSuchAlgorithmException {
     }
 
     @Before

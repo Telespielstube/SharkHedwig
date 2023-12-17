@@ -20,10 +20,6 @@ public enum SessionState {
         public SessionState nextState() {
             return Identification;
         }
-        @Override
-        public boolean stateCompleted() {
-            return true;
-        }
     },
 
     Identification {
@@ -36,10 +32,6 @@ public enum SessionState {
         public SessionState nextState() {
             return Request;
         }
-        @Override
-        public boolean stateCompleted() {
-            return true;
-        }
     },
 
     Request {
@@ -50,10 +42,6 @@ public enum SessionState {
         @Override
         public SessionState nextState() {
             return Contract;
-        }
-        @Override
-        public boolean stateCompleted() {
-            return true;
         }
     },
 
@@ -67,13 +55,6 @@ public enum SessionState {
         public SessionState nextState() {
             return NoSession;
         }
-
-        @Override
-        public boolean stateCompleted() {
-            return true;
-        }
-
-
     };
 
     /**
@@ -91,10 +72,4 @@ public enum SessionState {
      */
     public abstract SessionState nextState();
 
-    /**
-     * Returns a boolean value if session is completed.
-     *
-     * @return    Boolean value true if session is completed.
-     */
-    public abstract boolean stateCompleted();
 }

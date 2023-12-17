@@ -6,12 +6,13 @@ public enum MessageFlag {
     Advertisement(0),
     Challenge(1),
     Response(3),
-    Request(4),
-    RequestReply(5),
-    Contract(6),
-    Confirmation(7),
-    PickUp(8),
-    Ack(9);
+    ResponseRelpy(4),
+    Request(5),
+    RequestReply(6),
+    Contract(7),
+    Confirmation(8),
+    PickUp(9),
+    Ack(10);
 
     private final int flag;
 

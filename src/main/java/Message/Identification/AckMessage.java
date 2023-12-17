@@ -9,11 +9,11 @@ public class AckMessage extends AbstractIdentification {
     private boolean isAck = false;
 
     public AckMessage() {}
-    public AckMessage(UUID uuid, MessageFlag messageFlag, long timestamp, boolean isAck) {
+    public AckMessage(UUID uuid, boolean isAck, MessageFlag messageFlag, long timestamp) {
         this.uuid = uuid;
+        this.isAck = isAck;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
-        this.isAck = isAck;
     }
 
     public MessageFlag getMessageFlag() {

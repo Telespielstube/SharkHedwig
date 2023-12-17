@@ -71,13 +71,9 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
             this.setupChannel();
             this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).getOwner();
             this.setupLogger();
-
-            // Set the states for the session and the device.
+            // Set the initial states for the session and the device.
             this.sessionState = SessionState.NoSession.currentState();
-            if (!DeliveryContract.contractCreated) {
-                this.deviceState = DeviceState.Transferee.isActive();
-            }
-            this.deviceState = DeviceState.Transferor.isActive();
+            this.deviceState = DeviceState.Transferee.isActive();
         } catch (IOException e) {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
         }
@@ -85,9 +81,9 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     }
 
     /**
-     * Setting up all component channels. Multiple channels allow us to better control incoming and outgoing messages.
+     * Setting up all component channels. Multiple channels allow us to control incoming and outgoing messages much better.
      */
-    public void setupChannel()  {
+    private void setupChannel()  {
         for (Channel type : Channel.values()) {
             try {
                 this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).createChannel(type.getChannelType());
@@ -100,7 +96,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     /**
      * Setting up all things logging. The folder and the files to differentiate between request session and contract session.
      */
-    public void setupLogger() {
+    private void setupLogger() {
         String[] files = { Constant.RequestLog.getAppConstant(), Constant.ContractLog.getAppConstant() };
         try {
             SessionLogger.createLogDirectory(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant());
@@ -125,6 +121,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) throws IOException {
         CharSequence uri = messages.getURI();
         boolean invalid = false;
+
         while (uri != null) {
             if ( uri.equals(Channel.Advertisement.getChannelType()) ) {
                 invalid = isInvalid(messages, senderE2E, invalid);

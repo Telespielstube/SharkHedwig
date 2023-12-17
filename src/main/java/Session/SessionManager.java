@@ -1,14 +1,12 @@
 package Session;
 
-import Message.Contract.AbstractContract;
-import Message.Identification.AbstractIdentification;
+import DeliveryContract.DeliveryContract;
 import Message.Identification.Challenge;
-import Message.Identification.Response;
 import Setup.Channel;
 import Setup.Constant;
 import Setup.DeviceState;
 import Message.*;
-import Session.IdentificationSession.*;
+import Session.Sessions.*;
 import net.sharksystem.asap.ASAPException;
 import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.pki.SharkPKIComponent;
@@ -21,8 +19,8 @@ public class SessionManager implements ISessionManager {
     private SharkPKIComponent sharkPKIComponent;
     private ASAPPeer peer;
     private SessionState state;
-    private DeviceState deviceState;
-    private IIdentificationSession identification;
+
+    private Identification identification;
     private IMessageHandler messageHandler;
     private String sender;
     private Challenge messageObject;
@@ -36,31 +34,35 @@ public class SessionManager implements ISessionManager {
 
     public <T> boolean handleIncoming(T message, String sender, SessionState state, DeviceState deviceState) {
         this.state = state;
-        this.deviceState = deviceState;
         this.sender = sender;
 
-        if (this.deviceState.equals(DeviceState.Transferor.isActive())) {
-            transferorIncoming(message);
-        }
-        if (this.deviceState.equals(DeviceState.Transferee.isActive())) {
-            transfereeIncoming(message);
+        if (!DeliveryContract.contractCreated) {
+            handleTransferee(message);
+        } else {
+            deviceState = DeviceState.Transferor.isActive();
+            handleTransferor(message);
         }
         return true;
     }
 
-    public <T> void transferorIncoming(T message) {
+    public <T> void handleTransferor(T message) {
         if (this.state.equals(SessionState.NoSession) && (((IMessage) message).getMessageFlag().equals(MessageFlag.Advertisement.getFlag()))) {
             try {
-                this.identification = new IdentificationSession(sender, this.sharkPKIComponent);
+                this.identification = new Identification(sender, this.sharkPKIComponent);
+                this.messageObject = identification.initSession();
             } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
-            this.messageObject = identification.initSession();
             this.state.nextState();
         }
+
         if (this.state.equals(SessionState.Identification)) {
-                this.identification.processMessage(message);
-         //   this.state.nextState();
+                this.identification.unpackMessage(message);
+
+            if (this.identification.isSessionComplete()) {
+                this.state.nextState();
+            }
+
         }
         if (this.state.equals(SessionState.Request)) {
         }
@@ -73,7 +75,7 @@ public class SessionManager implements ISessionManager {
 
     }
 
-    public <T> void transfereeIncoming(T message) {
+    public <T> void handleTransferee(T message) {
 //        if (this.state.equals(SessionState.Identification) && ((AbstractIdentification) message).getMessageFlag().equals(MessageFlag.Challenge.getFlag())) {
 //            identification.parseMessage(message);
 //        } else {

@@ -15,12 +15,37 @@ public class Response extends AbstractIdentification {
         this.timestamp = timestamp;
     }
 
+    /**
+     * Contrstructor for a response to a response message. The second response message does not contain an
+     * encryptedNumber attribute anymore.
+     *
+     * @param uuid
+     * @param decryptedNumber
+     * @param messageFlag
+     * @param timestamp
+     */
+    public Response(UUID uuid, byte[] decryptedNumber, MessageFlag messageFlag, long timestamp) {
+        this.uuid = uuid;
+        this.decryptedNumber = decryptedNumber;
+        this.messageFlag = messageFlag;
+        this.timestamp = timestamp;
+    }
+
+    /**
+     * Constructor for a response to a challenge message.
+     *
+     * @param uuid
+     * @param encryptedNumber
+     * @param decryptedNumber
+     * @param messageFlag
+     * @param timestamp
+     */
     public Response(UUID uuid, byte[] encryptedNumber, byte[] decryptedNumber, MessageFlag messageFlag, long timestamp) {
         this.uuid = uuid;
         this.encryptedNumber = encryptedNumber;
+        this.decryptedNumber = decryptedNumber;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
-        this.decryptedNumber = decryptedNumber;
     }
 
     public byte[] getEncryptedNumber() {

@@ -3,6 +3,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 HedwigStorage/
+tester123/
 build/
 
 ### VS Code ###

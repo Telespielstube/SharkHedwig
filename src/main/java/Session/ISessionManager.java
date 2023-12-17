@@ -18,7 +18,7 @@ public interface ISessionManager {
      *
      * @param message    Incomming generic type Message object.
      */
-    <T> void transferorIncoming(T message);
+    <T> void handleTransferor(T message);
 
     /**
      * The incoming messages are handled differently based on the current device state.
@@ -26,7 +26,7 @@ public interface ISessionManager {
      *
      * @param message    Incoming generic type Message object.
      */
-    <T> void transfereeIncoming(T message);
+    <T> void handleTransferee(T message);
 
     /**
      * Methode to convert the Message object to an encrypted signed byte[] and send it as an ASAPMessage.
