@@ -66,16 +66,18 @@ public class Identification implements ISession {
         return this.secureNumber.equals(decryptedNumber);
     }
 
-    public void unpackMessage(Object message) {
+    public Response unpackMessage(Object message) {
+        Response response = null;
         if (((Response) message).getMessageFlag().equals(MessageFlag.Response)) {
-            handleResponse((Response) message);
+            response = handleResponse((Response) message);
         }
         if (((Response) message).getMessageFlag().equals(MessageFlag.ResponseRelpy)) {
-            handleResponseReply((Response) message);
+            response = handleResponseReply((Response) message);
         }
         if (((AckMessage) message).getMessageFlag().equals(MessageFlag.Ack)) {
             handleAckMessage((AckMessage) message);
         }
+        return response;
     }
 
     /**
@@ -111,7 +113,9 @@ public class Identification implements ISession {
      * Processes the steps after receiving the AckMessage object.
      */
     public void handleAckMessage(AckMessage ackMessage) {
-
+        if ( compareTimestamp(ackMessage.getTimestamp()) ) {
+            messageList.clear();
+        }
     }
     /**
      * Generates a sceure random number. The SecureRandom class generates a number up to 128 bits.
@@ -128,7 +132,7 @@ public class Identification implements ISession {
 
     public boolean isSessionComplete() {
         boolean isComplete = false;
-        if (messageList.size() == 4) {
+        if (messageList.isEmpty()) {
             isComplete = true;
         }
         return isComplete;

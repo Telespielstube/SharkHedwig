@@ -10,7 +10,7 @@ public interface ISession {
      * Unpacks the generic Message object to the according Message for this session it can be Challenge,
      * Response or an Ack message.
      */
-    <T> void unpackMessage(T message);
+    <T> T unpackMessage(T message);
 
     /**
      * Checks the TreeMap object if all neccessaray Message objects where sent and received.

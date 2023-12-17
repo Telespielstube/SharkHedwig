@@ -12,7 +12,7 @@ public class SharkComponentTestEnv {
 
 
     @Test
-    public void setupComponent() throws SharkException {
+    public void setupComponentTest() throws SharkException {
         ASAPPeer asapPeer = null;
         SharkPKIComponent sharkPKIComponent = null;
         Collection<CharSequence> formats = new ArrayList<>();

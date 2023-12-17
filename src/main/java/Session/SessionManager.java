@@ -19,11 +19,12 @@ public class SessionManager implements ISessionManager {
     private SharkPKIComponent sharkPKIComponent;
     private ASAPPeer peer;
     private SessionState state;
-
     private Identification identification;
+  //  private Request request;
+  //  private Contract contract;
     private IMessageHandler messageHandler;
     private String sender;
-    private Challenge messageObject;
+    private IMessage messageObject;
 
     public SessionManager(MessageHandler messageHandler, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) {
         this.messageHandler = messageHandler;
@@ -32,6 +33,7 @@ public class SessionManager implements ISessionManager {
 
     }
 
+    @Override
     public <T> boolean handleIncoming(T message, String sender, SessionState state, DeviceState deviceState) {
         this.state = state;
         this.sender = sender;
@@ -45,36 +47,40 @@ public class SessionManager implements ISessionManager {
         return true;
     }
 
+    @Override
     public <T> void handleTransferor(T message) {
         if (this.state.equals(SessionState.NoSession) && (((IMessage) message).getMessageFlag().equals(MessageFlag.Advertisement.getFlag()))) {
             try {
                 this.identification = new Identification(sender, this.sharkPKIComponent);
                 this.messageObject = identification.initSession();
+
             } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
             this.state.nextState();
         }
-
         if (this.state.equals(SessionState.Identification)) {
-                this.identification.unpackMessage(message);
-
+            this.messageObject = this.identification.unpackMessage(message);
+            handleOutgoing();
             if (this.identification.isSessionComplete()) {
                 this.state.nextState();
             }
-
         }
-        if (this.state.equals(SessionState.Request)) {
-        }
+//        if (this.state.equals(SessionState.Request)) {
+//           this.messageObject = this.request.unpackMessage(message);
+//           if (this.request.isSessionComplete()) {
+//               this.state.nextState();
+//           }
+//        }
 //        if (this.state.equals(SessionState.Contract)) {
-//            if (((AbstractContract) message).getMessageFlag().equals(MessageFlag.Request.getFlag())) {
+//            this.messageObject = this.contract.unpackMessage(message);
+//            if (this.contract.isSessionComplete()) {
+//                this.state.nextState();
 //            }
-//            if (((AbstractContract) message).getMessageFlag().equals(MessageFlag.Confirmation.getFlag())) {
-//                identification.parseMessage(message);
-//            }
-
+//        }
     }
 
+    @Override
     public <T> void handleTransferee(T message) {
 //        if (this.state.equals(SessionState.Identification) && ((AbstractIdentification) message).getMessageFlag().equals(MessageFlag.Challenge.getFlag())) {
 //            identification.parseMessage(message);
@@ -89,6 +95,7 @@ public class SessionManager implements ISessionManager {
 //        }
     }
 
+    @Override
     public void handleOutgoing() {
         byte[] signedByteMessage = this.messageHandler.buildOutgoingMessage(this.messageObject, Channel.Identification.getChannelType(), sender);
         try {
