@@ -20,11 +20,11 @@ public class SessionManager implements ISessionManager {
     private ASAPPeer peer;
     private SessionState state;
     private Identification identification;
-  //  private Request request;
+    private Request request;
   //  private Contract contract;
     private IMessageHandler messageHandler;
     private String sender;
-    private IMessage messageObject;
+    private Object messageObject;
 
     public SessionManager(MessageHandler messageHandler, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) {
         this.messageHandler = messageHandler;
@@ -59,20 +59,21 @@ public class SessionManager implements ISessionManager {
             }
             this.state.nextState();
         }
-        if (this.state.equals(SessionState.Identification)) {
+        else if (this.state.equals(SessionState.Identification)) {
             this.messageObject = this.identification.unpackMessage(message);
             handleOutgoing();
             if (this.identification.isSessionComplete()) {
                 this.state.nextState();
             }
         }
-//        if (this.state.equals(SessionState.Request)) {
-//           this.messageObject = this.request.unpackMessage(message);
-//           if (this.request.isSessionComplete()) {
-//               this.state.nextState();
-//           }
-//        }
-//        if (this.state.equals(SessionState.Contract)) {
+        else if (this.state.equals(SessionState.Request)) {
+           this.messageObject = this.request.unpackMessage(message);
+           handleOutgoing();
+           if (this.request.isSessionComplete()) {
+               this.state.nextState();
+           }
+        }
+//        else if (this.state.equals(SessionState.Contract)) {
 //            this.messageObject = this.contract.unpackMessage(message);
 //            if (this.contract.isSessionComplete()) {
 //                this.state.nextState();

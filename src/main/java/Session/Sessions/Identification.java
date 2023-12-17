@@ -18,7 +18,6 @@ import net.sharksystem.pki.SharkPKIComponent;
 public class Identification implements ISession {
 
     private SharkPKIComponent sharkPKIComponent;
-    private Response response;
     private Response responseReply;
     private Challenge challenge;
     private AckMessage ackMessage;
@@ -48,6 +47,7 @@ public class Identification implements ISession {
         return this.challenge;
     }
 
+
     public boolean compareTimestamp(long timestamp) {
         boolean valid = false;
         if (this.messageList.lastKey() - timestamp < this.timeOffset) {
@@ -66,18 +66,18 @@ public class Identification implements ISession {
         return this.secureNumber.equals(decryptedNumber);
     }
 
-    public Response unpackMessage(Object message) {
+    public Object unpackMessage(Object message) {
         Response response = null;
         if (((Response) message).getMessageFlag().equals(MessageFlag.Response)) {
-            response = handleResponse((Response) message);
+            return handleResponse((Response) message);
         }
         if (((Response) message).getMessageFlag().equals(MessageFlag.ResponseRelpy)) {
-            response = handleResponseReply((Response) message);
+            return handleResponseReply((Response) message);
         }
         if (((AckMessage) message).getMessageFlag().equals(MessageFlag.Ack)) {
             handleAckMessage((AckMessage) message);
         }
-        return response;
+        return null;
     }
 
     /**
@@ -97,16 +97,16 @@ public class Identification implements ISession {
                 e.printStackTrace();
             }
         }
-        return responseReply;
+        return this.responseReply;
     }
 
-    public Response handleResponseReply(Response responseReply) {
+    public AckMessage handleResponseReply(Response responseReply) {
         boolean isValid = false;
         if ( compareTimestamp(responseReply.getTimestamp()) && compareDecryptedNumber(responseReply.getDecryptedNumber()) ) {
             isValid = true;
-            this.ackMessage = new AckMessage(this.ackMessage.createUUID(), isValid, MessageFlag.Ack, Utilities.createTimestamp());
+            return new AckMessage(this.ackMessage.createUUID(), isValid, MessageFlag.Ack, Utilities.createTimestamp());
         }
-        return responseReply;
+        return null;
     }
 
     /**
