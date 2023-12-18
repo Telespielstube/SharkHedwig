@@ -8,11 +8,13 @@ import java.util.UUID;
 public class Advertisement implements IMessage {
 
     private UUID uuid;
+    private boolean adTag;
     private MessageFlag messageFlag;
     private long timestamp;
 
-    public Advertisement(UUID uuid, MessageFlag messageFlag, long timestamp) {
+    public Advertisement(UUID uuid, boolean adTag, MessageFlag messageFlag, long timestamp) {
         this.uuid = uuid;
+        this.adTag = adTag;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
 
@@ -25,6 +27,14 @@ public class Advertisement implements IMessage {
     @Override
     public UUID getUuid() {
         return null;
+    }
+
+    public boolean getAdTag() {
+        return this.adTag;
+    }
+
+    public void setAdTag(boolean adTag) {
+        this.adTag = adTag;
     }
 
     public MessageFlag getMessageFlag() {

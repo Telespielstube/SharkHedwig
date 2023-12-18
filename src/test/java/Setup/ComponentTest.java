@@ -1,7 +1,5 @@
 package Setup;
 
-import Message.Identification.*;
-import Message.Request.Request;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeerFS;
 import net.sharksystem.asap.ASAPPeer;
@@ -10,7 +8,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -35,17 +32,7 @@ public class ComponentTest {
         String uri = "sn2://Advertisement";
         assertEquals(uri, Channel.Advertisement.getChannelType());
     }
-
-//    private final Challenge challenge = new Challenge(UUID.randomUUID(), System.currentTimeMillis());
-//    private final Response response = new Response(UUID.randomUUID(), System.currentTimeMillis());
-//   // private final Request request = new Request();
-//    @Test
-//    public void returnTrueIfChallengeMessageIsOfTypeIdentification() {
-//        assertTrue(challenge instanceof AbstractIdentification);
-//    }
 //
 //    @Test
-//    public void returnTrueIfResponseMessageIsOfTypeIdentification() {
-//        assertTrue(response instanceof AbstractIdentification);
-//    }
+//    public void testIfAsapMessageReceivedPutsMessageInCorrect
 }

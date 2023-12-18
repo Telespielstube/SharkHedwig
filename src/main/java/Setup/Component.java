@@ -22,14 +22,12 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     private SharkPKIComponent sharkPKIComponent;
     private MessageHandler messageHandler;
     private ISessionManager sessionManager;
-    private SessionState sessionState;
     private DeviceState deviceState;
 
     public Component() {}
     public Component(SharkPKIComponent pkiComponent) {
         this.sharkPKIComponent = pkiComponent;
         this.messageHandler = new MessageHandler();
-        this.sessionManager = new SessionManager(this.messageHandler, this.peer, this.sharkPKIComponent);
     }
 
     /**
@@ -61,6 +59,8 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     @Override
     public void onStart(ASAPPeer asapPeer) throws SharkException {
         this.peer = asapPeer;
+        this.sessionManager = new SessionManager(this.messageHandler, SessionState.NoSession, DeviceState.Transferee ,this.peer, this.sharkPKIComponent);
+
         try {
             this.peer.setASAPRoutingAllowed(Constant.AppFormat.getAppConstant(), true);
         } catch (IOException e) {
@@ -71,9 +71,6 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
             this.setupChannel();
             this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).getOwner();
             this.setupLogger();
-            // Set the initial states for the session and the device.
-            this.sessionState = SessionState.NoSession.currentState();
-            this.deviceState = DeviceState.Transferee.isActive();
         } catch (IOException e) {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
         }
@@ -135,25 +132,40 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
             if (uri.equals(Channel.Contract.toString()))  {
                 invalid = isInvalid(messages, senderE2E, invalid);
             }
-            System.err.println("Message has invalid format" + invalid);
+            System.err.println("Message has invalid format: " + invalid);
         }
         System.err.println("Received message has no uri!");
         }
 
-    private boolean isInvalid(ASAPMessages messages, String senderE2E, boolean invalid) throws IOException {
+    /**
+     * The methode parses the byte[] message to a Message object and passes it to the SEssionManager class.
+     *
+     * @param messages    received message as byte[] data type..
+     * @param senderE2E   The device which sent the received message.
+     * @param invalid     False if message
+     * @return
+     * @throws IOException
+     */
+    private boolean isInvalid(ASAPMessages messages, String senderE2E, boolean invalid) {
         IMessage message;
-        for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
-            message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
-            if (!this.sessionManager.handleIncoming(message, senderE2E, this.sessionState, this.deviceState)) {
+        try {
+            for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
+                message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
+                if (this.sessionManager.checkTransferorState()) {
+                    sessionManager.handleTransferor(message, senderE2E);
+                } else {
+                    sessionManager.handleTransferee(message, senderE2E);
+                }
                 invalid = true;
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return invalid;
     }
 
     public void sendASAPMessage(Channel uri, byte[] signedMessage) throws ASAPException {
         this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), uri.toString(), signedMessage);
-
     }
 
 }

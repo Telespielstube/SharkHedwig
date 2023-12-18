@@ -1,13 +1,15 @@
 package Session.Sessions;
 
+import Message.IMessage;
+
 import java.util.SortedMap;
 
 public abstract class AbstractSession implements ISession {
 
-    private SortedMap<Long, Object> messageList;
+    protected SortedMap<Long, Object> messageList;
     private final long timeOffset = 5000;
 
-    public abstract Object unpackMessage(Object message);
+    public abstract Object unpackMessage(IMessage message);
 
     public boolean compareTimestamp(long timestamp) {
         boolean valid = false;
@@ -24,5 +26,5 @@ public abstract class AbstractSession implements ISession {
         }
         return isComplete;
     }
-    }
 }
+

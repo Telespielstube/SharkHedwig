@@ -5,13 +5,13 @@ import Message.MessageFlag;
 
 import java.util.UUID;
 
-public class Request extends AbstractRequest {
+public class Offer extends AbstractRequest {
 
     private double flightRange = 0.0;
     private double maxFreightWeight = 0.0;
 
-    public Request() {}
-    public Request(UUID uuid, MessageFlag messageFlag, long timestamp, double flightRange, double maxFreightWeight, Location currentLocation) {
+    public Offer() {}
+    public Offer(UUID uuid, MessageFlag messageFlag, long timestamp, double flightRange, double maxFreightWeight, Location currentLocation) {
         this.uuid = uuid;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;

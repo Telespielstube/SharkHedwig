@@ -1,5 +1,6 @@
 package Session.Sessions;
 
+import Message.IMessage;
 import Message.Identification.Challenge;
 
 /**
@@ -7,10 +8,9 @@ import Message.Identification.Challenge;
  */
 public interface ISession {
     /**
-     * Unpacks the generic Message object to the according Message for this session it can be Challenge,
-     * Response or an Ack message.
+     * Unpacks the generic Message object to the according message based on their flag.
      */
-    Object unpackMessage(Object message);
+    Object unpackMessage(IMessage message);
 
     /**
      * Compares two timestamps. The passed timestamp relates to the received message and the tother timestamps

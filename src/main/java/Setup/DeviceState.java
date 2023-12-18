@@ -14,25 +14,13 @@ public enum DeviceState {
         public DeviceState isActive() {
             return Transferor;
         }
-        @Override
-        public DeviceState isInactive() {
-            return Transferee;
-        }
-
     },
     Transferee {
         @Override
         public DeviceState isActive() {
             return Transferee;
         }
-
-        @Override
-        public DeviceState isInactive() {
-            return Transferor;
-        }
     };
 
     public abstract DeviceState isActive();
-    public abstract DeviceState isInactive();
-
 }
