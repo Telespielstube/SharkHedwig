@@ -5,6 +5,7 @@ import Message.IMessage;
 import Message.Identification.AbstractIdentification;
 import Message.Identification.Response;
 import Message.Request.AbstractRequest;
+import Message.Request.Confirm;
 import Message.Request.Offer;
 import Message.MessageFlag;
 import Message.Request.OfferReply;
@@ -24,15 +25,15 @@ public class Request extends AbstractSession {
 
 
     @Override
-    public Object unpackMessage(IMessage message) {
+    public Optional<Object> unpackMessage(IMessage message) {
         Optional<AbstractRequest> messageObject = null;
 
         switch(message.getMessageFlag()) {
             case Offer:
                 messageObject = Optional.of(handleOffer((Offer) message).get());
                 break;
-            case Ack:
-                messageObject = Optional.of(handleResponse((Response) message).get()));
+            case Confirm:
+                messageObject = Optional.of(handleConfirm((Confirm) message).get());
                 break;
             default:
                 break;
@@ -48,4 +49,7 @@ public class Request extends AbstractSession {
         return Optional.of(new OfferReply());
     }
 
+    private Optional<Confirm> handleConfirm(Confirm message) {
+        return Optional.of(new Confirm());
+    }
 }

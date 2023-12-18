@@ -20,7 +20,7 @@ public interface ISessionManager {
      *
      * @param message    Incomming generic type Message object.
      */
-     void handleTransferor(IMessage message, String sender);
+     void sessionHandling(IMessage message, String sender);
 
     /**
      * The incoming messages are handled differently based on the current device state.

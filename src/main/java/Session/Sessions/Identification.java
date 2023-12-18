@@ -48,7 +48,7 @@ public class Identification extends AbstractSession {
         return Arrays.equals(this.secureNumber, decryptedNumber);
     }
 
-    public Object unpackMessage(IMessage message) {
+    public Optional<Object> unpackMessage(IMessage message) {
         Optional<AbstractIdentification> messageObject = null;
 
         switch(message.getMessageFlag()) {

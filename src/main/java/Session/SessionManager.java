@@ -13,6 +13,7 @@ import net.sharksystem.pki.SharkPKIComponent;
 
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 public class SessionManager implements ISessionManager {
 
@@ -25,7 +26,7 @@ public class SessionManager implements ISessionManager {
     private Contract contract;
     private IMessageHandler messageHandler;
     private String sender;
-    private Object messageObject;
+    private Optional<Object> messageObject;
     private Advertisement advertisement;
 
     public SessionManager() {}
@@ -51,7 +52,7 @@ public class SessionManager implements ISessionManager {
     public boolean checkTransferorState() {
         boolean isTransferor = false;
         if ( (DeliveryContract.contractCreated)) {
-            this.isTransferor = DeviceState.Transferor;
+            this.isTransferor = DeviceState.Transferor.isActive();
             isTransferor = true;
         }
         else if (this.isTransferor.equals(DeviceState.Transferor.isActive())){
@@ -61,9 +62,10 @@ public class SessionManager implements ISessionManager {
     }
 
     @Override
-    public void handleTransferor(IMessage message, String sender) {
+    public void sessionHandling(IMessage message, String sender) {
         this.sender = sender;
 
+        checkTransferorState();
         switch (this.sessionState) {
             case NoSession:
                 try {
@@ -88,70 +90,40 @@ public class SessionManager implements ISessionManager {
                     this.sessionState.nextState();
                 }
                 break;
-            case Contract:
-                this.messageObject = this.contract.unpackMessage(message);
-                if (this.contract.isSessionComplete()) {
-                    this.sessionState.nextState();
-                }
-                break;
+//            case Contract:
+//                this.messageObject = this.contract.unpackMessage(message);
+//                if (this.contract.isSessionComplete()) {
+//                    this.sessionState.nextState();
+//                }
+//                break;
             default:
-                this.messageObject = null;
+                Optional.;
                 break;
         }
-        while (!this.messageObject.equals(null)) {
+        if (this.messageObject.isPresent()) {
+            this.messageObject.get();
             handleOutgoing();
         }
     }
-//        if (this.sessionState.equals(SessionState.NoSession) ) {
-//            try {
-//                this.identification = new Identification(this.sharkPKIComponent);
-//                this.messageObject = identification.unpackMessage(message);
-//                this.sessionState.nextState();
-//            } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
-//                e.printStackTrace();
-//                throw new RuntimeException(e);
-//            }
-//        }
-//        else if (this.sessionState.equals(SessionState.Identification)) {
-//            this.messageObject = this.identification.unpackMessage(message);
-//            if (this.identification.isSessionComplete()) {
-//                this.sessionState.nextState();
-//            }
-//        }
-//        else if (this.sessionState.equals(SessionState.Request)) {
-//            this.request = new Request();
-//            this.messageObject = this.request.unpackMessage(message);
-//            if (this.request.isSessionComplete()) {
-//                this.sessionState.nextState();
-//            }
-//        }
-//
-//        else if (this.sessionState.equals(SessionState.Contract)) {
-//            this.messageObject = this.contract.unpackMessage(message);
-//            if (this.contract.isSessionComplete()) {
-//                this.sessionState.nextState();
-//            }
-//        }
-//        while (!this.messageObject.equals(null)) {
-//            handleOutgoing();
-//        }
-//    }
 
     @Override
     public <T> void handleTransferee(IMessage message, String sender) {
         this.sender = sender;
-        if (this.sessionState.equals(SessionState.NoSession) ) {
-            this.messageObject = createAdvertisement();
-        } else if
 
-        while (!messageObject.equals(null)) {
-            handleOutgoing();
-        }
+        switch (this.sessionState) {
+            case NoSession:
+                this.messageObject = Optional.of(createAdvertisement());
+                break;
+            case Identification:
+                this.messageObject = Optional.of(this.identification.unpackMessage(message));
+                break;
+            default:
+
     }
 
     @Override
     public void handleOutgoing() {
-        byte[] signedByteMessage = this.messageHandler.buildOutgoingMessage(this.messageObject, Channel.Identification.getChannelType(), sender);
+        byte[] signedByteMessage = this.messageHandler.buildOutgoingMessage(this.messageObject, , sender);
         try {
             this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), Channel.Identification.getChannelType(), signedByteMessage);
         } catch (ASAPException e) {

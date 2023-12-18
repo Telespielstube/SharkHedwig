@@ -7,10 +7,11 @@ public enum MessageFlag {
     ResponseReply(4),
     Offer(5),
     OfferReply(6),
-    Contract(7),
-    Confirmation(8),
-    PickUp(9),
-    Ack(10);
+    Confirm(7),
+    Contract(8),
+    Confirmation(9),
+    PickUp(10),
+    Ack(11);
 
     private final int flag;
 

@@ -5,7 +5,7 @@ import Message.MessageFlag;
 
 import java.util.UUID;
 
-public class Confirm extends AbstractIdentification {
+public class Confirm extends AbstractRequest {
 
     private boolean isConfirm = false;
     public Confirm() {}
