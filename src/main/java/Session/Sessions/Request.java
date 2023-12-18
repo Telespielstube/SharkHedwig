@@ -1,13 +1,22 @@
 package Session.Sessions;
 
+import Message.Advertisement;
 import Message.IMessage;
+import Message.Identification.AbstractIdentification;
+import Message.Identification.Response;
+import Message.Request.AbstractRequest;
 import Message.Request.Offer;
 import Message.MessageFlag;
+import Message.Request.OfferReply;
+
 import java.util.Collections;
+import java.util.Optional;
 import java.util.TreeMap;
 
 public class Request extends AbstractSession {
 
+    private Offer offer;
+    private OfferReply offerReply;
 
     public Request() {
         this.messageList = Collections.synchronizedSortedMap(new TreeMap<>());
@@ -16,17 +25,27 @@ public class Request extends AbstractSession {
 
     @Override
     public Object unpackMessage(IMessage message) {
-        if (message.getMessageFlag().equals(MessageFlag.Offer)) {
-            return handleOffer((Offer) message);
-        } else if (message.getMessageFlag().equals(MessageFlag.OfferReply)) {
-            
+        Optional<AbstractRequest> messageObject = null;
+
+        switch(message.getMessageFlag()) {
+            case Offer:
+                messageObject = Optional.of(handleOffer((Offer) message).get());
+                break;
+            case Ack:
+                messageObject = Optional.of(handleResponse((Response) message).get()));
+                break;
+            default:
+                break;
         }
-        return null;
+        if (messageObject.isPresent()) {
+            this.messageList.put(messageObject.get().getTimestamp(), messageObject);
+        }
     }
 
 
-    public Offer handleOffer(Offer message) {
-        return null;
+    private Optional<OfferReply> handleOffer(Offer message) {
+
+        return Optional.of(new OfferReply());
     }
 
 }

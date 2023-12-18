@@ -49,20 +49,17 @@ public class Identification extends AbstractSession {
     }
 
     public Object unpackMessage(IMessage message) {
-        AbstractIdentification messageObject = null;
+        Optional<AbstractIdentification> messageObject = null;
 
         switch(message.getMessageFlag()) {
             case Advertisement:
-                messageObject = handleAdvertisement((Advertisement) message);
-               // this.challenge = (Challenge) messageObject;
+                messageObject = Optional.of(handleAdvertisement((Advertisement) message).get());
                 break;
             case Response:
-                messageObject = handleResponse((Response) message);
-           //     this.response = (Response) messageObject;
+                messageObject = Optional.of(handleResponse((Response) message).get()));
                 break;
             case ResponseReply:
-                messageObject = handleResponseReply((Response) message);
-           //     this.response = (Response) messageObject;
+                messageObject = Optional.of(handleResponseReply((Response) message).get());
                 break;
             case Ack:
                 if (handleAckMessage((AckMessage) message)) {
@@ -72,22 +69,22 @@ public class Identification extends AbstractSession {
                 System.err.println("No message object ");
                 break;
         }
-        if (messageObject != null) {
-            this.messageList.put(messageObject.getTimestamp(), messageObject);
+        if (messageObject.isPresent()) {
+            this.messageList.put(messageObject.get().getTimestamp(), messageObject);
         }
-        return messageObject;
+        return Optional.of(messageObject);
     }
 
-    private Challenge handleAdvertisement(Advertisement message) {
+    private Optional<Challenge> handleAdvertisement(Advertisement message) {
         if (message.getAdTag()) {
             try {
-                return new Challenge(this.challenge.createUUID(), Utilities.encryptRandomNumber(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()),
-                        MessageFlag.Challenge, Utilities.createTimestamp());
+                return Optional.of(new Challenge(this.challenge.createUUID(), Utilities.encryptRandomNumber(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()),
+                        MessageFlag.Challenge, Utilities.createTimestamp()));
             } catch (ASAPSecurityException e) {
                 throw new RuntimeException(e);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -97,24 +94,24 @@ public class Identification extends AbstractSession {
      * @param response    Received Response object.
      * @return            Response object.
      */
-    private Response handleResponse(Response response) {
+    private Optional<Response> handleResponse(Response response) {
         if ( compareTimestamp(response.getTimestamp()) && compareDecryptedNumber(response.getDecryptedNumber()) ) {
             try {
                 byte[] decryptedNumber = Utilities.decryptNumber(response.getEncryptedNumber(), this.sharkPKIComponent.getPrivateKey());
-                return new Response(this.response.createUUID(), decryptedNumber, MessageFlag.Response, Utilities.createTimestamp() );
+                return Optional.of(new Response(this.response.createUUID(), decryptedNumber, MessageFlag.Response, Utilities.createTimestamp() ));
             } catch (ASAPSecurityException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    private AckMessage handleResponseReply(Response responseReply) {
+    private Optional<AckMessage> handleResponseReply(Response responseReply) {
         if ( compareTimestamp(responseReply.getTimestamp()) && compareDecryptedNumber(responseReply.getDecryptedNumber()) ) {
-            return new AckMessage(this.ackMessage.createUUID(), true, MessageFlag.Ack, Utilities.createTimestamp());
+            return Optional.of(new AckMessage(this.ackMessage.createUUID(), true, MessageFlag.Ack, Utilities.createTimestamp()));
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
