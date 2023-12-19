@@ -82,11 +82,11 @@ public class ShippingLabel {
         return this.destination;
     }
 
-    public Location getLocationOrigin() {
+    public Location getPackageOrigin() {
         return this.locationOrigin;
     }
 
-    public Location getLocationDest() {
+    public Location getPackageDestination() {
         return this.locationDest;
     }
 }

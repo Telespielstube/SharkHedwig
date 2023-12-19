@@ -1,5 +1,6 @@
-package Message;
+package Message.Identification;
 
+import Message.IMessage;
 import Message.Identification.AbstractIdentification;
 import Message.MessageFlag;
 
@@ -11,10 +12,7 @@ public class AckMessage extends AbstractIdentification {
 
     public AckMessage() {}
     public AckMessage(UUID uuid, MessageFlag messageFlag, long timestamp, boolean isAck) {
-        this.uuid = uuid;
         this.isAck = isAck;
-        this.messageFlag = messageFlag;
-        this.timestamp = timestamp;
     }
 
     public MessageFlag getMessageFlag() {

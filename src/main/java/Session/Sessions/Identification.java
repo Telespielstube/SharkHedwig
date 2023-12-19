@@ -6,7 +6,7 @@ import java.security.SecureRandom;
 import java.util.*;
 import javax.crypto.NoSuchPaddingException;
 
-import Message.AckMessage;
+import Message.Identification.AckMessage;
 import Message.Advertisement;
 import Message.IMessage;
 import Message.Identification.*;
@@ -88,7 +88,6 @@ public class Identification extends AbstractSession {
         return Optional.ofNullable(messageObject);
     }
 
-
     private Optional<Response> handleChallenge(Challenge message) {
         try {
             byte[] decryptedNumber = Utilities.decryptNumber(response.getEncryptedNumber(), this.sharkPKIComponent.getPrivateKey());
@@ -149,6 +148,18 @@ public class Identification extends AbstractSession {
         return Optional.empty();
     }
 
+    /**
+     * Compares received timestamp to last saved message timestamp and checks the Ack flag.
+     *
+     * @return    True if message check was valid. False if not
+     */
+    public boolean handleAckMessage(AckMessage ackMessage)  {
+        boolean complete = false;
+        if ( compareTimestamp(ackMessage.getTimestamp()) && ackMessage.getIsAck() ) {
+            return complete = true;
+        }
+        return complete;
+    }
 
     /**
      * Generates a sceure random number. The SecureRandom class generates a number up to 128 bits.

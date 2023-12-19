@@ -24,4 +24,8 @@ public class DeliveryContract implements IDeliveryContract {
     public TransitRecord getTransitRecord() {
         return transitRecord;
     }
+
+    public DeliveryContract getDeliveryContract() {
+        return this;
+    }
 }

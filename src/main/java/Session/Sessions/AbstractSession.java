@@ -1,7 +1,6 @@
 package Session.Sessions;
 
 import Message.IMessage;
-import Message.AckMessage;
 
 import java.util.Optional;
 import java.util.SortedMap;
@@ -23,13 +22,10 @@ public abstract class AbstractSession implements ISession {
         return valid;
     }
 
-    public boolean handleAckMessage(AckMessage ackMessage) {
-        boolean complete = false;
-        if ( compareTimestamp(ackMessage.getTimestamp()) && ackMessage.getIsAck() ) {
-            return complete = true;
-        }
-        return complete;
+    public Object getLastValueFromList() {
+        return this.messageList.get(this.messageList.lastKey());
     }
+
 
     public boolean sessionComplete() {
         this.messageList.clear();

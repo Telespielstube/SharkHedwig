@@ -1,7 +1,6 @@
 package Session.Sessions;
 
 import Message.IMessage;
-import Message.AckMessage;
 
 import java.util.Optional;
 
@@ -30,11 +29,11 @@ public interface ISession {
     public boolean compareTimestamp(long timestamp);
 
     /**
-     * Compares received timestamp to last saved message timestamp and checks the Ack flag.
+     * Gets the last value from message TreeMap.
      *
-     * @return    True if message check was valid. False if not
+     * @return               Last object from TreeMap.
      */
-    public boolean handleAckMessage(AckMessage ackMessage);
+    public Object getLastValueFromList();
 
     /**
      * If all messages of a session are exchanged the list needs to be checked if

@@ -1,9 +1,13 @@
 package Battery;
 
 public class Battery implements IBattery {
+
+    public Battery() {
+
+    }
     @Override
     public int getBatteryLevel() {
-        return 0;
+        return 80;
     }
 
     @Override
