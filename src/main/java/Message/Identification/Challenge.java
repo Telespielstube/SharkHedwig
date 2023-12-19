@@ -13,7 +13,7 @@ public class Challenge extends AbstractIdentification {
         this.timestamp = timestamp;
     }
 
-    public Challenge(UUID uuid, byte[] challengeNumber, MessageFlag messageFlag, long timestamp) {
+    public Challenge(UUID uuid, MessageFlag messageFlag, long timestamp, byte[] challengeNumber) {
         this.uuid = uuid;
         this.challengeNumber = challengeNumber;
         this.messageFlag = messageFlag;

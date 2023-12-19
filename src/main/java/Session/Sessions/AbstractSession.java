@@ -1,7 +1,7 @@
 package Session.Sessions;
 
 import Message.IMessage;
-import Session.SessionState;
+import Message.AckMessage;
 
 import java.util.Optional;
 import java.util.SortedMap;
@@ -17,35 +17,23 @@ public abstract class AbstractSession implements ISession {
 
     public boolean compareTimestamp(long timestamp) {
         boolean valid = false;
-        if (this.messageList.lastKey() - timestamp < this.timeOffset) {
+        if (timestamp - this.messageList.lastKey() < this.timeOffset) {
             valid = true;
         }
         return valid;
     }
 
-
-//    /**
-//     * If some message does not seem legit the complete communication sessions are reset to NoSession
-//     * .
-//     * @param sessionState    current session.
-//     */
-//    public void cancelSession(SessionState sessionState) {
-//        sessionState.resetState();
-//        this.messageList.clear();
-//    }
-
-
-    /**
-     * If all messages of a session are exchanged the message list is cleared.
-     *
-     * @return    true if
-     */
-    public boolean isSessionComplete() {
-        boolean isComplete = false;
-        if (this.messageList.isEmpty()) {
-            isComplete = true;
+    public boolean handleAckMessage(AckMessage ackMessage) {
+        boolean complete = false;
+        if ( compareTimestamp(ackMessage.getTimestamp()) && ackMessage.getIsAck() ) {
+            return complete = true;
         }
-        return isComplete;
+        return complete;
+    }
+
+    public boolean sessionComplete() {
+        this.messageList.clear();
+        return true;
     }
 }
 

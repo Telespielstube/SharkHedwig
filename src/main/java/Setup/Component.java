@@ -9,12 +9,15 @@ import net.sharksystem.SharkPeerFS;
 import net.sharksystem.asap.*;
 import net.sharksystem.pki.SharkPKIComponent;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.List;
 
 import Misc.SessionLogger;
 import Message.*;
 import Session.*;
+
+import javax.crypto.NoSuchPaddingException;
 
 public class Component implements SharkComponent, ASAPMessageReceivedListener {
 
@@ -59,19 +62,14 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     @Override
     public void onStart(ASAPPeer asapPeer) throws SharkException {
         this.peer = asapPeer;
-        this.sessionManager = new SessionManager(this.messageHandler, SessionState.NoSession, DeviceState.Transferee ,this.peer, this.sharkPKIComponent);
-
-        try {
-            this.peer.setASAPRoutingAllowed(Constant.AppFormat.getAppConstant(), true);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         this.peer.addASAPMessageReceivedListener(Constant.AppFormat.getAppConstant(), this);
         try {
+            this.sessionManager = new SessionManager(this.messageHandler, SessionState.NoSession, DeviceState.Transferee ,this.peer, this.sharkPKIComponent);
+            this.peer.setASAPRoutingAllowed(Constant.AppFormat.getAppConstant(), true);
             this.setupChannel();
             this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).getOwner();
             this.setupLogger();
-        } catch (IOException e) {
+        } catch (IOException | NoSuchPaddingException | NoSuchAlgorithmException e) {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
         }
         new PKIManager(Constant.CaId.getAppConstant(), sharkPKIComponent);

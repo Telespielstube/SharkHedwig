@@ -1,6 +1,8 @@
 package Session;
 
 import DeliveryContract.DeliveryContract;
+import Misc.LogEntry;
+import Misc.SessionLogger;
 import Misc.Utilities;
 import Setup.Channel;
 import Setup.Constant;
@@ -28,17 +30,21 @@ public class SessionManager implements ISessionManager {
     private String sender;
     private Optional<Object> messageObject;
     private Advertisement advertisement;
+    private LogEntry logEntry;
 
     public SessionManager() {}
 
-    public SessionManager(MessageHandler messageHandler, SessionState sessionState, DeviceState isTransferor, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) {
+    public SessionManager(MessageHandler messageHandler, SessionState sessionState, DeviceState isTransferor, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.messageHandler = messageHandler;
         this.peer = peer;
         this.sharkPKIComponent = sharkPKIComponent;
         this.isTransferor = isTransferor;
         this.sessionState = sessionState;
+        this.identification = new Identification(this.sharkPKIComponent);
+        this.request = new Request();
+        this.contract = new Contract();
+        this.logEntry = new LogEntry();
     }
-
 
     /**
      * A small message just to advertise a delivery service.
@@ -65,56 +71,48 @@ public class SessionManager implements ISessionManager {
 
         switch (this.sessionState) {
             case NoSession:
-                try {
-                    this.identification = new Identification(this.sharkPKIComponent);
-                    if (checkTransferorState()) {
-                        this.messageObject = Optional.ofNullable(identification.transferor(message).orElse(this.sessionState.resetState()));
-                    }
-                    this.messageObject = Optional.of(createAdvertisement());
-                    this.sessionState.nextState();
-                } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
-                    throw new RuntimeException(e);
+                if (checkTransferorState()) {
+                    this.messageObject = Optional.ofNullable(this.identification.transferor(message).orElse(this.sessionState.resetState()));
                 }
+                this.messageObject = Optional.of(createAdvertisement());
+                this.sessionState.nextState();
                 break;
 
             case Identification:
                 if (checkTransferorState()) {
-                    this.messageObject = Optional.ofNullable(identification.transferor(message).orElse(this.sessionState.resetState()));
+                    this.messageObject = Optional.ofNullable(this.identification.transferor(message).orElse(this.sessionState.resetState()));
                 }
-                this.messageObject = Optional.ofNullable(identification.transferee(message).orElse(this.sessionState.resetState()));
-                if (this.identification.isSessionComplete()) {
+                this.messageObject = Optional.ofNullable(this.identification.transferee(message).orElse(this.sessionState.resetState()));
+                break;
+
+            case Request:
+                if (checkTransferorState()) {
+                    this.messageObject = Optional.ofNullable(this.request.transferor(message).orElse(this.sessionState.resetState()));
+                }
+                this.messageObject = Optional.ofNullable(this.request.transferee(message).orElse(this.sessionState.resetState()));
+                if (SessionLogger.writeEntry(null, Constant.RequestLogPath.getAppConstant())) {
+                    this.request.sessionComplete();
                     this.sessionState.nextState();
                 }
                 break;
 
-            case Request:
-                this.request = new Request();
+            case Contract:
                 if (checkTransferorState()) {
                     this.messageObject = identification.transferor(message);
                 } else {
                     this.messageObject = identification.transferee(message);
                 }
-                //   this.messageObject = this.request.unpackMessage(message);
-                if (this.request.isSessionComplete()) {
+                if (SessionLogger.writeEntry(null, Constant.ContractLog.getAppConstant())) {
+                    this.request.sessionComplete();
                     this.sessionState.nextState();
                 }
                 break;
-//                case Contract:
-//                    // this.messageObject = this.contract.unpackMessage(message);
-//                    if (checkTransferorState()) {
-//                        this.messageObject = identification.transferor(message);
-//                    } else {
-//                        this.messageObject = identification.transferee(message);
-//                    }
-//                    if (this.contract.isSessionComplete()) {
-//                        this.sessionState.nextState();
-//                    }
-//                    break;
             default:
                 break;
         }
         handleOutgoing();
     }
+
 
     @Override
     public void handleOutgoing() {

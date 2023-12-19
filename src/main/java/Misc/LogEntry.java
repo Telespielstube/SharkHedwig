@@ -13,6 +13,8 @@ public class LogEntry {
     byte[] signatureTransferor;
     byte[] signatureTransferee;
 
+    public LogEntry() {}
+
     public LogEntry(UUID packageId, long timestamp, String transferor, String transferee, byte[] signatureTransferor, byte[] signatureTransferee) {
 
     }

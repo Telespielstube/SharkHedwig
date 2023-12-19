@@ -40,12 +40,12 @@ public class Response extends AbstractIdentification {
      * @param messageFlag
      * @param timestamp
      */
-    public Response(UUID uuid, byte[] encryptedNumber, byte[] decryptedNumber, MessageFlag messageFlag, long timestamp) {
+    public Response(UUID uuid, MessageFlag messageFlag, long timestamp, byte[] encryptedNumber, byte[] decryptedNumber) {
         this.uuid = uuid;
-        this.encryptedNumber = encryptedNumber;
-        this.decryptedNumber = decryptedNumber;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
+        this.encryptedNumber = encryptedNumber;
+        this.decryptedNumber = decryptedNumber;
     }
 
     public byte[] getEncryptedNumber() {

@@ -6,6 +6,7 @@ import java.security.SecureRandom;
 import java.util.*;
 import javax.crypto.NoSuchPaddingException;
 
+import Message.AckMessage;
 import Message.Advertisement;
 import Message.IMessage;
 import Message.Identification.*;
@@ -50,7 +51,7 @@ public class Identification extends AbstractSession {
                     break;
                 }
             default:
-                System.err.println("No message object ");
+                System.err.println("Missing message flag.");
                 break;
         }
         if (messageObject.isPresent()) {
@@ -72,22 +73,26 @@ public class Identification extends AbstractSession {
                 messageObject = Optional.ofNullable(handleResponseReply((Response) message).orElse(null));
                 break;
             case Ready:
-
+                if (!handleAckMessage((AckMessage) message)) {
+                    messageObject.orElse(null);
+                }
+                break;
             default:
+                System.err.println("Missing message flag.");
                 break;
         }
-        if (messageObject.isPresent()) {
-            this.messageList.put(messageObject.get().getTimestamp(), messageObject);
-        } else {
+        if (!messageObject.isPresent()) {
             this.messageList.clear();
         }
+        this.messageList.put(messageObject.get().getTimestamp(), messageObject);
         return Optional.ofNullable(messageObject);
     }
+
 
     private Optional<Response> handleChallenge(Challenge message) {
         try {
             byte[] decryptedNumber = Utilities.decryptNumber(response.getEncryptedNumber(), this.sharkPKIComponent.getPrivateKey());
-            this.response = Optional.of(new Response(this.response.createUUID(), Utilities.encryptRandomNumber(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()), decryptedNumber, MessageFlag.Response, Utilities.createTimestamp())).get();
+            this.response = Optional.of(new Response(this.response.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), Utilities.encryptRandomNumber(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()), decryptedNumber)).get();
         } catch (ASAPSecurityException e) {
             throw new RuntimeException(e);
         }
@@ -98,8 +103,8 @@ public class Identification extends AbstractSession {
     private Optional<Challenge> handleAdvertisement(Advertisement message) {
         if (message.getAdTag()) {
             try {
-                return Optional.of(new Challenge(this.challenge.createUUID(), Utilities.encryptRandomNumber(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()),
-                        MessageFlag.Challenge, Utilities.createTimestamp()));
+                return Optional.of(new Challenge(this.challenge.createUUID(), MessageFlag.Challenge, Utilities.createTimestamp(),
+                        Utilities.encryptRandomNumber(generateRandomNumber(), this.sharkPKIComponent.getPublicKey())));
             } catch (ASAPSecurityException e) {
                 throw new RuntimeException(e);
             }
@@ -139,24 +144,11 @@ public class Identification extends AbstractSession {
 
     private Optional<AckMessage> handleResponseReply(Response responseReply) {
         if ( compareTimestamp(responseReply.getTimestamp()) && compareDecryptedNumber(responseReply.getDecryptedNumber()) ) {
-            return Optional.of(new AckMessage(this.ackMessage.createUUID(), true, MessageFlag.Ack, Utilities.createTimestamp()));
+            return Optional.of(new AckMessage(this.ackMessage.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
     }
 
-    /**
-     * Processes the steps after receiving the AckMessage object.
-     *
-     * @return
-     */
-    private boolean handleAckMessage(AckMessage ackMessage) {
-        boolean complete = false;
-        if ( compareTimestamp(ackMessage.getTimestamp()) && ackMessage.getIsAck() ) {
-            messageList.clear();
-            return complete = true;
-        }
-        return complete;
-    }
 
     /**
      * Generates a sceure random number. The SecureRandom class generates a number up to 128 bits.

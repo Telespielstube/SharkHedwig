@@ -11,8 +11,9 @@ public enum Constant {
     // Constants for the log files. */
     LogFolder("Log"),
     RequestLog("Request"),
-    ContractLog("ContractLog");
-
+    RequestLogPath("HedwigStroage/Log/Request.txt"),
+    ContractLog("Contract"),
+    ContractLogPath("HedwigStorage/Log/Contract.txt");
     private final String name;
 
     Constant(String name) {

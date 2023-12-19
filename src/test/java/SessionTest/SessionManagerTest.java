@@ -6,6 +6,9 @@ import Session.SessionState;
 import Setup.DeviceState;
 import org.junit.Test;
 
+import javax.crypto.NoSuchPaddingException;
+import java.security.NoSuchAlgorithmException;
+
 import static org.junit.Assert.*;
 
 public class SessionManagerTest {
@@ -14,6 +17,9 @@ public class SessionManagerTest {
 //    private final Response response = new Response(UUID.randomUUID(), System.currentTimeMillis());
 //    private final Contract contract = new Contract();
     private final SessionManager sessionManager = new SessionManager(null, SessionState.NoSession, DeviceState.Transferee, null, null);
+
+    public SessionManagerTest() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    }
 
     @Test
     public void testIfDeviceTransferorStateReturnsFalseWhenDeliveryContractIsCreatedButEmpty() {

@@ -1,7 +1,7 @@
 package Session.Sessions;
 
 import Message.IMessage;
-import Message.Identification.Challenge;
+import Message.AckMessage;
 
 import java.util.Optional;
 
@@ -10,23 +10,37 @@ import java.util.Optional;
  */
 public interface ISession {
     /**
-     * Unpacks the generic Message object to the according message based on their flag.
+     * if protocol is in transferor state.
      */
     Optional<Object> transferor(IMessage message);
 
-    Optional<Object> transferee(IMessage message);
     /**
-     * Compares two timestamps. The passed timestamp relates to the received message and the tother timestamps
-     * relates to the sent and saved message.
+     * If protocol is in transferee state.
+     * @param message
+     * @return
+     */
+    Optional<Object> transferee(IMessage message);
+
+    /**
+     * Compares to timestamps if the difference is less than the offset of 5 seconds.
      *
      * @param timestamp    timestamp of received message.
-     * @return             true if timestamp is valid the difference is not greater than 5 seconds.
+     * @return             True if difference is less than offset. False if it is greater than.
      */
     public boolean compareTimestamp(long timestamp);
+
     /**
-     * Checks the TreeMap object if all neccessaray Message objects where sent and received.
+     * Compares received timestamp to last saved message timestamp and checks the Ack flag.
      *
-     * @return    Treu if the size of the TreeMap matches the expected message number of session messages.
+     * @return    True if message check was valid. False if not
      */
-    boolean isSessionComplete();
+    public boolean handleAckMessage(AckMessage ackMessage);
+
+    /**
+     * If all messages of a session are exchanged the list needs to be checked if
+     * all messages are cleared out.
+     *
+     * @return    true if list is cleared.
+     */
+    boolean sessionComplete();
 }
