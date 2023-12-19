@@ -117,22 +117,17 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     @Override
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) throws IOException {
         CharSequence uri = messages.getURI();
-        boolean invalid = false;
-
         while (uri != null) {
             if ( uri.equals(Channel.Advertisement.getChannelType()) ) {
-                invalid = isInvalid(messages, senderE2E, invalid);
+                processMessages(messages, senderE2E);
+            } else if ( (uri.equals(Channel.Identification.getChannelType()))) {
+                processMessages(messages, senderE2E);
+            } else if (uri.equals(Channel.Request.toString()))  {
+                processMessages(messages, senderE2E);
+            } else if (uri.equals(Channel.Contract.toString()))  {
+                processMessages(messages, senderE2E);
             }
-            if ( (uri.equals(Channel.Identification.getChannelType()))) {
-                invalid = isInvalid(messages, senderE2E, invalid);
-            }
-            if (uri.equals(Channel.Request.toString()))  {
-                invalid = isInvalid(messages, senderE2E, invalid);
-            }
-            if (uri.equals(Channel.Contract.toString()))  {
-                invalid = isInvalid(messages, senderE2E, invalid);
-            }
-            System.err.println("Message has invalid format: " + invalid);
+            System.err.println("Message has invalid format: ");
         }
         System.err.println("Received message has no uri!");
         }
@@ -142,26 +137,19 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
      *
      * @param messages    received message as byte[] data type..
      * @param senderE2E   The device which sent the received message.
-     * @param invalid     False if message
      * @return
      * @throws IOException
      */
-    private boolean isInvalid(ASAPMessages messages, String senderE2E, boolean invalid) {
+    private void processMessages(ASAPMessages messages, String senderE2E) {
         IMessage message;
         try {
             for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
                 message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
-                if (this.sessionManager.checkTransferorState()) {
-                    sessionManager.handleTransferor(message, senderE2E);
-                } else {
-                    sessionManager.handleTransferee(message, senderE2E);
-                }
-                invalid = true;
+                sessionManager.sessionHandling(message, senderE2E);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return invalid;
     }
 
     public void sendASAPMessage(Channel uri, byte[] signedMessage) throws ASAPException {

@@ -24,24 +24,24 @@ public class Request extends AbstractSession {
     }
 
 
-    @Override
-    public Optional<Object> unpackMessage(IMessage message) {
-        Optional<AbstractRequest> messageObject = null;
-
-        switch(message.getMessageFlag()) {
-            case Offer:
-                messageObject = Optional.of(handleOffer((Offer) message).get());
-                break;
-            case Confirm:
-                messageObject = Optional.of(handleConfirm((Confirm) message).get());
-                break;
-            default:
-                break;
-        }
-        if (messageObject.isPresent()) {
-            this.messageList.put(messageObject.get().getTimestamp(), messageObject);
-        }
-    }
+//    @Override
+//    public Optional<Object> unpackMessage(IMessage message) {
+//        Optional<AbstractRequest> messageObject = null;
+//
+//        switch(message.getMessageFlag()) {
+//            case Offer:
+//                messageObject = Optional.of(handleOffer((Offer) message).get());
+//                break;
+//            case Confirm:
+//                messageObject = Optional.of(handleConfirm((Confirm) message).get());
+//                break;
+//            default:
+//                break;
+//        }
+//        if (messageObject.isPresent()) {
+//            this.messageList.put(messageObject.get().getTimestamp(), messageObject);
+//        }
+//    }
 
 
     private Optional<OfferReply> handleOffer(Offer message) {
@@ -51,5 +51,15 @@ public class Request extends AbstractSession {
 
     private Optional<Confirm> handleConfirm(Confirm message) {
         return Optional.of(new Confirm());
+    }
+
+    @Override
+    public Optional<Object> transferor(IMessage message) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Object> transferee(IMessage message) {
+        return Optional.empty();
     }
 }

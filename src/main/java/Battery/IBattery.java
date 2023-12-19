@@ -1,5 +1,6 @@
 package Battery;
 
+
 public interface IBattery {
 
     /**
@@ -12,10 +13,9 @@ public interface IBattery {
     /**
      * Claculates an estimated value based on the passed parameter.
      *
-     * @param destination    Destination of the package.
      * @return               Expected battery consumption.
      */
-    public int expectedConsumptionToDestination(Location destination);
+    public int expectedConsumptionToDestination();
 
     /**
      * Based on the calculated consumption trueor false is returned.

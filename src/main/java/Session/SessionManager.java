@@ -39,6 +39,7 @@ public class SessionManager implements ISessionManager {
         this.sessionState = sessionState;
     }
 
+
     /**
      * A small message just to advertise a delivery service.
      *
@@ -51,11 +52,8 @@ public class SessionManager implements ISessionManager {
     @Override
     public boolean checkTransferorState() {
         boolean isTransferor = false;
-        if ( (DeliveryContract.contractCreated)) {
+        if (DeliveryContract.contractCreated) {
             this.isTransferor = DeviceState.Transferor.isActive();
-            isTransferor = true;
-        }
-        else if (this.isTransferor.equals(DeviceState.Transferor.isActive())){
             isTransferor = true;
         }
         return isTransferor;
@@ -65,65 +63,62 @@ public class SessionManager implements ISessionManager {
     public void sessionHandling(IMessage message, String sender) {
         this.sender = sender;
 
-        checkTransferorState();
         switch (this.sessionState) {
             case NoSession:
                 try {
                     this.identification = new Identification(this.sharkPKIComponent);
-                    this.messageObject = identification.unpackMessage(message);
+                    if (checkTransferorState()) {
+                        this.messageObject = Optional.ofNullable(identification.transferor(message).orElse(this.sessionState.resetState()));
+                    }
+                    this.messageObject = Optional.of(createAdvertisement());
                     this.sessionState.nextState();
                 } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
-                    e.printStackTrace();
                     throw new RuntimeException(e);
                 }
                 break;
+
             case Identification:
-                this.messageObject = this.identification.unpackMessage(message);
+                if (checkTransferorState()) {
+                    this.messageObject = Optional.ofNullable(identification.transferor(message).orElse(this.sessionState.resetState()));
+                }
+                this.messageObject = Optional.ofNullable(identification.transferee(message).orElse(this.sessionState.resetState()));
                 if (this.identification.isSessionComplete()) {
                     this.sessionState.nextState();
                 }
                 break;
+
             case Request:
                 this.request = new Request();
-                this.messageObject = this.request.unpackMessage(message);
+                if (checkTransferorState()) {
+                    this.messageObject = identification.transferor(message);
+                } else {
+                    this.messageObject = identification.transferee(message);
+                }
+                //   this.messageObject = this.request.unpackMessage(message);
                 if (this.request.isSessionComplete()) {
                     this.sessionState.nextState();
                 }
                 break;
-//            case Contract:
-//                this.messageObject = this.contract.unpackMessage(message);
-//                if (this.contract.isSessionComplete()) {
-//                    this.sessionState.nextState();
-//                }
-//                break;
+//                case Contract:
+//                    // this.messageObject = this.contract.unpackMessage(message);
+//                    if (checkTransferorState()) {
+//                        this.messageObject = identification.transferor(message);
+//                    } else {
+//                        this.messageObject = identification.transferee(message);
+//                    }
+//                    if (this.contract.isSessionComplete()) {
+//                        this.sessionState.nextState();
+//                    }
+//                    break;
             default:
-                Optional.;
                 break;
         }
-        if (this.messageObject.isPresent()) {
-            this.messageObject.get();
-            handleOutgoing();
-        }
-    }
-
-    @Override
-    public <T> void handleTransferee(IMessage message, String sender) {
-        this.sender = sender;
-
-        switch (this.sessionState) {
-            case NoSession:
-                this.messageObject = Optional.of(createAdvertisement());
-                break;
-            case Identification:
-                this.messageObject = Optional.of(this.identification.unpackMessage(message));
-                break;
-            default:
-
+        handleOutgoing();
     }
 
     @Override
     public void handleOutgoing() {
-        byte[] signedByteMessage = this.messageHandler.buildOutgoingMessage(this.messageObject, , sender);
+        byte[] signedByteMessage = this.messageHandler.buildOutgoingMessage(this.messageObject, "uri", sender);
         try {
             this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), Channel.Identification.getChannelType(), signedByteMessage);
         } catch (ASAPException e) {

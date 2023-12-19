@@ -3,6 +3,8 @@ package Session.Sessions;
 import Message.IMessage;
 import Message.Identification.Challenge;
 
+import java.util.Optional;
+
 /**
  * Interface for all protcol sessions.
  */
@@ -10,8 +12,9 @@ public interface ISession {
     /**
      * Unpacks the generic Message object to the according message based on their flag.
      */
-    Object unpackMessage(IMessage message);
+    Optional<Object> transferor(IMessage message);
 
+    Optional<Object> transferee(IMessage message);
     /**
      * Compares two timestamps. The passed timestamp relates to the received message and the tother timestamps
      * relates to the sent and saved message.
