@@ -11,6 +11,8 @@ import Setup.Constant;
  */
 public class ShippingLabel {
 
+    public static boolean labelCreated = false;
+
     private UUID packageUUID;
     private String transferorID = null;
     private String sender = null;
@@ -21,7 +23,9 @@ public class ShippingLabel {
     private Location locationOrigin = null;
     private Location locationDest = null;
 
-    public ShippingLabel() {}
+    public ShippingLabel() {
+        labelCreated = false;
+    }
     /**
      * Creates the shipping label object from the user input data, the uuid and the PEER_NAME.
      *
@@ -33,9 +37,8 @@ public class ShippingLabel {
      * @param locationDest      Geolocation of the reception location.
      * @param packageWeight     Weight of the package.
      */
-    public ShippingLabel(String sender, String origin, Location locationOrigin, String recipient, String destination, Location locationDest, double packageWeight) {
-        this.packageUUID = UUID.randomUUID();
-        this.transferorID = Constant.PeerName.getAppConstant();
+    public ShippingLabel(UUID packageUUID, String sender, String origin, Location locationOrigin, String recipient, String destination, Location locationDest, double packageWeight) {
+        this.packageUUID = packageUUID;
         this.sender = sender;
         this.origin = origin;
         this.locationOrigin = locationOrigin;
@@ -43,6 +46,45 @@ public class ShippingLabel {
         this.destination = destination;
         this.locationDest = locationDest;
         this.packageWeight = packageWeight;
+        labelCreated = true;
+    }
+
+    public UUID createUUID() {
+        return UUID.randomUUID();
+    }
+
+    // Getter methods to get the value of the Object field.
+    public UUID getUUID() {
+        return this.packageUUID;
+    }
+
+    public String getSender() {
+        return this.sender;
+    }
+
+    public String getOrigin() {
+        return this.origin;
+    }
+
+    public Location getPackageOrigin() {
+        return this.locationOrigin;
+    }
+
+    public String getRecipient() {
+        return this.recipient;
+    }
+
+    public String getDestination() {
+        return this.destination;
+    }
+
+
+    public Location getPackageDestination() {
+        return this.locationDest;
+    }
+
+    public double getPackageWeight() {
+        return this.packageWeight;
     }
 
     /**
@@ -55,38 +97,5 @@ public class ShippingLabel {
         return String.format(this.packageUUID + this.transferorID + this.sender + this.origin +
                 this.locationOrigin + this.recipient + this.destination +
                 this.locationDest + this.packageWeight);
-    }
-
-    // Getter methods to get the value of the Object field.
-    public UUID getPackageUUID() {
-        return this.packageUUID;
-    }
-
-    public String getSender() {
-        return this.sender;
-    }
-
-    public String getOrigin() {
-        return this.origin;
-    }
-
-    public String getRecipient() {
-        return this.recipient;
-    }
-
-    public double getPackageWeight() {
-        return this.packageWeight;
-    }
-
-    public String getDestination() {
-        return this.destination;
-    }
-
-    public Location getPackageOrigin() {
-        return this.locationOrigin;
-    }
-
-    public Location getPackageDestination() {
-        return this.locationDest;
     }
 }

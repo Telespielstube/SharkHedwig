@@ -1,6 +1,7 @@
 package Setup;
 
 import DeliveryContract.*;
+import Location.Location;
 import Session.SessionManager;
 import org.junit.Test;
 
@@ -11,17 +12,23 @@ import static org.junit.Assert.*;
 public class DeviceStateTest {
 
     private final SessionManager sessionManager = new SessionManager();
+    private ShippingLabel shippingLabel;
+
     @Test
     public void testIfStateIsSwitchedToTransferorAfterDeliveryContractIsCreated() {
-        new DeliveryContract(new ShippingLabel(), new TransitRecord());
-        assertTrue(DeliveryContract.contractCreated);
+        new ShippingLabel(shippingLabel.createUUID(), "Alice", "HTW-Berlin", new Location(80.67, 90.56),
+                "Bob", "Ostbahnhof", new Location(52.5105, 13.4346),
+                1.2);
+        assertTrue(ShippingLabel.labelCreated);
+        assertEquals("Transferor", Transferor);
     }
 
     @Test
-    public void testIfStateIsTransfereeAsLongAsNoDeliveryContractIsCreated() {
+    public void testIfStateIsTransfereeAsLongAsNoShippingLabelIsCreated() {
        //  DeviceState state = DeviceState.Transferee.isActive();
-         new DeliveryContract();
-         assertFalse(DeliveryContract.contractCreated);
+         new ShippingLabel();
+         assertFalse(ShippingLabel.labelCreated);
+         assertEquals("Transferee", Transferee);
     }
 
     @Test
@@ -32,7 +39,7 @@ public class DeviceStateTest {
 
 
     @Test
-    public void checkIfCurentStateIsTransferor() {
+    public void checkIfCurrentStateIsTransferor() {
         DeviceState state = DeviceState.Transferor.isActive();
         System.out.println("Device state: " + state.toString());
         assertEquals(Transferor, state);

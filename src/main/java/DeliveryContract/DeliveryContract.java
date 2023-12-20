@@ -1,20 +1,20 @@
 package DeliveryContract;
 
+import Message.IMessage;
+
 public class DeliveryContract implements IDeliveryContract {
+
+    public static boolean isCreated = false;
 
     private ShippingLabel shippingLabel;
     private TransitRecord transitRecord;
 
-    public static boolean contractCreated = false;
-
-    public DeliveryContract() {
-        contractCreated = false;
-    }
+    public DeliveryContract() {}
 
     public DeliveryContract(ShippingLabel shippingLabel, TransitRecord transitRecord) {
         this.shippingLabel = shippingLabel;
         this.transitRecord = transitRecord;
-        contractCreated = true;
+        isCreated = true;
     }
 
     public ShippingLabel getShippingLabel() {

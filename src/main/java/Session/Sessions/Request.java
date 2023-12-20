@@ -7,7 +7,6 @@ import Message.MessageFlag;
 import Message.Request.*;
 import Battery.Battery;
 import Location.GeoCalculation;
-import Message.Request.OfferReply;
 import Misc.LogEntry;
 import Misc.SessionLogger;
 import Misc.Utilities;
@@ -25,16 +24,16 @@ public class Request extends AbstractSession {
     private Battery battery;
     private GeoCalculation geoCalculation;
     private DeliveryContract deliveryContract;
+    private AckMessage ackMessage;
 
     public Request() {
         this.battery = new Battery();
         this.geoCalculation = new GeoCalculation();
         this.messageList = Collections.synchronizedSortedMap(new TreeMap<>());
-
     }
 
     @Override
-    public Optional<Object> transferor(IMessage message) {
+    public Optional<Object> transferor(IMessage message, String sender) {
         Optional<AbstractRequest> messageObject = null;
         switch(message.getMessageFlag()) {
             case Offer:
@@ -43,14 +42,17 @@ public class Request extends AbstractSession {
             case Confirm:
                 messageObject = Optional.ofNullable(handleConfirm((Confirm) message).orElse(null));
                 SessionLogger.writeEntry(new LogEntry(), Constant.RequestLogPath.getAppConstant());
+            case Ready:
+                messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
+                break;
             default:
                 System.err.println("Missing message flag.");
                 break;
         }
-        if (messageObject.isPresent()) {
-            this.messageList.put(messageObject.get().getTimestamp(), messageObject);
+        if (!messageObject.isPresent()) {
+            clearMessageList();
         } else {
-            this.messageList.clear();
+            addMessageToList(messageObject.get());
         }
         return Optional.ofNullable(messageObject);
     }
@@ -65,14 +67,18 @@ public class Request extends AbstractSession {
                 break;
             case Confirm:
                 messageObject = Optional.ofNullable(handleConfirm((Confirm) message).orElse(null));
-                SessionLogger.writeEntry(new LogEntry(), Constant.RequestLogPath.getAppConstant());
+                break;
+            case Ack:
+                messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 break;
             default:
-                System.err.println("Missing message flag.");
+                clearMessageList();
                 break;
         }
-        if (messageObject.isPresent()) {
-            this.messageList.put(messageObject.get().getTimestamp(), messageObject);
+        if (!messageObject.isPresent()) {
+            clearMessageList();
+        } else {
+            addMessageToList(messageObject.get());
         }
         return Optional.ofNullable(messageObject);
     }
@@ -115,14 +121,27 @@ public class Request extends AbstractSession {
      */
     private Optional<Confirm> handleConfirm(Confirm message) {
         Object object = getLastValueFromList();
-        if (compareTimestamp(message.getTimestamp()) && message.getIsConfirmed() && (!(object instanceof Confirm))) {
+        if (compareTimestamp(message.getTimestamp()) && message.getConfirmed() && (!(object instanceof Confirm))) {
             return Optional.of(new Confirm(this.confirm.createUUID(), MessageFlag.Confirm, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
     }
 
     /**
-     * This methods processes the received offer data and calculates from the crucial data set if the
+     * The message sends an AckMessage signal the session is passed.
+     *
+     * @return    True if message check was valid. False if not
+     */
+    public Optional<AckMessage> handleAckMessage(AckMessage ackMessage)  {
+        boolean isFirstAck = compareTimestamp(ackMessage.getTimestamp()) && ackMessage.getIsAck() && ackMessage.getMessageFlag().equals(MessageFlag.Ack);
+        if (isFirstAck) {
+            return Optional.of(new AckMessage(this.ackMessage.createUUID(), MessageFlag.Ready, Utilities.createTimestamp(), true));
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * This method processes the received offer data and calculates from the crucial data set if the
      * delivery service is possible. This need to be done!!!
      *
      * @return    True if all data is valid and package can be delivered to destination.

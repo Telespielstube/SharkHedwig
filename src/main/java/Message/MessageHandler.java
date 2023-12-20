@@ -8,22 +8,21 @@ import java.io.*;
 public class MessageHandler implements IMessageHandler {
 
     private ASAPPeer peer;
-    ASAPCryptoAlgorithms.EncryptedMessagePackage encryptedMessagePackage;
     private SharkPKIComponent sharkPKIComponent;
-    private byte[] signedMessage;
 
-    private byte[] decryptedMessage;
-    private byte[] encryptedMessage;
 
     public MessageHandler() {}
 
     public <T> T parseMessage(byte[] message, String senderE2E, SharkPKIComponent sharkPKIComponent) {
+        ASAPCryptoAlgorithms.EncryptedMessagePackage encryptedMessagePackage;
         T object = null;
+        byte[] decryptedMessage;
+
         try {
-            this.encryptedMessagePackage = ASAPCryptoAlgorithms.parseEncryptedMessagePackage(message);
-            this.decryptedMessage = ASAPCryptoAlgorithms.decryptPackage(this.encryptedMessagePackage, sharkPKIComponent.getASAPKeyStore());
-            if (ASAPCryptoAlgorithms.verify(this.decryptedMessage, message, senderE2E, sharkPKIComponent.getASAPKeyStore())) {
-                object = (T) byteArrayToObject(this.decryptedMessage);
+            encryptedMessagePackage = ASAPCryptoAlgorithms.parseEncryptedMessagePackage(message);
+            decryptedMessage = ASAPCryptoAlgorithms.decryptPackage(encryptedMessagePackage, sharkPKIComponent.getASAPKeyStore());
+            if (ASAPCryptoAlgorithms.verify(decryptedMessage, message, senderE2E, sharkPKIComponent.getASAPKeyStore())) {
+                object = (T) byteArrayToObject(decryptedMessage);
             }
         } catch (ASAPException | IOException e) {
             throw new RuntimeException(e);
@@ -31,15 +30,17 @@ public class MessageHandler implements IMessageHandler {
         return object;
     }
 
-    public <T> byte[] buildOutgoingMessage(T object, String uri, String recipient ) {
+    public <T> byte[] buildOutgoingMessage(T object, String uri, String recipient) {
         byte[] unencryptedByteMessage = objectToByteArray(object);
+        byte[] signedMessage;
+        byte[] encryptedMessage;
         try {
-            this.encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(unencryptedByteMessage, recipient, this.sharkPKIComponent.getASAPKeyStore());
-            this.signedMessage = ASAPCryptoAlgorithms.sign(this.encryptedMessage, this.sharkPKIComponent.getASAPKeyStore());
+            encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(unencryptedByteMessage, recipient, this.sharkPKIComponent.getASAPKeyStore());
+            signedMessage = ASAPCryptoAlgorithms.sign(encryptedMessage, this.sharkPKIComponent.getASAPKeyStore());
         } catch (ASAPException e) {
             throw new RuntimeException(e);
         }
-        return this.signedMessage;
+        return signedMessage;
     }
 
 
@@ -63,9 +64,5 @@ public class MessageHandler implements IMessageHandler {
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-    }
-    public <T> boolean compareTimestamp(T object1, T object2) {
-        boolean passed = false;
-        return true;
     }
 }

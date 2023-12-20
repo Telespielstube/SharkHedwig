@@ -10,12 +10,18 @@ import java.util.Optional;
 public interface ISession {
     /**
      * if protocol is in transferor state.
+     *
+     * @param message    Message object to be processed by transferor
+     *
+     * @return
      */
-    Optional<Object> transferor(IMessage message);
+    Optional<Object> transferor(IMessage message, String sender);
 
     /**
      * If protocol is in transferee state.
+     *
      * @param message
+     *
      * @return
      */
     Optional<Object> transferee(IMessage message);
@@ -39,7 +45,20 @@ public interface ISession {
      * If all messages of a session are exchanged the list needs to be checked if
      * all messages are cleared out.
      *
-     * @return    true if list is cleared.
+     * @param message    Message object.
+     * @return           true if list is cleared.
      */
-    boolean sessionComplete();
+    boolean sessionComplete(Object message);
+
+    /**
+     * Adds a message object to the TreeMap.
+     */
+    public void addMessageToList(IMessage message);
+
+    /**
+     * Clears the messageList TreeMap object.
+     *
+     * @return    True if list is clear,
+     */
+    boolean clearMessageList();
 }

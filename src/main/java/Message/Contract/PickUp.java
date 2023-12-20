@@ -1,18 +1,15 @@
 package Message.Contract;
 
-import Location.Location;
 import Message.MessageFlag;
-
 import java.util.UUID;
 
 public class PickUp extends AbstractContract {
 
-    private Location pickUpLocation;
+    private byte[] signedTransitEntry;
     public PickUp() {}
 
-    public PickUp(UUID uuid, MessageFlag messageFlag, long timestamp, Location pickUpLocation) {
-        this.messageFlag = messageFlag;
-        this.pickUpLocation = pickUpLocation;
+    public PickUp(UUID uuid, MessageFlag messageFlag, long timestamp, byte[] signedTransitEntry) {
+        this.signedTransitEntry = signedTransitEntry;
     }
 
     public MessageFlag getMessageFlag() {
@@ -23,11 +20,8 @@ public class PickUp extends AbstractContract {
         this.messageFlag = messageFlag;
     }
 
-    public Location getPickUpLocation() {
-        return this.pickUpLocation;
-    }
+    public byte[] getSignedTransitRecord() {
+        return this.signedTransitEntry;
 
-    public void setPickUpLocation(Location pickUpLocation) {
-        this.pickUpLocation = pickUpLocation;
     }
 }

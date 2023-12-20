@@ -18,6 +18,7 @@ public class UserInterface implements IUserInterface, Runnable {
     private double latitudeDest = 0.0;
     private double longitudeDest = 0.0;
     private String cargo = "cargo";
+    private ShippingLabel shippingLabel;
 
     /**
      * Constructer prints out a helpful text on how to interact with the protocol.
@@ -97,10 +98,9 @@ public class UserInterface implements IUserInterface, Runnable {
                     shippingLabelForm("Shipping label. Please fill in the required information.");
                 }
 
-                IDeliveryContract deliveryContract = new DeliveryContract(new ShippingLabel(this.sender, this.origin,
-                        new Location(this.latitudeOrigin, this.longitudeOrigin), this.recipient, this.destination,
-                        new Location(this.destination, this.latitudeDest, this.longitudeDest), this.packageWeight),
-                        new TransitRecord());
+                new ShippingLabel(this.shippingLabel.createUUID(), this.sender, this.origin, new Location(this.latitudeOrigin, this.longitudeOrigin),
+                        this.recipient, this.destination, new Location(this.destination, this.latitudeDest, this.longitudeDest),
+                        this.packageWeight);
                 System.out.println("Shipping label created!");
 
             }

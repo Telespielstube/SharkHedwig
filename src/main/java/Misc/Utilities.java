@@ -1,15 +1,10 @@
 package Misc;
 
-import net.sharksystem.asap.ASAPSecurityException;
-import net.sharksystem.pki.SharkPKIComponent;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -39,7 +34,10 @@ public class Utilities {
     }
 
     /**
-     * Encrypts a byte[] number for the challenge-response methode.
+     * Encrypts a byte[] data type to create a digital signed document.
+     *
+     * @param unencrypted    unencrypted document.
+     * @param publicKey      Public key to encrypt.
      *
      * @return    Encrypted challenge number.
      */
@@ -57,7 +55,15 @@ public class Utilities {
         return encrypted;
     }
 
-    public static byte[] decryptNumber(byte[] encrypted, Key privateKey) {
+    /**
+     * Decrypts an encrypted byte[] primitive data type[].
+     *
+     * @param encrypted     Encrypted document.
+     * @param privateKey    Private key to decrypt the document.
+     *
+     * @return              Decrypted document.
+     */
+    public static byte[] decryptRandomNumber(byte[] encrypted, Key privateKey) {
         Cipher cipher;
         byte[] decrypted = new byte[0];
         try {
@@ -69,5 +75,26 @@ public class Utilities {
             e.printStackTrace();
         }
         return decrypted;
+    }
+
+    /**
+     * Digitally signs the TransitRecord object.
+     *
+     * @param unsigned    Serialized unencrypted TransitRecord object.
+     * @param privateKey     Private key for digitally signing.
+     *
+     * @return               signed object as byte[].
+     */
+    public static byte[] digitalSign(byte[] unsigned, PrivateKey privateKey) {
+        byte[] signed = new byte[1024];
+        try {
+            Signature signature = Signature.getInstance("SHA1withDSA");
+            signature.initSign(privateKey);
+            signature.update(unsigned);
+            signed = signature.sign();
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+            throw new RuntimeException(e);
+        }
+        return signed;
     }
 }

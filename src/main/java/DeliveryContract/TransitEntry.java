@@ -8,14 +8,13 @@ import java.util.UUID;
 
 public class TransitEntry {
 
-    private UUID packageUUID;
     private int serialNumber;
+    private UUID packageUUID;
     private String transferor;
     private String transferee;
     private Location handoverLocation;
     private long timestamp;
-    private Signature transferorSignature;
-    private Signature transfereeSignature;
+    private byte[] digitalSignature;
 
     public TransitEntry() {}
 
@@ -27,20 +26,48 @@ public class TransitEntry {
      * @param transferor             Sender of the package.
      * @param transferee             Recipient of the package.
      * @param timestamp              Timestamp of the package handover.
-     * @param transferorSignature    Signature of the sender.
-     * @param transfereeSignature    Signature of the recipient.
+     * @param digitalSignature       digitalSignature of the newly adeed entry.
      */
     public TransitEntry(int serialNumber, UUID packageUUID, String transferor, String transferee, Location handoverLocation,
-                        String timestamp, Signature transferorSignature, Signature transfereeSignature) {
+                        long timestamp, byte[] digitalSignature) {
         this.serialNumber = serialNumber;
         this.packageUUID = packageUUID;
+        this.transferor = transferor;
         this.transferee = transferee;
         this.handoverLocation = handoverLocation;
-        this.timestamp = Utilities.createTimestamp();
-        this.transferorSignature = transferorSignature;
-        this.transfereeSignature = transfereeSignature;
+        this.timestamp = timestamp;
+        this.digitalSignature = digitalSignature;
     }
 
+    /**
+     * Just adds 1 tho the serialNumber.
+     *
+     * @return    serial number plus 1.
+     */
+    public int countUp() {
+        return this.serialNumber++;
+    }
+
+    /**
+     * Sets the transferee attribute to complete the TransitEntry object.
+     *
+     * @param transferee    The expectant receiver of the package.
+     */
+    public void setTransferee(String transferee) {
+        this.transferee = transferee;
+    }
+
+    public String getTransferee() {
+        return this.transferee;
+    }
+
+    public Location getHandoverLocation() {
+        return this.handoverLocation;
+    }
+
+    public void setSignedTransitEntry(byte[] digitalSignatur) {
+        this.digitalSignature = digitalSignature;
+    }
     /**
      * Writes all attributes of the Entry object as String representation.
      *
@@ -48,6 +75,6 @@ public class TransitEntry {
      */
     public String toString() {
         return String.format(this.serialNumber + " " + this.packageUUID + " " + this.transferor + " " + this.transferee
-                + " " + this.handoverLocation + " " + this.timestamp + " " + this.transferorSignature + " " + this.transfereeSignature);
+                + " " + this.handoverLocation + " " + this.timestamp + " " + this.digitalSignature);
     }
 }

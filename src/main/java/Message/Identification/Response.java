@@ -26,9 +26,9 @@ public class Response extends AbstractIdentification {
      */
     public Response(UUID uuid, byte[] decryptedNumber, MessageFlag messageFlag, long timestamp) {
         this.uuid = uuid;
-        this.decryptedNumber = decryptedNumber;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
+        this.decryptedNumber = decryptedNumber;
     }
 
     /**

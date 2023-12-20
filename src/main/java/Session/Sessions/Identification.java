@@ -36,7 +36,7 @@ public class Identification extends AbstractSession {
     }
 
     @Override
-    public Optional<Object> transferor(IMessage message) {
+    public Optional<Object> transferor(IMessage message, String sender) {
         Optional<AbstractIdentification> messageObject = null;
 
         switch(message.getMessageFlag()) {
@@ -47,17 +47,17 @@ public class Identification extends AbstractSession {
                 messageObject = Optional.ofNullable(handleResponse((Response) message).orElse(null));
                 break;
             case Ack:
-                if (handleAckMessage((AckMessage) message)) {
-                    break;
-                }
+                messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
+                break;
             default:
-                System.err.println("Missing message flag.");
+                System.err.println("Message flag was incorrect: " + message.getMessageFlag());
+                clearMessageList();
                 break;
         }
-        if (messageObject.isPresent()) {
-            this.messageList.put(messageObject.get().getTimestamp(), messageObject);
+        if (!messageObject.isPresent()) {
+            clearMessageList();
         } else {
-            this.messageList.clear();
+            addMessageToList(messageObject.get());
         }
         return Optional.ofNullable(messageObject);
     }
@@ -73,34 +73,28 @@ public class Identification extends AbstractSession {
                 messageObject = Optional.ofNullable(handleResponseReply((Response) message).orElse(null));
                 break;
             case Ready:
-                if (!handleAckMessage((AckMessage) message)) {
-                    messageObject.orElse(null);
-                }
+                messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 break;
             default:
-                System.err.println("Missing message flag.");
+                System.err.println("Message flag was incorrect: " + message.getMessageFlag());
+                clearMessageList();
                 break;
         }
         if (!messageObject.isPresent()) {
-            this.messageList.clear();
+            clearMessageList();
+        } else {
+            addMessageToList(messageObject.get());
         }
-        this.messageList.put(messageObject.get().getTimestamp(), messageObject);
         return Optional.ofNullable(messageObject);
     }
 
-    private Optional<Response> handleChallenge(Challenge message) {
-        try {
-            byte[] decryptedNumber = Utilities.decryptNumber(response.getEncryptedNumber(), this.sharkPKIComponent.getPrivateKey());
-            this.response = Optional.of(new Response(this.response.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), Utilities.encryptRandomNumber(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()), decryptedNumber)).get();
-        } catch (ASAPSecurityException e) {
-            throw new RuntimeException(e);
-        }
-        return Optional.of(this.response);
-    }
-
-
+    /**
+     *
+     * @param message
+     * @return
+     */
     private Optional<Challenge> handleAdvertisement(Advertisement message) {
-        if (message.getAdTag()) {
+        if (message.getMessageFlag().equals(MessageFlag.Advertisement) && message.getAdTag()) {
             try {
                 return Optional.of(new Challenge(this.challenge.createUUID(), MessageFlag.Challenge, Utilities.createTimestamp(),
                         Utilities.encryptRandomNumber(generateRandomNumber(), this.sharkPKIComponent.getPublicKey())));
@@ -109,16 +103,6 @@ public class Identification extends AbstractSession {
             }
         }
         return Optional.empty();
-    }
-
-    /**
-     * Compares two decrypted secure random numbers to check if the message sender's identitiy is corrent.
-     *
-     * @param decryptedNumber    Received decrypted number. This is the securely generated Number from the Challenge object.
-     * @return                   True if decrypted number matches the saved number.
-     */
-    private boolean compareDecryptedNumber(byte[] decryptedNumber) {
-        return Arrays.equals(this.secureNumber, decryptedNumber);
     }
 
     /**
@@ -131,7 +115,7 @@ public class Identification extends AbstractSession {
     private Optional<Response> handleResponse(Response response) {
         if ( compareTimestamp(response.getTimestamp()) && compareDecryptedNumber(response.getDecryptedNumber()) ) {
             try {
-                byte[] decryptedNumber = Utilities.decryptNumber(response.getEncryptedNumber(), this.sharkPKIComponent.getPrivateKey());
+                byte[] decryptedNumber = Utilities.decryptRandomNumber(response.getEncryptedNumber(), this.sharkPKIComponent.getPrivateKey());
                 return Optional.of(new Response(this.response.createUUID(), decryptedNumber, MessageFlag.Response, Utilities.createTimestamp() ));
             } catch (ASAPSecurityException e) {
                 e.printStackTrace();
@@ -141,24 +125,50 @@ public class Identification extends AbstractSession {
         return Optional.empty();
     }
 
-    private Optional<AckMessage> handleResponseReply(Response responseReply) {
-        if ( compareTimestamp(responseReply.getTimestamp()) && compareDecryptedNumber(responseReply.getDecryptedNumber()) ) {
-            return Optional.of(new AckMessage(this.ackMessage.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true));
+    /**
+     * An Acknowledgment massage to signal that the second secure code was decrypted successfully. It compares the timestamp
+     * checks the flag and checks if the last TreeMap entry equals Ack.
+     *
+     * @param ackMessage    The received AckMessage object.
+     * @return              An otional AckMessage object if timestamp and ack flag are ok
+     *                      or an empty Optional if its not.
+     */
+    public Optional<AckMessage> handleAckMessage(AckMessage ackMessage)  {
+        boolean isFirstAck = compareTimestamp(ackMessage.getTimestamp()) && ackMessage.getIsAck() && ackMessage.getMessageFlag().equals(MessageFlag.Ack);
+        boolean readyFlag = ackMessage.getMessageFlag().equals(MessageFlag.Ready);
+
+        //Only send the Ready Message if the flag of the received message is not "Ready" Prevent infinite loop!!!
+        if (isFirstAck && ( !readyFlag)) {
+            return Optional.of(new AckMessage(this.ackMessage.createUUID(), MessageFlag.Ready, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
     }
 
     /**
-     * Compares received timestamp to last saved message timestamp and checks the Ack flag.
      *
-     * @return    True if message check was valid. False if not
+     * @param message
+     * @return
      */
-    public boolean handleAckMessage(AckMessage ackMessage)  {
-        boolean complete = false;
-        if ( compareTimestamp(ackMessage.getTimestamp()) && ackMessage.getIsAck() ) {
-            return complete = true;
+    private Optional<Response> handleChallenge(Challenge message) {
+        try {
+            byte[] decryptedNumber = Utilities.decryptRandomNumber(response.getEncryptedNumber(), this.sharkPKIComponent.getPrivateKey());
+            this.response = Optional.of(new Response(this.response.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), Utilities.encryptRandomNumber(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()), decryptedNumber)).get();
+        } catch (ASAPSecurityException e) {
+            throw new RuntimeException(e);
         }
-        return complete;
+        return Optional.of(this.response);
+    }
+
+    /**
+     *
+     * @param responseReply
+     * @return
+     */
+    private Optional<AckMessage> handleResponseReply(Response responseReply) {
+        if ( compareTimestamp(responseReply.getTimestamp()) && compareDecryptedNumber(responseReply.getDecryptedNumber()) ) {
+            return Optional.of(new AckMessage(this.ackMessage.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true));
+        }
+        return Optional.empty();
     }
 
     /**
@@ -172,5 +182,15 @@ public class Identification extends AbstractSession {
         BigInteger bigInt = BigInteger.valueOf(secureRandom.nextInt());
         this.secureNumber =  bigInt.toByteArray();
         return this.secureNumber;
+    }
+
+    /**
+     * Compares two decrypted secure random numbers to check if the message sender's identitiy is corrent.
+     *
+     * @param decryptedNumber    Received decrypted number. This is the securely generated Number from the Challenge object.
+     * @return                   True if decrypted number matches the saved number.
+     */
+    private boolean compareDecryptedNumber(byte[] decryptedNumber) {
+        return Arrays.equals(this.secureNumber, decryptedNumber);
     }
 }

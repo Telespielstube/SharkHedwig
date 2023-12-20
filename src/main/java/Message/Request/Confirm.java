@@ -23,10 +23,10 @@ public class Confirm extends AbstractRequest {
         this.messageFlag = messageFlag;
     }
 
-    public boolean getIsConfirmed() {
+    public boolean getConfirmed() {
         return this.isConfirmed;
     }
-    public void setIsConfirm(boolean isAck) {
+    public void setConfirm(boolean isAck) {
         this.isConfirmed = isConfirmed;
     }
 }

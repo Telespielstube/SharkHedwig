@@ -1,11 +1,38 @@
 package Location;
 
 import static java.lang.Math.sqrt;
+import Location.Location;
 
 public class GeoCalculation implements ILocation {
 
+    private Location pickUp;
+
     public GeoCalculation() {}
 
+    /**
+     * For now this is the hard coded location for the HTW-Berlin Building C.
+     *
+     * @return    The hard coded HTW-Berlin building C location.
+     */
+    public Location getCurrentLocation() {
+        return new Location(52.456931, 13.526444);
+    }
+
+    /**
+     * Sets the location for package handover.
+     *
+     * @param pickUp    Location object where the handover happens.
+     */
+    public void setPickUpLocation(Location pickUp) {
+        this.pickUp = pickUp;
+    }
+
+    /**
+     *
+     * @param sender       Location object that holds the latitude and longitude coordinates of the origin.
+     * @param recipient    Location object that holds the latitude and longitude coordinates of the destination.
+     * @return
+     */
     @Override
     public double pointToPointDistance(Location sender, Location recipient) {
         double dx = Paralelle.ParallelOfLatitude.getParalelle() * (sender.getLatitude() - recipient.getLatitude()); // delta of latitude points
@@ -13,11 +40,22 @@ public class GeoCalculation implements ILocation {
         return sqrt(dx * dx + dy * dy);
     }
 
+    /**
+     *
+     * @param sender                Current transferor location
+     * @param packageDestination    Location of the package to deliver.
+     * @return
+     */
     @Override
     public double toDestination(Location sender, Location packageDestination) {
         return 0;
     }
 
+    /**
+     *
+     * @param sender
+     * @return
+     */
     @Override
     public double toDestination(Location sender) {
         return 0;

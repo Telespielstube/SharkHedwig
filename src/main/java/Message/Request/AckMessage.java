@@ -1,11 +1,11 @@
-package Message.Contract;
+package Message.Request;
 
 import Message.Identification.AbstractIdentification;
 import Message.MessageFlag;
 
 import java.util.UUID;
 
-public class AckMessage extends AbstractContract {
+public class AckMessage extends AbstractRequest {
 
     private boolean isAck = false;
 

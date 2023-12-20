@@ -8,7 +8,7 @@ public enum MessageFlag {
     Offer(5),
     OfferReply(6),
     Confirm(7),
-    Contract(8),
+    ShippingDocument(8),
     Confirmation(9),
     PickUp(10),
     Ack(11),

@@ -13,8 +13,8 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 
-import static Misc.Utilities.decryptNumber;
-import static Misc.Utilities.encryptRandomNumber;
+import static Misc.Utilities.decrypt;
+import static Misc.Utilities.encrypt;
 import static org.junit.Assert.*;
 
 public class IdentificationIdentificationTest {
@@ -47,8 +47,8 @@ public class IdentificationIdentificationTest {
     @Test
     public void testIfRandomNumberGetsEncryptedAndDecrypted() throws NoSuchAlgorithmException {
         byte[] random = identTest.generateRandomNumber();
-        byte[] encrypted = encryptRandomNumber(random, pair.getPublic());
-        byte[] decrypted = decryptNumber(encrypted, pair.getPrivate());
+        byte[] encrypted = encrypt(random, pair.getPublic());
+        byte[] decrypted = decrypt(encrypted, pair.getPrivate());
         assertEquals(new String(random, StandardCharsets.UTF_8), new String(decrypted, StandardCharsets.UTF_8));
         assertArrayEquals(random, decrypted);
     }
