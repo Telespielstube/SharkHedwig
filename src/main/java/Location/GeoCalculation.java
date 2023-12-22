@@ -2,7 +2,7 @@ package Location;
 
 import static java.lang.Math.sqrt;
 
-public class GeoCalculation implements ILocation {
+public class GeoCalculation implements IGeoLocation {
 
     private Location pickUp;
 

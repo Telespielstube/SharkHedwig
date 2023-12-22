@@ -3,7 +3,7 @@ package Location;
 /**
  * Interface for all thing geo locations.
  */
-public interface ILocation {
+public interface IGeoLocation {
 
     /**
      * BEWARE!! This is a very simplified method to calculate distance between two geo location points.
@@ -12,7 +12,7 @@ public interface ILocation {
      * @param recipient    Location object that holds the latitude and longitude coordinates of the destination.
      * @return             Distance between two points.
      */
-    public double pointToPointDistance(Location sender, Location recipient);
+    double pointToPointDistance(Location sender, Location recipient);
 
     /**
      * Another simplified method to calculate the distance transferee to package destination.
@@ -20,7 +20,7 @@ public interface ILocation {
      * @param sender
      * @return
      */
-    public double toDestination(Location sender);
+    double toDestination(Location sender);
 
     /**
      * Another simplified method mainly for the "OfferReply" recipient to calculate the distance from its current
@@ -30,5 +30,19 @@ public interface ILocation {
      * @param packageDestination    Location of the package to deliver.
      * @return                      Total distance.
      */
-    public double toDestination(Location sender, Location packageDestination);
+    double toDestination(Location sender, Location packageDestination);
+
+    /**
+     * Returns the current location.
+     *
+     * @return    Location object.
+     */
+    Location getCurrentLocation();
+
+    /**
+     * Sets the location for handover.
+     *
+     * @param handoverLocation    Location object.
+     */
+    void setPickUpLocation(Location handoverLocation);
 }

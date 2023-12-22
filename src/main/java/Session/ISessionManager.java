@@ -5,8 +5,6 @@ import Setup.DeviceState;
 
 public interface ISessionManager {
 
-
-
     /**
      * Checks if the current device state is transferor or transferee.
      *

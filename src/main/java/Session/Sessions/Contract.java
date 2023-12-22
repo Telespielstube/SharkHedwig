@@ -2,17 +2,21 @@ package Session.Sessions;
 
 import DeliveryContract.*;
 import Location.Location;
-import Location.GeoCalculation;
+import Location.IGeoLocation;
 import Message.Contract.*;
 import Message.IMessage;
 import Message.IMessageHandler;
 import Message.MessageFlag;
+import Misc.LogEntry;
+import Misc.SessionLogger;
 import Misc.Utilities;
 import Setup.Constant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.pki.SharkPKIComponent;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.Vector;
 
 public class Contract extends AbstractSession {
@@ -24,7 +28,7 @@ public class Contract extends AbstractSession {
     private DeliveryDocument deliveryDocument;
     private DeliveryContract deliveryContract;
     private ShippingLabel shippingLabel;
-    private GeoCalculation geoCalculation;
+    private IGeoLocation geoCalculation;
     private Location location;
     private TransitRecord transitRecord;
     private Confirm confirm;
@@ -35,6 +39,7 @@ public class Contract extends AbstractSession {
     public Contract(IMessageHandler messageHandler, SharkPKIComponent sharkPKIComponent) {
         this.messageHandler = messageHandler;
         this.sharkPKIComponent = sharkPKIComponent;
+        this.messageList = Collections.synchronizedSortedMap(new TreeMap<>());
     }
 
     /**
@@ -64,6 +69,8 @@ public class Contract extends AbstractSession {
                 break;
             case Ack:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
+                LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(), new Location(52.456931, 13.526444), true, Constant.PeerName.getAppConstant(), sender);
+                SessionLogger.writeEntry(logEntry, Constant.RequestLogPath.getAppConstant());
                 break;
 
             default:
@@ -89,7 +96,11 @@ public class Contract extends AbstractSession {
             case PickUp:
                 messageObject = Optional.ofNullable(handlePickUp((PickUp) message).orElse(null));
                 break;
-
+            case Ack:
+                messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
+                LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(), new Location(52.456931, 13.526444), true, Constant.PeerName.getAppConstant(), sender);
+                SessionLogger.writeEntry(logEntry, Constant.RequestLogPath.getAppConstant());
+                break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
                 clearMessageList();

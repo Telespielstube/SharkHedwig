@@ -44,6 +44,8 @@ public class Request extends AbstractSession {
                 SessionLogger.writeEntry(new LogEntry(), Constant.RequestLogPath.getAppConstant());
             case Ready:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
+                LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(), true, Constant.PeerName.getAppConstant(), sender);
+                SessionLogger.writeEntry(logEntry, Constant.RequestLogPath.getAppConstant());
                 break;
             default:
                 System.err.println("Missing message flag.");
@@ -53,6 +55,8 @@ public class Request extends AbstractSession {
             clearMessageList();
         } else {
             addMessageToList(messageObject.get());
+
+            SessionLogger.writeEntry(null, Constant.RequestLogPath.getAppConstant());
         }
         return Optional.ofNullable(messageObject);
     }
@@ -70,6 +74,8 @@ public class Request extends AbstractSession {
                 break;
             case Ack:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
+                LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(), true, Constant.PeerName.getAppConstant(), sender);
+                SessionLogger.writeEntry(logEntry, Constant.RequestLogPath.getAppConstant());
                 break;
             default:
                 clearMessageList();

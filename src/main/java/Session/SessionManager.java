@@ -44,7 +44,6 @@ public class SessionManager implements ISessionManager {
         this.identification = new Identification(this.sharkPKIComponent);
         this.request = new Request();
         this.contract = new Contract(this.messageHandler, this.sharkPKIComponent);
-        this.logEntry = new LogEntry();
     }
 
     /**
@@ -87,9 +86,9 @@ public class SessionManager implements ISessionManager {
             case Identification:
                 if (checkTransferorState()) {
                     messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetState()));
+                } else {
+                    messageObject = Optional.ofNullable(this.identification.transferee(message).orElse(this.sessionState.resetState()));
                 }
-                messageObject = Optional.ofNullable(this.identification.transferee(message).orElse(this.sessionState.resetState()));
-
                 if (messageObject.isPresent() && this.identification.sessionComplete(messageObject) ) {
                     this.identification.clearMessageList();
                     this.sessionState.nextState();
@@ -101,11 +100,10 @@ public class SessionManager implements ISessionManager {
             case Request:
                 if (checkTransferorState()) {
                     messageObject = Optional.ofNullable(this.request.transferor(message, sender).orElse(this.sessionState.resetState()));
+                } else {
+                    messageObject = Optional.ofNullable(this.request.transferee(message).orElse(this.sessionState.resetState()));
                 }
-                messageObject = Optional.ofNullable(this.request.transferee(message).orElse(this.sessionState.resetState()));
-
                 if (messageObject.isPresent() && this.request.sessionComplete(messageObject) ) {
-                    SessionLogger.writeEntry(null, Constant.RequestLogPath.getAppConstant());
                     this.request.clearMessageList();
                     this.sessionState.nextState();
                 }
@@ -119,9 +117,8 @@ public class SessionManager implements ISessionManager {
                 } else {
                     messageObject = Optional.ofNullable(this.contract.transferee(message).orElse(this.sessionState.resetState()));
                 }
-
                 if (messageObject.isPresent() && this.contract.sessionComplete(messageObject) ) {
-                    SessionLogger.writeEntry(null, Constant.RequestLogPath.getAppConstant());
+                    SessionLogger.writeEntry(new LogEntry(), Constant.RequestLogPath.getAppConstant());
                     DeviceState.Transferee.isActive();
                     resetAll();
                 }

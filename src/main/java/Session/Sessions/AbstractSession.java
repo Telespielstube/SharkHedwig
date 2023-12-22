@@ -5,6 +5,7 @@ import Message.Identification.AckMessage;
 import Message.MessageFlag;
 import Misc.Utilities;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.SortedMap;
 
@@ -24,6 +25,9 @@ public abstract class AbstractSession implements ISession {
         return false;
     }
 
+    public Object getEntry(int index) {
+        return  this.messageList.get(index);
+    }
     public Object getLastValueFromList() {
         return this.messageList.get(this.messageList.lastKey());
     }

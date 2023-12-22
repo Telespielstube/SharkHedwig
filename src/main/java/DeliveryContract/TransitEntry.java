@@ -76,7 +76,7 @@ public class TransitEntry {
         return this.handoverLocation;
     }
 
-    public void setSignedTransitEntry(byte[] digitalSignatur) {
+    public void setDigitalSignature(byte[] digitalSignature) {
         this.digitalSignature = digitalSignature;
     }
     /**
