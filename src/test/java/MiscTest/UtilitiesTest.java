@@ -1,5 +1,6 @@
-package Misc;
+package MiscTest;
 
+import Misc.Utilities;
 import org.junit.Test;
 
 import javax.rmi.CORBA.Util;

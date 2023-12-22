@@ -1,4 +1,4 @@
-package Setup;
+package SetupTest;
 
 import Setup.Channel;
 import org.junit.Test;

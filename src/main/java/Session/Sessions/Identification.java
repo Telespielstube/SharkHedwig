@@ -177,7 +177,7 @@ public class Identification extends AbstractSession {
      *
      * @return    The secure random number converted to byte[] ready for encryption.
      */
-    private byte[] generateRandomNumber() {
+    public byte[] generateRandomNumber() {
         SecureRandom secureRandom = new SecureRandom();
         BigInteger bigInt = BigInteger.valueOf(secureRandom.nextInt());
         this.secureNumber =  bigInt.toByteArray();

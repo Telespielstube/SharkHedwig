@@ -152,7 +152,7 @@ public class SessionManager implements ISessionManager {
      */
     @Override
     public void handleOutgoing(Object messageObject, String uri, String sender) {
-        byte[] signedByteMessage = this.messageHandler.buildOutgoingMessage(messageObject, uri, sender);
+        byte[] signedByteMessage = this.messageHandler.buildOutgoingMessage(messageObject, uri, sender, sharkPKIComponent);
         try {
             this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), Channel.Identification.getChannelType(), signedByteMessage);
         } catch (ASAPException e) {

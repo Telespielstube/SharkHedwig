@@ -13,22 +13,23 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 
-import static Misc.Utilities.decrypt;
-import static Misc.Utilities.encrypt;
+
+import static Misc.Utilities.decryptRandomNumber;
+import static Misc.Utilities.encryptRandomNumber;
 import static org.junit.Assert.*;
 
-public class IdentificationIdentificationTest {
+public class IdentificationTest {
 
     private final MessageHandler messageHandler = new MessageHandler();
     private ASAPPeer peer;
     private SharkPKIComponent sharkPKIComponent;
-    private final Identification identTest = new Identification("Peter", sharkPKIComponent);
+    private final Identification identTest = new Identification(this.sharkPKIComponent);
     private KeyPair pair;
-    public IdentificationIdentificationTest() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public IdentificationTest() throws NoSuchPaddingException, NoSuchAlgorithmException {
     }
 
     @Before
-    public void setupKeyPai() {
+    public void setupKeyPair() {
         KeyPairGenerator generator = null;
         try {
             generator = KeyPairGenerator.getInstance("RSA");
@@ -47,8 +48,8 @@ public class IdentificationIdentificationTest {
     @Test
     public void testIfRandomNumberGetsEncryptedAndDecrypted() throws NoSuchAlgorithmException {
         byte[] random = identTest.generateRandomNumber();
-        byte[] encrypted = encrypt(random, pair.getPublic());
-        byte[] decrypted = decrypt(encrypted, pair.getPrivate());
+        byte[] encrypted = encryptRandomNumber(random, pair.getPublic());
+        byte[] decrypted = decryptRandomNumber(encrypted, pair.getPrivate());
         assertEquals(new String(random, StandardCharsets.UTF_8), new String(decrypted, StandardCharsets.UTF_8));
         assertArrayEquals(random, decrypted);
     }

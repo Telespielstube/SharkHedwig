@@ -1,5 +1,7 @@
-package Message;
+package MessageTest;
 
+import Message.MessageFlag;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -8,6 +10,6 @@ public class MessageFlagTest {
 
     @Test
     public void testIfMessageFlagIsCorrect() {
-        assertEquals(1, MessageFlag.Challenge.getFlag());
+        Assert.assertEquals(1, MessageFlag.Challenge.getFlag());
     }
 }

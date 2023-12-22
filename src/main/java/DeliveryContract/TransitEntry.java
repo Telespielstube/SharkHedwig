@@ -16,7 +16,9 @@ public class TransitEntry {
     private long timestamp;
     private byte[] digitalSignature;
 
-    public TransitEntry() {}
+    public TransitEntry(int serialNumber) {
+        this.serialNumber = serialNumber;
+    }
 
     /**
      * Constructor to write the transit record entry.
@@ -45,7 +47,16 @@ public class TransitEntry {
      * @return    serial number plus 1.
      */
     public int countUp() {
-        return this.serialNumber++;
+        return this.serialNumber+1;
+    }
+
+    /**
+     * Serial number of the entry.
+     *
+     * @return    Serial number.
+     */
+    public int getSerialNumber() {
+        return this.serialNumber;
     }
 
     /**

@@ -1,4 +1,4 @@
-package HedwigUI;
+package HedwigUITest;
 
 import HedwigUI.UserInterface;
 import org.junit.After;

@@ -1,5 +1,6 @@
-package Misc;
+package MiscTest;
 
+import Misc.ErrorLogger;
 import org.junit.Test;
 import org.junit.jupiter.api.io.TempDir;
 

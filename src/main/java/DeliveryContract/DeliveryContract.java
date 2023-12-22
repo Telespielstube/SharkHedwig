@@ -9,7 +9,9 @@ public class DeliveryContract implements IDeliveryContract {
     private ShippingLabel shippingLabel;
     private TransitRecord transitRecord;
 
-    public DeliveryContract() {}
+    public DeliveryContract() {
+        isCreated = false;
+    }
 
     public DeliveryContract(ShippingLabel shippingLabel, TransitRecord transitRecord) {
         this.shippingLabel = shippingLabel;

@@ -1,5 +1,7 @@
-package Setup;
+package SetupTest;
 
+import Setup.Constant;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +17,7 @@ public class ConstantTest {
     }
     @Test
     public void testIfHedwigStringGetsReturnedFromAppConstantsEnumClass() {
-        assertEquals("hedwig" , Constant.AppFormat.getAppConstant());
+        Assert.assertEquals("hedwig" , Constant.AppFormat.getAppConstant());
     }
 
     @Test

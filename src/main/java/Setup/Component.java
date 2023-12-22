@@ -142,7 +142,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         IMessage message;
         try {
             for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
-                message = this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
+                message = (IMessage) this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
                 sessionManager.sessionHandling(message, senderE2E);
             }
         } catch (IOException e) {

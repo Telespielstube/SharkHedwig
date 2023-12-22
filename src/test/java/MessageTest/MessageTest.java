@@ -1,4 +1,4 @@
-package Message;
+package MessageTest;
 
 import org.junit.Test;
 import java.util.UUID;

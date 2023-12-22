@@ -4,14 +4,14 @@ import net.sharksystem.pki.SharkPKIComponent;
 
 public interface IMessageHandler {
 
-    <T> T parseMessage(byte[] message, String senderE2E, SharkPKIComponent sharkPKIComponent);
+    Object parseMessage(byte[] message, String senderE2E, SharkPKIComponent sharkPKIComponent);
     /**
      * Prepares the passed message object for sending to other devices.
      *
      * @param object    A Generic Message object. It accepts all Message object because we want one 
      *                  build methode not a methode for every message object.
      */
-    <T> byte[] buildOutgoingMessage(T object, String uri, String recipient);
+    <T> byte[] buildOutgoingMessage(T object, String uri, String recipient, SharkPKIComponent sharkPKIComponent);
 
    // void sendMessage(APP_FORMAT, String uri.toString(), byte[] signedMessage);
     /**

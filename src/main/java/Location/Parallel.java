@@ -1,13 +1,13 @@
 package Location;
 
-public enum Paralelle {
+public enum Parallel {
     // location constants.
     ParallelOfLatitude(111.3),
     ParallelOfLongitude(71.5);
 
     private final double distance;
 
-    Paralelle(double distance) {
+    Parallel(double distance) {
         this.distance = distance;
     }
 

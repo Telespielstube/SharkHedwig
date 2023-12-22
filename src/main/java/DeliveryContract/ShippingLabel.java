@@ -26,6 +26,7 @@ public class ShippingLabel {
     public ShippingLabel() {
         labelCreated = false;
     }
+
     /**
      * Creates the shipping label object from the user input data, the uuid and the PEER_NAME.
      *

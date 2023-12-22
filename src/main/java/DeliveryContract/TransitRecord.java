@@ -53,10 +53,11 @@ public class TransitRecord implements Serializable {
     }
 
     /**
-     * Writes all entries in the transit record list to a local stored file.
+     * Writes all entries in the transit record list to a locally stored file.
+     * @param file    "./TransitRecordList.txt"
      */
-    public void writeRecordToFile() {
-        try (FileWriter fileWriter = new FileWriter("./TransitRecordList.txt")) {
+    public void writeRecordToFile(String file) {
+        try (FileWriter fileWriter = new FileWriter(file)) {
             for (TransitEntry entry : this.entryList) {
                 fileWriter.append(entry.toString());
             }

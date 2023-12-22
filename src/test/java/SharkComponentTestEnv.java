@@ -22,6 +22,5 @@ public class SharkComponentTestEnv {
         Component component = new Component(sharkPKIComponent);
         component.setupComponent(testPeerFS);
         testPeerFS.start();
-        //component.onStart(asapPeer);
     }
 }

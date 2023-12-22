@@ -2,6 +2,7 @@ package Message;
 
 import net.sharksystem.asap.*;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
+import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms.EncryptedMessagePackage;
 import net.sharksystem.pki.SharkPKIComponent;
 import java.io.*;
 
@@ -13,16 +14,15 @@ public class MessageHandler implements IMessageHandler {
 
     public MessageHandler() {}
 
-    public <T> T parseMessage(byte[] message, String senderE2E, SharkPKIComponent sharkPKIComponent) {
-        ASAPCryptoAlgorithms.EncryptedMessagePackage encryptedMessagePackage;
-        T object = null;
+    public Object parseMessage(byte[] message, String senderE2E, SharkPKIComponent sharkPKIComponent) {
+        EncryptedMessagePackage encryptedMessagePackage;
+        Object object = null;
         byte[] decryptedMessage;
-
         try {
             encryptedMessagePackage = ASAPCryptoAlgorithms.parseEncryptedMessagePackage(message);
             decryptedMessage = ASAPCryptoAlgorithms.decryptPackage(encryptedMessagePackage, sharkPKIComponent.getASAPKeyStore());
             if (ASAPCryptoAlgorithms.verify(decryptedMessage, message, senderE2E, sharkPKIComponent.getASAPKeyStore())) {
-                object = (T) byteArrayToObject(decryptedMessage);
+                object = byteArrayToObject(decryptedMessage);
             }
         } catch (ASAPException | IOException e) {
             throw new RuntimeException(e);
@@ -30,19 +30,20 @@ public class MessageHandler implements IMessageHandler {
         return object;
     }
 
-    public <T> byte[] buildOutgoingMessage(T object, String uri, String recipient) {
+    public <T> byte[] buildOutgoingMessage(T object, String uri, String recipient, SharkPKIComponent sharkPKIComponent) {
         byte[] unencryptedByteMessage = objectToByteArray(object);
+        byte[] encryptedMessage = new byte[0];
         byte[] signedMessage;
-        byte[] encryptedMessage;
         try {
-            encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(unencryptedByteMessage, recipient, this.sharkPKIComponent.getASAPKeyStore());
-            signedMessage = ASAPCryptoAlgorithms.sign(encryptedMessage, this.sharkPKIComponent.getASAPKeyStore());
+            signedMessage = ASAPCryptoAlgorithms.sign(encryptedMessage, sharkPKIComponent.getASAPKeyStore());
+            encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(signedMessage, recipient, sharkPKIComponent.getASAPKeyStore());
+
         } catch (ASAPException e) {
             throw new RuntimeException(e);
         }
-        return signedMessage;
+        return encryptedMessage;
+        //return signedMessage;
     }
-
 
     public <T> byte[] objectToByteArray(T object) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

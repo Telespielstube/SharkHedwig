@@ -1,8 +1,9 @@
-package Setup;
+package SetupTest;
 
 import DeliveryContract.*;
 import Location.Location;
 import Session.SessionManager;
+import Setup.DeviceState;
 import org.junit.Test;
 
 import static Setup.DeviceState.Transferee;
@@ -15,20 +16,20 @@ public class DeviceStateTest {
     private ShippingLabel shippingLabel;
 
     @Test
-    public void testIfStateIsSwitchedToTransferorAfterDeliveryContractIsCreated() {
-        new ShippingLabel(shippingLabel.createUUID(), "Alice", "HTW-Berlin", new Location(80.67, 90.56),
-                "Bob", "Ostbahnhof", new Location(52.5105, 13.4346),
-                1.2);
-        assertTrue(ShippingLabel.labelCreated);
-        assertEquals("Transferor", Transferor);
+    public void testIfStateIsTransfereerAfterShippingLabelCreatedButEmpty() {
+        shippingLabel = new ShippingLabel();
+
+        assertFalse(ShippingLabel.labelCreated);
+        assertEquals(Transferee, DeviceState.Transferee.isActive());
     }
 
     @Test
-    public void testIfStateIsTransfereeAsLongAsNoShippingLabelIsCreated() {
-       //  DeviceState state = DeviceState.Transferee.isActive();
-         new ShippingLabel();
-         assertFalse(ShippingLabel.labelCreated);
-         assertEquals("Transferee", Transferee);
+    public void testIfStateIsSwitchedToTransferorAfterLabelIsFilledwithContent() {
+        shippingLabel = new ShippingLabel(null, "Alice", "HTW-Berlin",
+                new Location(52.456931, 13.526444), "Bob", "Ostbahnhof",
+                new Location(52.5105, 13.4346), 1.2);
+        assertTrue(ShippingLabel.labelCreated);
+        assertEquals(Transferor, Transferor.isActive());
     }
 
     @Test

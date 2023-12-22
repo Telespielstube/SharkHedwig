@@ -1,7 +1,6 @@
 package Location;
 
 import static java.lang.Math.sqrt;
-import Location.Location;
 
 public class GeoCalculation implements ILocation {
 
@@ -35,8 +34,8 @@ public class GeoCalculation implements ILocation {
      */
     @Override
     public double pointToPointDistance(Location sender, Location recipient) {
-        double dx = Paralelle.ParallelOfLatitude.getParalelle() * (sender.getLatitude() - recipient.getLatitude()); // delta of latitude points
-        double dy = Paralelle.ParallelOfLongitude.getParalelle() * (sender.getLongitude() - recipient.getLongitude()); // delta of longitude points
+        double dx = Parallel.ParallelOfLatitude.getParalelle() * (sender.getLatitude() - recipient.getLatitude()); // delta of latitude points
+        double dy = Parallel.ParallelOfLongitude.getParalelle() * (sender.getLongitude() - recipient.getLongitude()); // delta of longitude points
         return sqrt(dx * dx + dy * dy);
     }
 
