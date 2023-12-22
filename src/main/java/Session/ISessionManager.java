@@ -1,7 +1,9 @@
 package Session;
 
 import Message.IMessage;
+import Message.MessageBuilder;
 import Setup.DeviceState;
+import net.sharksystem.pki.SharkPKIComponent;
 
 public interface ISessionManager {
 
@@ -18,10 +20,12 @@ public interface ISessionManager {
      *
      * @param message    Incomming generic type Message object.
      */
-     void sessionHandling(IMessage message, String sender);
+     MessageBuilder sessionHandling(IMessage message, String sender);
 
-    /**
-     * Methode to convert the Message object to an encrypted signed byte[] and send it as an ASAPMessage.
-     */
-    void handleOutgoing(Object messageObject, String uri, String sender);
+    public void resetAll();
+
+//    /**
+//     * Methode to convert the Message object to an encrypted signed byte[] and send it as an ASAPMessage.
+//     */
+//    void handleOutgoing(Object messageObject, String uri, String sender, SharkPKIComponent sharkPKIComponent);
 }

@@ -35,14 +35,13 @@ public class MessageHandler implements IMessageHandler {
         byte[] encryptedMessage = new byte[0];
         byte[] signedMessage;
         try {
-            signedMessage = ASAPCryptoAlgorithms.sign(encryptedMessage, sharkPKIComponent.getASAPKeyStore());
+            signedMessage = ASAPCryptoAlgorithms.sign(unencryptedByteMessage, sharkPKIComponent.getASAPKeyStore());
             encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(signedMessage, recipient, sharkPKIComponent.getASAPKeyStore());
 
         } catch (ASAPException e) {
             throw new RuntimeException(e);
         }
         return encryptedMessage;
-        //return signedMessage;
     }
 
     public <T> byte[] objectToByteArray(T object) {

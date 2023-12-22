@@ -62,7 +62,7 @@ public class Request extends AbstractSession {
     }
 
     @Override
-    public Optional<Object> transferee(IMessage message) {
+    public Optional<Object> transferee(IMessage message, String sender) {
         Optional<AbstractRequest> messageObject = null;
 
         switch(message.getMessageFlag()) {

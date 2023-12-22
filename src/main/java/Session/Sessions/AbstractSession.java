@@ -16,7 +16,7 @@ public abstract class AbstractSession implements ISession {
 
     public abstract Optional<Object> transferor(IMessage message, String sender);
 
-    public abstract Optional<Object> transferee(IMessage message);
+    public abstract Optional<Object> transferee(IMessage message, String sender);
 
     public boolean compareTimestamp(long timestamp) {
         if (timestamp - this.messageList.lastKey() < this.timeOffset) {

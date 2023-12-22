@@ -32,6 +32,7 @@ public class SessionManager implements ISessionManager {
     private String sender;
     private Advertisement advertisement;
     private LogEntry logEntry;
+    private MessageBuilder messageBuilder;
 
     public SessionManager() {}
 
@@ -52,7 +53,7 @@ public class SessionManager implements ISessionManager {
      * @return    Advertisement message object.
      */
     private Advertisement createAdvertisement() {
-        return new Advertisement(this.advertisement.createUUID(), true, MessageFlag.Advertisement, Utilities.createTimestamp());
+        return new Advertisement(null, true, MessageFlag.Advertisement, Utilities.createTimestamp());
     }
 
     @Override
@@ -66,12 +67,13 @@ public class SessionManager implements ISessionManager {
     }
 
     /**
+     * Method that handles all the sessions.
      *
      * @param message    Incomming generic type Message object.
      * @param sender
      */
     @Override
-    public void sessionHandling(IMessage message, String sender) {
+    public MessageBuilder sessionHandling(IMessage message, String sender) {
         Optional<Object> messageObject;
         switch (this.sessionState) {
             case NoSession:
@@ -80,42 +82,43 @@ public class SessionManager implements ISessionManager {
                 }
                 messageObject = Optional.of((createAdvertisement()));
                 this.sessionState.nextState();
-                handleOutgoing(messageObject, Channel.Advertisement.getChannelType(), sender);
+
+                messageBuilder = new MessageBuilder(messageObject, Channel.Advertisement.getChannelType(), sender);
                 break;
 
             case Identification:
                 if (checkTransferorState()) {
                     messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetState()));
                 } else {
-                    messageObject = Optional.ofNullable(this.identification.transferee(message).orElse(this.sessionState.resetState()));
+                    messageObject = Optional.ofNullable(this.identification.transferee(message, sender).orElse(this.sessionState.resetState()));
                 }
                 if (messageObject.isPresent() && this.identification.sessionComplete(messageObject) ) {
                     this.identification.clearMessageList();
                     this.sessionState.nextState();
                 }
 
-                handleOutgoing(messageObject, Channel.Identification.getChannelType(), sender);
+                messageBuilder = new MessageBuilder(messageObject, Channel.Identification.getChannelType(), sender);
                 break;
 
             case Request:
                 if (checkTransferorState()) {
                     messageObject = Optional.ofNullable(this.request.transferor(message, sender).orElse(this.sessionState.resetState()));
                 } else {
-                    messageObject = Optional.ofNullable(this.request.transferee(message).orElse(this.sessionState.resetState()));
+                    messageObject = Optional.ofNullable(this.request.transferee(message, sender).orElse(this.sessionState.resetState()));
                 }
                 if (messageObject.isPresent() && this.request.sessionComplete(messageObject) ) {
                     this.request.clearMessageList();
                     this.sessionState.nextState();
                 }
 
-                handleOutgoing(messageObject, Channel.Request.getChannelType(), sender);
+                messageBuilder = new MessageBuilder(messageObject, Channel.Request.getChannelType(), sender);
                 break;
 
             case Contract:
                 if (checkTransferorState()) {
                     messageObject = Optional.ofNullable(this.contract.transferor(message, sender).orElse(this.sessionState.resetState()));
                 } else {
-                    messageObject = Optional.ofNullable(this.contract.transferee(message).orElse(this.sessionState.resetState()));
+                    messageObject = Optional.ofNullable(this.contract.transferee(message, sender).orElse(this.sessionState.resetState()));
                 }
                 if (messageObject.isPresent() && this.contract.sessionComplete(messageObject) ) {
                     SessionLogger.writeEntry(new LogEntry(), Constant.RequestLogPath.getAppConstant());
@@ -123,7 +126,8 @@ public class SessionManager implements ISessionManager {
                     resetAll();
                 }
 
-                handleOutgoing(messageObject, Channel.Contract.getChannelType(), sender);
+
+                 messageBuilder = new MessageBuilder(messageObject, Channel.Contract.getChannelType(), sender);
                 break;
 
             default:
@@ -131,6 +135,7 @@ public class SessionManager implements ISessionManager {
                 resetAll();
                 break;
         }
+        return messageBuilder;
     }
 
     /**
@@ -142,18 +147,5 @@ public class SessionManager implements ISessionManager {
         this.contract.clearMessageList();
         this.sessionState.resetState();
         Contract.contractSent = false;
-    }
-
-    /**
-     * Processes the message object to a
-     */
-    @Override
-    public void handleOutgoing(Object messageObject, String uri, String sender) {
-        byte[] signedByteMessage = this.messageHandler.buildOutgoingMessage(messageObject, uri, sender, sharkPKIComponent);
-        try {
-            this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), Channel.Identification.getChannelType(), signedByteMessage);
-        } catch (ASAPException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

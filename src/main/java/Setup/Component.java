@@ -143,14 +143,20 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         try {
             for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
                 message = (IMessage) this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
-                sessionManager.sessionHandling(message, senderE2E);
+                MessageBuilder messageBuilder = sessionManager.sessionHandling(message, senderE2E);
+                byte[] encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.getMessage(), messageBuilder.getUri(), messageBuilder.getSender(), sharkPKIComponent);
+                try {
+                    sendASAPMessage(messageBuilder.getUri(), encryptedMessage);
+                } catch (ASAPException e) {
+                    throw new RuntimeException(e);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void sendASAPMessage(Channel uri, byte[] signedMessage) throws ASAPException {
+    public void sendASAPMessage(String uri, byte[] signedMessage) throws ASAPException {
         this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), uri.toString(), signedMessage);
     }
 

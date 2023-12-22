@@ -87,7 +87,7 @@ public class Contract extends AbstractSession {
     }
 
     @Override
-    public Optional<Object> transferee(IMessage message) {
+    public Optional<Object> transferee(IMessage message, String sender) {
         Optional<AbstractContract> messageObject = null;
         switch(message.getMessageFlag()) {
             case ShippingDocument:
@@ -165,22 +165,31 @@ public class Contract extends AbstractSession {
      * @return           An empty optional if a Confirm object is found.
      */
     private Optional<PickUp> handleConfirm(Confirm message, String sender) {
-        Object object = getLastValueFromList();
         byte[] signedTransitEntry = new byte[0];
         if (compareTimestamp(message.getTimestamp()) && message.getConfirmed()) {
             String transferee = message.getDeliveryContract().getTransitRecord().getAllEntries().lastElement().getTransferee();
             if (transferee.equals(sender)) {
-                // Gets the last TransitEntry object for digital signing.
-                byte[] unsignedMessage = messageHandler.objectToByteArray(message.getDeliveryContract().getTransitRecord().getAllEntries().lastElement());
-                try {
-                    signedTransitEntry = Utilities.digitalSign(unsignedMessage, this.sharkPKIComponent.getPrivateKey());
-                } catch (ASAPSecurityException e) {
-                    throw new RuntimeException(e);
-                }
+                signTransitEntry(message);
             }
             return Optional.of(new PickUp(this.pickUp.createUUID(), MessageFlag.PickUp, Utilities.createTimestamp(), signedTransitEntry));
         }
         return Optional.empty();
+    }
+
+    /**
+     * Digitally signs the last TransitEntry object.
+     *
+     * @param message    Confirm message holds the DeliveryContract + TransitRecor object.
+     */
+    public byte[] signTransitEntry(Confirm message) {
+        byte[] unsignedMessage = messageHandler.objectToByteArray(message.getDeliveryContract().getTransitRecord().getAllEntries().lastElement());
+        byte[] signedTransitEntry = new byte[0];
+        try {
+            signedTransitEntry = Utilities.digitalSign(unsignedMessage, this.sharkPKIComponent.getPrivateKey());
+        } catch (ASAPSecurityException e) {
+            throw new RuntimeException(e);
+        }
+        return signedTransitEntry;
     }
 
     /**
@@ -191,7 +200,7 @@ public class Contract extends AbstractSession {
      */
     private Optional<AckMessage> handlePickUp(PickUp message) {
         if (compareTimestamp(message.getTimestamp())) {
-            this.deliveryContract.getTransitRecord().getAllEntries().lastElement().setSignedTransitEntry(message.getSignedTransitRecord());
+            this.deliveryContract.getTransitRecord().getAllEntries().lastElement().setDigitalSignature(message.getSignedTransitRecord());
             return Optional.of(new AckMessage(this.ackMessage.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true));
         }
         return Optional.empty();

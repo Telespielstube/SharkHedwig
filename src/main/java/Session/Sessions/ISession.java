@@ -24,7 +24,7 @@ public interface ISession {
      *
      * @return
      */
-    Optional<Object> transferee(IMessage message);
+    Optional<Object> transferee(IMessage message, String sender);
 
     /**
      * Compares to timestamps if the difference is less than the offset of 5 seconds.

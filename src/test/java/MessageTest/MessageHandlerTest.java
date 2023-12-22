@@ -46,17 +46,7 @@ public class MessageHandlerTest {
     public void setup() throws SharkException, IOException {
 
         SharkTestPeerFS aliceSharkPeer = new SharkTestPeerFS("Alice", "tester123/Alice");
-        sharkPKIComponent = setupComponent(aliceSharkPeer);
-        aliceSharkPeer.start();
-
-        String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
-
-        asapKeyStore = sharkPKIComponent.getASAPKeyStore();
-        francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
-        publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
-    }
-
-    private SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException {
+      //  sharkPKIComponent = setupComponent(aliceSharkPeer);
         SharkPKIComponentFactory certificateComponentFactory = new SharkPKIComponentFactory();
 
         // register this component with shark peer - note: we use interface SharkPeer
@@ -70,10 +60,35 @@ public class MessageHandlerTest {
         SharkComponent component = sharkPeer.getComponent(SharkPKIComponent.class);
 
         // project "clean code" :) we only use interfaces - unfortunately casting is unavoidable
-        SharkPKIComponent sharkPKIComponent = (SharkPKIComponent) component;
+        sharkPKIComponent = (SharkPKIComponent) component;
 
-        return sharkPKIComponent;
+        aliceSharkPeer.start();
+
+        String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
+
+        asapKeyStore = sharkPKIComponent.getASAPKeyStore();
+        francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
+        publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
     }
+
+//    private SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException {
+//        SharkPKIComponentFactory certificateComponentFactory = new SharkPKIComponentFactory();
+//
+//        // register this component with shark peer - note: we use interface SharkPeer
+//        try {
+//            sharkPeer.addComponent(certificateComponentFactory, SharkPKIComponent.class);
+//        } catch (SharkException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        // get component instance
+//        SharkComponent component = sharkPeer.getComponent(SharkPKIComponent.class);
+//
+//        // project "clean code" :) we only use interfaces - unfortunately casting is unavoidable
+//        SharkPKIComponent sharkPKIComponent = (SharkPKIComponent) component;
+//
+//        return sharkPKIComponent;
+//    }
 
     @Test
     public void testIfMessageGetsBuildForSending() {

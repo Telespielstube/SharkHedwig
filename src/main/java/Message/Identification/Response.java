@@ -10,10 +10,7 @@ public class Response extends AbstractIdentification {
     private byte[] encryptedNumber;
     private byte[] decryptedNumber;
 
-    public Response(UUID uuid, long timestamp) {
-        this.uuid = uuid;
-        this.timestamp = timestamp;
-    }
+    public Response() {}
 
     /**
      * Contrstructor for a response to a response message. The second response message does not contain an

@@ -63,7 +63,7 @@ public class Identification extends AbstractSession {
     }
 
     @Override
-    public Optional<Object> transferee(IMessage message) {
+    public Optional<Object> transferee(IMessage message, String sender) {
         Optional<AbstractIdentification> messageObject = null;
         switch(message.getMessageFlag()) {
             case Challenge:
@@ -151,7 +151,7 @@ public class Identification extends AbstractSession {
      */
     private Optional<Response> handleChallenge(Challenge message) {
         try {
-            byte[] decryptedNumber = Utilities.decryptRandomNumber(response.getEncryptedNumber(), this.sharkPKIComponent.getPrivateKey());
+            byte[] decryptedNumber = Utilities.decryptRandomNumber(message.getChallengeNumber(), this.sharkPKIComponent.getPublicKey());
             this.response = Optional.of(new Response(this.response.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), Utilities.encryptRandomNumber(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()), decryptedNumber)).get();
         } catch (ASAPSecurityException e) {
             throw new RuntimeException(e);
