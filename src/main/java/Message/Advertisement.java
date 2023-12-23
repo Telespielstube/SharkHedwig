@@ -13,15 +13,11 @@ public class Advertisement implements IMessage {
     private long timestamp;
 
     public Advertisement(UUID uuid, boolean adTag, MessageFlag messageFlag, long timestamp) {
-        this.uuid = UUID.randomUUID();
+        this.uuid = uuid;
         this.adTag = adTag;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
 
-    }
-    @Override
-    public UUID createUUID() {
-        return null;
     }
 
     @Override

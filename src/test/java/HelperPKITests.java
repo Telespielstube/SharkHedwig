@@ -53,17 +53,17 @@ public class HelperPKITests {
         asapPKI.acceptAndSignCredential(
                 new CredentialMessageInMemo(francisID, FRANCIS_NAME, now, francisStorage.getPublicKey()));
 
-        // Francis signs Gloria: cef(f) = 0.5 ia(g) = 5.0
-        String gloriaID = getPeerID(idStart,  GLORIA_NAME);
-        certificateStorage = new InMemoAbstractCertificateStore(gloriaID, GLORIA_NAME);
-        ASAPKeyStore gloriaCryptoStorage = new InMemoASAPKeyStore(GLORIA_NAME);
-        gloriaStorage = new ASAPCertificateStoreImpl(certificateStorage, gloriaCryptoStorage);
-        // francis signs gloria
-        ASAPCertificate asapCertificate =
-                francisStorage.addAndSignPerson(gloriaID, GLORIA_NAME, gloriaStorage.getPublicKey(), now);
-
-        // store certificate(issuer: Francis, subject: Gloria)
-        asapPKI.addCertificate(asapCertificate);
+//        // Francis signs Gloria: cef(f) = 0.5 ia(g) = 5.0
+//        String gloriaID = getPeerID(idStart,  GLORIA_NAME);
+//        certificateStorage = new InMemoAbstractCertificateStore(gloriaID, GLORIA_NAME);
+//        ASAPKeyStore gloriaCryptoStorage = new InMemoASAPKeyStore(GLORIA_NAME);
+//        gloriaStorage = new ASAPCertificateStoreImpl(certificateStorage, gloriaCryptoStorage);
+//        // francis signs gloria
+//        ASAPCertificate asapCertificate =
+//                francisStorage.addAndSignPerson(gloriaID, GLORIA_NAME, gloriaStorage.getPublicKey(), now);
+//
+//        // store certificate(issuer: Francis, subject: Gloria)
+//        asapPKI.addCertificate(asapCertificate);
 
 //        // Gloria signs Hassan: cef(g) = 0.5 ia(h) = 2.5 == 3
 //        String hassanID = getPeerID(idStart, HASSAN_NAME);

@@ -10,6 +10,7 @@ import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeer;
 import net.sharksystem.SharkTestPeerFS;
 import net.sharksystem.asap.ASAPSecurityException;
+import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
@@ -20,6 +21,7 @@ import org.junit.Test;
 import javax.rmi.CORBA.Util;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -64,6 +66,17 @@ public class UtilitiesTest {
     }
 
     @Test
+    public void testIfTwoUUIDsDifferFromEachOther() {
+        UUID uuid1 = Utilities.createUUID();
+        UUID uuid2 = Utilities.createUUID();
+        assertNotEquals(uuid1, uuid2);
+    }
+    @Test
+    public void checkIfUUIDVersionIsNumber4() {
+        assertEquals(4, Utilities.createUUID().version());
+    }
+
+    @Test
     public void testIfIDReadableTimestampIsReturned() {
         String timestamp = Utilities.createReadableTimestamp();
         System.out.println(timestamp);
@@ -77,8 +90,8 @@ public class UtilitiesTest {
 
     @Test
     public void testIfRandomNumberGetsEncryptedAndDecrypted() throws ASAPSecurityException {
-        byte[] encrypted = Utilities.encryptRandomNumber("3452345345".getBytes(), sharkPKIComponent.getPublicKey());
-        byte[] decrypted = Utilities.decryptRandomNumber(encrypted, sharkPKIComponent.getPrivateKey());
+        byte[] encrypted = Utilities.encryptAsymmetric("3452345345".getBytes(), sharkPKIComponent.getPublicKey());
+        byte[] decrypted = ASAPCryptoAlgorithms.decryptAsymmetric(encrypted, sharkPKIComponent.getASAPKeyStore());
         assertArrayEquals("3452345345".getBytes(), decrypted);
     }
 }

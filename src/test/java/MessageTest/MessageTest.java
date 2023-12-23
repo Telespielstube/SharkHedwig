@@ -12,16 +12,7 @@ import Message.Identification.Challenge;
  */
 public class MessageTest {
 
-    private final Challenge challenge = new Challenge(UUID.randomUUID(), System.currentTimeMillis());
+   // private final Challenge challenge = new Challenge(UUID.randomUUID(), System.currentTimeMillis());
 
-    @Test
-    public void testIfTwoUUIDsDifferFromEachOther() {
-        UUID uuid1 = challenge.createUUID();
-        UUID uuid2 = challenge.createUUID();
-        assertNotEquals(uuid1, uuid2);
-    }
-    @Test
-    public void checkIfUUIDVersionIsNumber4() {
-        assertEquals(4, challenge.createUUID().version());
-    }
+
 }

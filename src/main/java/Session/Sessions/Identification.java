@@ -13,6 +13,7 @@ import Message.Identification.*;
 import Misc.Utilities;
 import Message.MessageFlag;
 import net.sharksystem.asap.ASAPSecurityException;
+import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;
 
 public class Identification extends AbstractSession {
@@ -97,7 +98,7 @@ public class Identification extends AbstractSession {
         if (message.getMessageFlag().equals(MessageFlag.Advertisement) && message.getAdTag()) {
             try {
                 return Optional.of(new Challenge(this.challenge.createUUID(), MessageFlag.Challenge, Utilities.createTimestamp(),
-                        Utilities.encryptRandomNumber(generateRandomNumber(), this.sharkPKIComponent.getPublicKey())));
+                        Utilities.encryptAsymmetric(generateRandomNumber(), this.sharkPKIComponent.getPublicKey())));
             } catch (ASAPSecurityException e) {
                 throw new RuntimeException(e);
             }
@@ -115,7 +116,7 @@ public class Identification extends AbstractSession {
     private Optional<Response> handleResponse(Response response) {
         if ( compareTimestamp(response.getTimestamp()) && compareDecryptedNumber(response.getDecryptedNumber()) ) {
             try {
-                byte[] decryptedNumber = Utilities.decryptRandomNumber(response.getEncryptedNumber(), this.sharkPKIComponent.getPrivateKey());
+                byte[] decryptedNumber = ASAPCryptoAlgorithms.decryptAsymmetric(response.getEncryptedNumber(), this.sharkPKIComponent.getASAPKeyStore());
                 return Optional.of(new Response(this.response.createUUID(), decryptedNumber, MessageFlag.Response, Utilities.createTimestamp() ));
             } catch (ASAPSecurityException e) {
                 e.printStackTrace();
@@ -139,7 +140,7 @@ public class Identification extends AbstractSession {
 
         //Only send the Ready Message if the flag of the received message is not "Ready" Prevent infinite loop!!!
         if (isFirstAck && ( !readyFlag)) {
-            return Optional.of(new AckMessage(this.ackMessage.createUUID(), MessageFlag.Ready, Utilities.createTimestamp(), true));
+            return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.Ready, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
     }
@@ -151,8 +152,10 @@ public class Identification extends AbstractSession {
      */
     private Optional<Response> handleChallenge(Challenge message) {
         try {
-            byte[] decryptedNumber = Utilities.decryptRandomNumber(message.getChallengeNumber(), this.sharkPKIComponent.getPublicKey());
-            this.response = Optional.of(new Response(this.response.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), Utilities.encryptRandomNumber(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()), decryptedNumber)).get();
+            //byte[] decryptedNumber = Utilities.decryptRandomNumber(message.getChallengeNumber(), this.sharkPKIComponent.getPublicKey());
+            byte[] decryptedNumber = ASAPCryptoAlgorithms.decryptAsymmetric(message.getChallengeNumber(), this.sharkPKIComponent.getASAPKeyStore());
+
+            this.response = Optional.of(new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), Utilities.encryptAsymmetric(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()), decryptedNumber)).get();
         } catch (ASAPSecurityException e) {
             throw new RuntimeException(e);
         }
@@ -166,7 +169,7 @@ public class Identification extends AbstractSession {
      */
     private Optional<AckMessage> handleResponseReply(Response responseReply) {
         if ( compareTimestamp(responseReply.getTimestamp()) && compareDecryptedNumber(responseReply.getDecryptedNumber()) ) {
-            return Optional.of(new AckMessage(this.ackMessage.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true));
+            return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
     }
@@ -179,9 +182,10 @@ public class Identification extends AbstractSession {
      */
     public byte[] generateRandomNumber() {
         SecureRandom secureRandom = new SecureRandom();
-        BigInteger bigInt = BigInteger.valueOf(secureRandom.nextInt());
-        this.secureNumber =  bigInt.toByteArray();
-        return this.secureNumber;
+        byte bytes[] = new byte[1];
+        secureRandom.nextBytes(bytes);
+
+        return bytes;
     }
 
     /**

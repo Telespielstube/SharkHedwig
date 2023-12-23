@@ -58,12 +58,11 @@ public class SessionManager implements ISessionManager {
 
     @Override
     public boolean checkTransferorState() {
-        boolean isTransferor = false;
         if (ShippingLabel.labelCreated) {
-            this.isTransferor = DeviceState.Transferor.isActive();
-            isTransferor = true;
+            DeviceState.Transferor.isActive();
+            return true;
         }
-        return isTransferor;
+        return false;
     }
 
     /**
@@ -110,7 +109,6 @@ public class SessionManager implements ISessionManager {
                     this.request.clearMessageList();
                     this.sessionState.nextState();
                 }
-
                 messageBuilder = new MessageBuilder(messageObject, Channel.Request.getChannelType(), sender);
                 break;
 
@@ -121,7 +119,6 @@ public class SessionManager implements ISessionManager {
                     messageObject = Optional.ofNullable(this.contract.transferee(message, sender).orElse(this.sessionState.resetState()));
                 }
                 if (messageObject.isPresent() && this.contract.sessionComplete(messageObject) ) {
-                    SessionLogger.writeEntry(new LogEntry(), Constant.RequestLogPath.getAppConstant());
                     DeviceState.Transferee.isActive();
                     resetAll();
                 }

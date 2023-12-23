@@ -2,6 +2,8 @@ package Misc;
 
 import java.io.Serializable;
 import Location.Location;
+import org.junit.Test;
+
 import java.util.UUID;
 
 public class LogEntry implements Serializable {
@@ -49,4 +51,9 @@ public class LogEntry implements Serializable {
         this.transferee = transferee;
     }
 
+    @Override
+    public String toString() {
+        return ("PackageUUID :" + this.packageUUID + " Message created: " + this.timestamp + " Handover: " + this.handover
+                + "Accepted: " + this.concluded + " Transferor: " + this.transferor + " Transferee: " + this.transferee);
+    }
 }

@@ -4,6 +4,9 @@ import LocationTest.*;
 import MessageTest.MessageFlagTest;
 import MessageTest.MessageHandlerTest;
 import MessageTest.MessageTest;
+import Misc.Utilities;
+import MiscTest.ErrorLoggerTest;
+import MiscTest.SessionLoggerTest;
 import SessionTest.*;
 import SetupTest.ChannelTest;
 import SetupTest.ComponentTest;
@@ -13,8 +16,6 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 
@@ -40,6 +41,10 @@ public class TestRunner {
             testCases.add(MessageFlagTest.class);
             testCases.add(MessageHandlerTest.class);
             testCases.add(MessageTest.class);
+            // MiscTest
+            testCases.add(ErrorLoggerTest.class);
+            testCases.add(SessionLoggerTest.class);
+            testCases.add(Utilities.class);
             // SessionTest
             testCases.add(IdentificationStateTest.class);
             testCases.add(IdentificationTest.class);

@@ -35,7 +35,4 @@ public class ComponentTest {
         String uri = "sn2://Advertisement";
         Assert.assertEquals(uri, Channel.Advertisement.getChannelType());
     }
-//
-//    @Test
-//    public void testIfAsapMessageReceivedPutsMessageInCorrect
 }

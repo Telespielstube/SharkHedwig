@@ -15,10 +15,6 @@ public abstract class AbstractRequest implements IMessage {
     protected long timestamp;
     protected Location currentLocation;
 
-    public UUID createUUID() {
-        return UUID.randomUUID();
-    }
-
     public UUID getUuid() {
         return this.uuid;
     }

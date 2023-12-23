@@ -8,9 +8,9 @@ import java.util.UUID;
 public class Challenge extends AbstractIdentification {
 
     private byte[] challengeNumber;
-    public Challenge(UUID uuid, long timestamp) {
+    public Challenge(UUID uuid, byte[] challengeNumber) {
         this.uuid = uuid;
-        this.timestamp = timestamp;
+        this.challengeNumber = challengeNumber;
     }
 
     public Challenge(UUID uuid, MessageFlag messageFlag, long timestamp, byte[] challengeNumber) {

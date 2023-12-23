@@ -12,6 +12,7 @@ import Misc.SessionLogger;
 import Misc.Utilities;
 import Setup.Constant;
 import net.sharksystem.asap.ASAPSecurityException;
+import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;
 
 import java.util.Collections;
@@ -70,7 +71,7 @@ public class Contract extends AbstractSession {
             case Ack:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(), new Location(52.456931, 13.526444), true, Constant.PeerName.getAppConstant(), sender);
-                SessionLogger.writeEntry(logEntry, Constant.RequestLogPath.getAppConstant());
+                SessionLogger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
                 break;
 
             default:
@@ -99,7 +100,7 @@ public class Contract extends AbstractSession {
             case Ack:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(), new Location(52.456931, 13.526444), true, Constant.PeerName.getAppConstant(), sender);
-                SessionLogger.writeEntry(logEntry, Constant.RequestLogPath.getAppConstant());
+                SessionLogger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
                 break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
@@ -185,7 +186,7 @@ public class Contract extends AbstractSession {
         byte[] unsignedMessage = messageHandler.objectToByteArray(message.getDeliveryContract().getTransitRecord().getAllEntries().lastElement());
         byte[] signedTransitEntry = new byte[0];
         try {
-            signedTransitEntry = Utilities.digitalSign(unsignedMessage, this.sharkPKIComponent.getPrivateKey());
+            signedTransitEntry = ASAPCryptoAlgorithms.sign(unsignedMessage, this.sharkPKIComponent.getASAPKeyStore());
         } catch (ASAPSecurityException e) {
             throw new RuntimeException(e);
         }

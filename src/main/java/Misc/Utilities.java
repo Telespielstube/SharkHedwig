@@ -7,12 +7,23 @@ import javax.crypto.NoSuchPaddingException;
 import java.security.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * The Utilities class is a collection of small small useful methods like
  * CheckDroneID()
  */
 public class Utilities {
+
+    /**
+     * Creates a Version 4 (randomly generated) UUID which is an identifier that is
+     * unique across both space and time
+     *
+     * @return    A 128-bit randomly created UUID.
+     */
+    public static UUID createUUID() {
+        return UUID.randomUUID();
+    }
 
     /**
      * Creates a human readable ISO-8601 conform timestamp.
@@ -41,11 +52,11 @@ public class Utilities {
      *
      * @return    Encrypted challenge number.
      */
-    public static byte[] encryptRandomNumber(byte[] unencrypted, Key publickey) {
+    public static byte[] encryptAsymmetric(byte[] unencrypted, Key publickey) {
         Cipher cipher = null;
         byte[] encrypted = new byte[0];
         try {
-            cipher = Cipher.getInstance("RSA");
+            cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, publickey);
             encrypted = cipher.doFinal(unencrypted);
         } catch (InvalidKeyException | NoSuchAlgorithmException |
@@ -53,48 +64,5 @@ public class Utilities {
             e.printStackTrace();
         }
         return encrypted;
-    }
-
-    /**
-     * Decrypts an encrypted byte[] primitive data type[].
-     *
-     * @param encrypted     Encrypted document.
-     * @param privateKey    Private key to decrypt the document.
-     *
-     * @return              Decrypted document.
-     */
-    public static byte[] decryptRandomNumber(byte[] encrypted, Key privateKey) {
-        Cipher cipher;
-        byte[] decrypted = new byte[0];
-        try {
-            cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
-            decrypted = cipher.doFinal(encrypted);
-        } catch (InvalidKeyException | NoSuchAlgorithmException |
-                 NoSuchPaddingException |IllegalBlockSizeException | BadPaddingException e) {
-            e.printStackTrace();
-        }
-        return decrypted;
-    }
-
-    /**
-     * Digitally signs the TransitRecord object.
-     *
-     * @param unsigned    Serialized unencrypted TransitRecord object.
-     * @param privateKey     Private key for digitally signing.
-     *
-     * @return               signed object as byte[].
-     */
-    public static byte[] digitalSign(byte[] unsigned, PrivateKey privateKey) {
-        byte[] signed = new byte[1024];
-        try {
-            Signature signature = Signature.getInstance("SHA1withDSA");
-            signature.initSign(privateKey);
-            signature.update(unsigned);
-            signed = signature.sign();
-        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
-            throw new RuntimeException(e);
-        }
-        return signed;
     }
 }
