@@ -8,10 +8,6 @@ import java.io.*;
 
 public class MessageHandler implements IMessageHandler {
 
-    private ASAPPeer peer;
-    private SharkPKIComponent sharkPKIComponent;
-
-
     public MessageHandler() {}
 
     public Object parseMessage(byte[] message, String senderE2E, SharkPKIComponent sharkPKIComponent) {

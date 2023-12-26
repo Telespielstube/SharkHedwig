@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class TransitEntry {
 
-    private int serialNumber;
+    private int serialNumber = 0;
     private UUID packageUUID;
     private String transferor;
     private String transferee;

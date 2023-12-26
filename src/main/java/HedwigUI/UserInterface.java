@@ -2,8 +2,6 @@ package HedwigUI;
 
 import java.text.DecimalFormat;
 import java.util.Scanner;
-import Location.Location;
-import DeliveryContract.*;
 
 
 public class UserInterface implements IUserInterface, Runnable {
@@ -18,7 +16,6 @@ public class UserInterface implements IUserInterface, Runnable {
     private double latitudeDest = 0.0;
     private double longitudeDest = 0.0;
     private String cargo = "cargo";
-    private ShippingLabel shippingLabel;
 
     /**
      * Constructer prints out a helpful text on how to interact with the protocol.
@@ -51,9 +48,9 @@ public class UserInterface implements IUserInterface, Runnable {
         System.out.print("Longitude of the origin: ");
         this.longitudeDest = Double.parseDouble(coordinates.format(Double.parseDouble(readUserInput())));
         System.out.print("Latitude of the origin: ");
-        this.latitudeDest = Double.parseDouble(coordinates.format(Double.parseDouble(readUserInput())));
+        this.latitudeDest = Double.parseDouble(coordinates.format(Double.parseDouble(readUserInput().substring(0, 7))));
         System.out.print("Package weight in grams: ");
-        this.packageWeight = Float.parseFloat(readUserInput().substring(0, 5));
+        this.packageWeight = Float.parseFloat(readUserInput().substring(0, 7));
     }
 
     public void checkFormData(String userInfo) {
@@ -97,12 +94,10 @@ public class UserInterface implements IUserInterface, Runnable {
                 if (!acceptInput()) {
                     shippingLabelForm("Shipping label. Please fill in the required information.");
                 }
-
-                new ShippingLabel(this.shippingLabel.createUUID(), this.sender, this.origin, new Location(this.latitudeOrigin, this.longitudeOrigin),
-                        this.recipient, this.destination, new Location(this.destination, this.latitudeDest, this.longitudeDest),
+                new UserInputBuilder(this.sender, this.origin, this.latitudeOrigin, this.longitudeOrigin,
+                        this.recipient, this.destination, this.latitudeDest, this.longitudeDest,
                         this.packageWeight);
                 System.out.println("Shipping label created!");
-
             }
         }
     }

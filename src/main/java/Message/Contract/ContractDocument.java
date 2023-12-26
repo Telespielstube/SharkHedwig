@@ -4,12 +4,11 @@ import java.util.UUID;
 import DeliveryContract.*;
 import Message.MessageFlag;
 
-public class DeliveryDocument extends AbstractContract {
+public class ContractDocument extends AbstractContract {
 
-    private DeliveryContract deliveryContract;
+    private final DeliveryContract deliveryContract;
 
-    public DeliveryDocument() {}
-    public DeliveryDocument(UUID uuid, MessageFlag messageFlag, long timestamp, DeliveryContract deliveryContract) {
+    public ContractDocument(UUID uuid, MessageFlag messageFlag, long timestamp, DeliveryContract deliveryContract) {
         this.deliveryContract = deliveryContract;
     }
 

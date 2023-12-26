@@ -22,7 +22,7 @@ public class Advertisement implements IMessage {
 
     @Override
     public UUID getUuid() {
-        return null;
+        return this.uuid;
     }
 
     public boolean getAdTag() {
@@ -43,7 +43,7 @@ public class Advertisement implements IMessage {
 
     @Override
     public long getTimestamp() {
-        return 0;
+        return this.timestamp;
     }
 
     @Override

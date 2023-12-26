@@ -1,7 +1,5 @@
 package Message;
 
-import sun.plugin2.message.Message;
-
 import java.io.Serializable;
 import java.util.UUID;
 

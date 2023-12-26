@@ -1,23 +1,17 @@
 package Session;
 
-import DeliveryContract.ShippingLabel;
 import Misc.LogEntry;
-import Misc.SessionLogger;
 import Misc.Utilities;
 import Setup.Channel;
-import Setup.Constant;
 import Setup.DeviceState;
 import Message.*;
 import Session.Sessions.*;
-import net.sharksystem.asap.ASAPException;
 import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.pki.SharkPKIComponent;
 
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
-
-import static Session.Sessions.Contract.contractSent;
 
 public class SessionManager implements ISessionManager {
 
@@ -33,6 +27,7 @@ public class SessionManager implements ISessionManager {
     private Advertisement advertisement;
     private LogEntry logEntry;
     private MessageBuilder messageBuilder;
+    private IShippingLabel shippingLabel;
 
     public SessionManager() {}
 
@@ -58,7 +53,7 @@ public class SessionManager implements ISessionManager {
 
     @Override
     public boolean checkTransferorState() {
-        if (ShippingLabel.labelCreated) {
+        if (shippingLabel.getIsCreated()) {
             DeviceState.Transferor.isActive();
             return true;
         }

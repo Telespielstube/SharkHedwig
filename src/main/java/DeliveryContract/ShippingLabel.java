@@ -1,17 +1,19 @@
 package DeliveryContract;
 
 import java.util.UUID;
+
+import HedwigUI.UserInputBuilder;
+import HedwigUI.UserInterface;
 import Location.Location;
-import Setup.Constant;
+import Misc.Utilities;
+
 
 /**
  * The shipping label object is a core function of the whole protocoll. The label is created after the user confirmed
  * their entry. The input is immutable that means it cannot be changed after confimration.
  * That is why there are no set methods in this class.
  */
-public class ShippingLabel {
-
-    public static boolean labelCreated = false;
+public class ShippingLabel implements IContractComponent {
 
     private UUID packageUUID;
     private String transferorID = null;
@@ -22,10 +24,7 @@ public class ShippingLabel {
     private String destination = null;
     private Location locationOrigin = null;
     private Location locationDest = null;
-
-    public ShippingLabel() {
-        labelCreated = false;
-    }
+    private boolean isCreated = false;
 
     /**
      * Creates the shipping label object from the user input data, the uuid and the PEER_NAME.
@@ -47,12 +46,26 @@ public class ShippingLabel {
         this.destination = destination;
         this.locationDest = locationDest;
         this.packageWeight = packageWeight;
-        labelCreated = true;
+        this.isCreated = true;
     }
 
-    public UUID createUUID() {
-        return UUID.randomUUID();
+    /**
+     * Creates a new ShippingLabel object passed from the UserInputBuilder object.
+     * @param object
+     */
+    public Object create(Object object) {
+        UserInputBuilder userInput = (UserInputBuilder) object;
+        return (ShippingLabel) new ShippingLabel(Utilities.createUUID(), userInput.getSender(), userInput.getOrigin(),
+                new Location(userInput.getLatitudeOrigin(), userInput.getLongitudeOrigin()),
+                userInput.getRecipient(), userInput.getDestination(), new Location(userInput.getLatitudeDest(),
+                userInput.getLongitudeDest()), userInput.getPackageWeight());
     }
+
+
+    public boolean getIsCreated() {
+        return this.isCreated;
+    }
+
 
     // Getter methods to get the value of the Object field.
     public UUID getUUID() {

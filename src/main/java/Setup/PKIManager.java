@@ -5,19 +5,17 @@ import net.sharksystem.asap.pki.ASAPCertificate;
 import net.sharksystem.pki.SharkPKIComponent;
 
 public class PKIManager {
-    CharSequence caID;
     SharkPKIComponent sharkPKIComponent;
 
-    public PKIManager(CharSequence caID, SharkPKIComponent sharkPKIComponent) {
-        this.caID = caID;
+    public PKIManager(SharkPKIComponent sharkPKIComponent) {
         this.sharkPKIComponent = sharkPKIComponent;
     }
 
     public CharSequence getCertificateAuthority() {
-        return this.caID;
+        return Constant.CaId.getAppConstant();
     }
 
     public ASAPCertificate getCertificateOf(CharSequence subject) throws ASAPSecurityException {
-        return sharkPKIComponent.getCertificateByIssuerAndSubject(caID, subject);
+        return sharkPKIComponent.getCertificateByIssuerAndSubject(Constant.CaId.getAppConstant(), subject);
     }
 }

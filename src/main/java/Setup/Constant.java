@@ -5,7 +5,7 @@ public enum Constant {
     AppFormat("hedwig"),
     PeerFolder("HedwigStorage"),
     PeerName("hedwig123"),
-    CaId("caID"),
+    CaId("ceretificateAuthority"),
     Scheme("sn2://"),
 
     // Constants for the log files. */

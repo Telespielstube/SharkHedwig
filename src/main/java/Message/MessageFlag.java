@@ -8,11 +8,10 @@ public enum MessageFlag {
     Offer(5),
     OfferReply(6),
     Confirm(7),
-    ShippingDocument(8),
-    Confirmation(9),
-    PickUp(10),
-    Ack(11),
-    Ready(12);
+    ContractDocument(8),
+    PickUp(9),
+    Ack(10),
+    Ready(11);
 
     private final int flag;
 

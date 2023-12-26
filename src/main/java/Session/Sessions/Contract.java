@@ -1,8 +1,9 @@
 package Session.Sessions;
 
 import DeliveryContract.*;
+import HedwigUI.UserInputBuilder;
 import Location.Location;
-import Location.IGeoLocation;
+import Location.IGeoSpatial;
 import Message.Contract.*;
 import Message.IMessage;
 import Message.IMessageHandler;
@@ -26,12 +27,13 @@ public class Contract extends AbstractSession {
 
     private SharkPKIComponent sharkPKIComponent;
     private IMessageHandler messageHandler;
-    private DeliveryDocument deliveryDocument;
+    private ContractDocument contractDocument;
     private DeliveryContract deliveryContract;
-    private ShippingLabel shippingLabel;
-    private IGeoLocation geoCalculation;
+    private IContractComponent shippingLabel;
+    private IContractComponent transitRecord;
+    private UserInputBuilder userInputBuilder;
+    private IGeoSpatial geoCalculation;
     private Location location;
-    private TransitRecord transitRecord;
     private Confirm confirm;
     private PickUp pickUp;
     private Location pickupLocation;
@@ -43,26 +45,13 @@ public class Contract extends AbstractSession {
         this.messageList = Collections.synchronizedSortedMap(new TreeMap<>());
     }
 
-    /**
-     * Creates the shipping document object.
-     *
-     * @return    new ShippingDocument object.
-     */
-    public DeliveryDocument createShippingDocument() {
-        TransitEntry transitEntry = null;
-        this.deliveryContract.getTransitRecord().addEntry(new TransitEntry(transitEntry.countUp(), this.shippingLabel.getUUID(),
-                Constant.PeerName.getAppConstant(), "", geoCalculation.getCurrentLocation(), Utilities.createTimestamp(), null));
-        return new DeliveryDocument(this.deliveryDocument.createUUID(), MessageFlag.ShippingDocument, Utilities.createTimestamp(),
-                this.deliveryDocument.getDeliveryContract());
-    }
-
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
         Optional<AbstractContract> messageObject = null;
-        // Check to send the shipping documents only once.
-        if (!contractSent) {
-            messageObject = Optional.of(createShippingDocument());
-            contractSent = true;
+        // Check object state to make sure to send the contract documents only once.
+        if (!this.deliveryContract.getContractSent()) {
+            messageObject = Optional.of(createDeliveryContract());
+            this.deliveryContract.setContractSent(true);
         }
         switch(message.getMessageFlag()) {
             case Confirm:
@@ -73,7 +62,6 @@ public class Contract extends AbstractSession {
                 LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(), new Location(52.456931, 13.526444), true, Constant.PeerName.getAppConstant(), sender);
                 SessionLogger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
                 break;
-
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
                 clearMessageList();
@@ -91,8 +79,8 @@ public class Contract extends AbstractSession {
     public Optional<Object> transferee(IMessage message, String sender) {
         Optional<AbstractContract> messageObject = null;
         switch(message.getMessageFlag()) {
-            case ShippingDocument:
-                messageObject = Optional.ofNullable(handleDocument((DeliveryDocument) message).orElse(null));
+            case ContractDocument:
+                messageObject = Optional.ofNullable(handleContract((ContractDocument) message).orElse(null));
                 break;
             case PickUp:
                 messageObject = Optional.ofNullable(handlePickUp((PickUp) message).orElse(null));
@@ -116,12 +104,46 @@ public class Contract extends AbstractSession {
     }
 
     /**
+     * Creates the contract document object.
+     *
+     * @return    new ContractDocument message object.
+     */
+    public ContractDocument createDeliveryContract() {
+        ShippingLabel label = (ShippingLabel) shippingLabel.create(userInputBuilder);
+        TransitRecord record = (TransitRecord) transitRecord.create(
+                new TransitEntry(0, label.getUUID(), Constant.PeerName.getAppConstant(), "",
+                        geoCalculation.getCurrentLocation(), Utilities.createTimestamp(), null));
+        this.deliveryContract = new DeliveryContract(label, record);
+        return new ContractDocument(Utilities.createUUID(), MessageFlag.ContractDocument,
+                Utilities.createTimestamp(), this.deliveryContract);
+    }
+
+    /**
+     * Validates the received Confirm message object and if no Confirm object is already saved
+     * a new Confirm object gets created.
+     *
+     * @param message    Confirm messge object.
+     * @return           An empty optional if a Confirm object is found.
+     */
+    private Optional<PickUp> handleConfirm(Confirm message, String sender) {
+        byte[] signedTransitEntry = new byte[0];
+        if (compareTimestamp(message.getTimestamp()) && message.getConfirmed()) {
+            String transferee = message.getDeliveryContract().getTransitRecord().getAllEntries().lastElement().getTransferee();
+            if (transferee.equals(sender)) {
+                signedTransitEntry = signTransitEntry(message);
+            }
+            return Optional.of(new PickUp(Utilities.createUUID(), MessageFlag.PickUp, Utilities.createTimestamp(), signedTransitEntry));
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Handles all things data processing after of the received shipping document.
      *
      * @param message    PickUp message object.
      * @return           An optional if the message passed the timestamp and flag checks or empty if not.
      */
-    private Optional<Confirm> handleDocument(DeliveryDocument message) {
+    private Optional<Confirm> handleContract(ContractDocument message) {
         if (message.getDeliveryContract() != null) {
             this.deliveryContract = storeDeliveryContract(message.getDeliveryContract());
             fillTransfereeField(this.deliveryContract.getTransitRecord().getAllEntries());
@@ -159,42 +181,23 @@ public class Contract extends AbstractSession {
     }
 
     /**
-     * Validates the received Confirm message object and if no Confirm object is already saved
-     * a new Confirm object gets created.
-     *
-     * @param message    Confirm messge object.
-     * @return           An empty optional if a Confirm object is found.
-     */
-    private Optional<PickUp> handleConfirm(Confirm message, String sender) {
-        byte[] signedTransitEntry = new byte[0];
-        if (compareTimestamp(message.getTimestamp()) && message.getConfirmed()) {
-            String transferee = message.getDeliveryContract().getTransitRecord().getAllEntries().lastElement().getTransferee();
-            if (transferee.equals(sender)) {
-                signTransitEntry(message);
-            }
-            return Optional.of(new PickUp(this.pickUp.createUUID(), MessageFlag.PickUp, Utilities.createTimestamp(), signedTransitEntry));
-        }
-        return Optional.empty();
-    }
-
-    /**
      * Digitally signs the last TransitEntry object.
      *
      * @param message    Confirm message holds the DeliveryContract + TransitRecor object.
      */
     public byte[] signTransitEntry(Confirm message) {
-        byte[] unsignedMessage = messageHandler.objectToByteArray(message.getDeliveryContract().getTransitRecord().getAllEntries().lastElement());
-        byte[] signedTransitEntry = new byte[0];
+        byte[] unsignedEntry = message.getDeliveryContract().getTransitRecord().getAllEntries().lastElement());
+        byte[] signedEntry;
         try {
-            signedTransitEntry = ASAPCryptoAlgorithms.sign(unsignedMessage, this.sharkPKIComponent.getASAPKeyStore());
+            signedEntry = ASAPCryptoAlgorithms.sign(unsignedEntry, this.sharkPKIComponent.getASAPKeyStore());
         } catch (ASAPSecurityException e) {
             throw new RuntimeException(e);
         }
-        return signedTransitEntry;
+        return signedEntry;
     }
 
     /**
-     * This message holds the Location object of where the pick up or better hand over of the package is about to happen
+     * This message holds the Location object of where the pick up/hand over of the package is about to happen
      *
      * @param message    PickUp message object.
      * @return           An optional if the message passed the timestamp and flag checks or empty if not.

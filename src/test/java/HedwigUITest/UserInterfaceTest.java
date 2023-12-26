@@ -4,6 +4,8 @@ import HedwigUI.UserInterface;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.*;
 
@@ -32,11 +34,10 @@ public class UserInterfaceTest {
         System.out.println(input);
         assertEquals(45.789866, input, 0.001);
     }
-
-    @Test
-    public void testIfInputDataIsAccepted() {
-        String yes = "yes";
-        ByteArrayInputStream in = new ByteArrayInputStream(yes.getBytes());
+    @ParameterizedTest
+    @ValueSource(strings = {"yes", "no", "boo", "3434"})
+    public void testIfInputDataIsAccepted(String values) {
+        ByteArrayInputStream in = new ByteArrayInputStream(values.getBytes());
         System.setIn(in);
         boolean accepted = ui.acceptInput();
         assertTrue(accepted);

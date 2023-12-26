@@ -3,23 +3,34 @@ package DeliveryContract;
 import java.io.*;
 import java.util.Vector;
 
+
 /**
  * Class to add a new entry to the list of all previous handovers of this package.
  */
-public class TransitRecord implements Serializable {
+public class TransitRecord implements IContractComponent, Serializable {
 
+    private TransitEntry transitEntry;
     private Vector<TransitEntry> entryList = null;
 
     /**
-     * The TransitRecord object is a dynamic vector where TransitEnry objects are added.
-     * The advantage of the Java Vecor object is its threadsafty.
+     * The TransitRecord object is a dynamic vector where TransitEntry objects are added.
+     * The advantage of the Java Vector object is its threadsaty.
      */
     public TransitRecord() {
         this.entryList = new Vector<TransitEntry>();
     }
 
     /**
-     * Adds Vector entries to a newly instatiated TransitRecord object.
+     * Contructor expects a TransitEntry object.
+     *
+     * @param transitEntry    TransitEntry object.
+     */
+    public TransitRecord(TransitEntry transitEntry) {
+        this.transitEntry = transitEntry;
+    }
+
+    /**
+     * Adds Vector entries to a newly instantiated TransitRecord object.
      * Only called by transferees.
      *
      * @param entries    All previous handover entries of the package.
@@ -27,6 +38,12 @@ public class TransitRecord implements Serializable {
     public TransitRecord(Vector<TransitEntry> entries) {
         this.entryList = entries;
     }
+
+    public Object create(Object object) {
+        TransitEntry entry = (TransitEntry) object;
+        return new TransitRecord(entry);
+    }
+
     /**
      * Adds a new entry to the transit record list.
      * @param entry    TransitEntry object

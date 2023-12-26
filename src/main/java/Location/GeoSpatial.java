@@ -2,11 +2,11 @@ package Location;
 
 import static java.lang.Math.sqrt;
 
-public class GeoCalculation implements IGeoLocation {
+public class GeoSpatial implements IGeoSpatial {
 
     private Location pickUp;
 
-    public GeoCalculation() {}
+    public GeoSpatial() {}
 
     /**
      * For now this is the hard coded location for the HTW-Berlin Building C.

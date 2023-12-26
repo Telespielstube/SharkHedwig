@@ -6,7 +6,6 @@ import java.util.UUID;
 import Message.IMessage;
 import Location.Location;
 import Message.MessageFlag;
-import sun.plugin2.message.Message;
 
 public abstract class AbstractRequest implements IMessage {
     protected UUID uuid;

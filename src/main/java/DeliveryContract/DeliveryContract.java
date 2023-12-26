@@ -1,33 +1,36 @@
 package DeliveryContract;
 
-import Message.IMessage;
+public class DeliveryContract  {
 
-public class DeliveryContract implements IDeliveryContract {
+    private final IContractComponent transitRecord;
+    private final IContractComponent shippingLabel;
+    private boolean isSent = false;
 
-    public static boolean isCreated = false;
-
-    private ShippingLabel shippingLabel;
-    private TransitRecord transitRecord;
-
-    public DeliveryContract() {
-        isCreated = false;
-    }
-
-    public DeliveryContract(ShippingLabel shippingLabel, TransitRecord transitRecord) {
+    public DeliveryContract(IContractComponent shippingLabel, IContractComponent transitRecord) {
         this.shippingLabel = shippingLabel;
         this.transitRecord = transitRecord;
-        isCreated = true;
+        this.isSent = true;
+    }
+
+    public boolean getContractSent() {
+        return this.isSent;
+    }
+
+    public void setContractSent(boolean isSent) {
+        this.isSent = isSent;
     }
 
     public ShippingLabel getShippingLabel() {
-        return shippingLabel;
+        return (ShippingLabel) this.shippingLabel.get();
     }
 
     public TransitRecord getTransitRecord() {
-        return transitRecord;
+        return (TransitRecord) this.transitRecord.get();
     }
 
     public DeliveryContract getDeliveryContract() {
         return this;
     }
+
+
 }

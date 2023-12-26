@@ -6,7 +6,7 @@ import Message.IMessage;
 import Message.MessageFlag;
 import Message.Request.*;
 import Battery.Battery;
-import Location.GeoCalculation;
+import Location.GeoSpatial;
 import Misc.LogEntry;
 import Misc.SessionLogger;
 import Misc.Utilities;
@@ -22,13 +22,13 @@ public class Request extends AbstractSession {
     private OfferReply offerReply;
     private Confirm confirm;
     private Battery battery;
-    private GeoCalculation geoCalculation;
+    private GeoSpatial geoCalculation;
     private DeliveryContract deliveryContract;
     private AckMessage ackMessage;
 
     public Request() {
         this.battery = new Battery();
-        this.geoCalculation = new GeoCalculation();
+        this.geoCalculation = new GeoSpatial();
         this.messageList = Collections.synchronizedSortedMap(new TreeMap<>());
     }
 

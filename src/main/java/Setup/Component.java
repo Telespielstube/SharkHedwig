@@ -72,7 +72,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         } catch (IOException | NoSuchPaddingException | NoSuchAlgorithmException e) {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
         }
-        new PKIManager(Constant.CaId.getAppConstant(), sharkPKIComponent);
+        new PKIManager(sharkPKIComponent);
     }
 
     /**

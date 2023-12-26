@@ -39,7 +39,7 @@ public class UtilitiesTest {
     public void setup() throws SharkException {
         try {
             SharkTestPeerFS sharkPeer = new SharkTestPeerFS("Alice", "tester123/Alice");
-            //  sharkPKIComponent = setupComponent(aliceSharkPeer);
+//            sharkPKIComponent = setupComponent(aliceSharkPeer);
             SharkPKIComponentFactory certificateComponentFactory = new SharkPKIComponentFactory();
 
             // register this component with shark peer - note: we use interface SharkPeer
