@@ -1,7 +1,8 @@
 package HedwigUI;
 
 /**
- * This does nothing more than filling up the object constructor with the input data.
+ * This does nothing more than filling up the object constructor with the input data. This can be replaced by a fx JSON
+ * library to receive the user input from a phone, tablet, computer....
  */
 public class UserInputBuilder {
 

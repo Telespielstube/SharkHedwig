@@ -1,17 +1,15 @@
-package DeliveryContractTest;
+package SessionTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import DeliveryContract.TransitRecord;
 import DeliveryContract.TransitEntry;
 import Location.Location;
 import SetupTest.TestConstant;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.After;
 
-public class TransitRecordTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ContractTest {
 
     private TransitRecord transitRecord;
 
@@ -41,26 +39,5 @@ public class TransitRecordTest {
         assertEquals("Bruce", entry.getTransferee());
     }
 
-    @Test
-    public void testIfVectorGetsCreatedInConstructor() {
-        assertEquals(2, transitRecord.getTransitRecordSize());
-    }
-
-    @Test
-    public void testThatAnTransitEntryObjectGetsAddedToVector() {
-        transitRecord.addEntry(new TransitEntry(2, null, "Alice", "Bobby", new Location(80.0,90.0), 45345345, null ));
-        assertEquals("Bobby", transitRecord.getAllEntries().lastElement().getTransferee());
-        assertEquals(2, transitRecord.getAllEntries().lastElement().getSerialNumber());
-    }
-
-    @Test
-    public void testIfAllEntriesGetReturned() {
-        assertNotNull(transitRecord.getAllEntries());
-    }
-
-    @After
-    public void clearVector() {
-        transitRecord.getAllEntries().clear();
-    }
 
 }

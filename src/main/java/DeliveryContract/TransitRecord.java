@@ -44,6 +44,15 @@ public class TransitRecord implements IContractComponent, Serializable {
         return new TransitRecord(entry);
     }
 
+    public Object get() {
+        return TransitRecord.class;
+    }
+
+    @Override
+    public boolean isCreated() {
+        return false;
+    }
+
     /**
      * Adds a new entry to the transit record list.
      * @param entry    TransitEntry object
@@ -52,6 +61,13 @@ public class TransitRecord implements IContractComponent, Serializable {
         this.entryList.add(entry);
     }
 
+    /**
+     *
+     * @return
+     */
+    public TransitEntry getLastElement() {
+        return entryList.lastElement();
+    }
     /**
      * Returns all entries.
      *

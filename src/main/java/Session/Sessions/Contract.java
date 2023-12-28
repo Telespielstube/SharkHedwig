@@ -176,7 +176,7 @@ public class Contract extends AbstractSession {
      * Fills out the missing Transferee field in the TransitEntry object.
      */
     private void fillTransfereeField(Vector<TransitEntry> transitRecord) {
-        TransitEntry lastEntry = this.transitRecord.getAllEntries().lastElement();
+        TransitEntry lastEntry = transitRecord.lastElement();
         lastEntry.setTransferee(Constant.PeerName.getAppConstant());
     }
 
@@ -186,7 +186,7 @@ public class Contract extends AbstractSession {
      * @param message    Confirm message holds the DeliveryContract + TransitRecor object.
      */
     public byte[] signTransitEntry(Confirm message) {
-        byte[] unsignedEntry = message.getDeliveryContract().getTransitRecord().getAllEntries().lastElement());
+        byte[] unsignedEntry = messageHandler.objectToByteArray(message.getDeliveryContract().getTransitRecord().getAllEntries().lastElement());
         byte[] signedEntry;
         try {
             signedEntry = ASAPCryptoAlgorithms.sign(unsignedEntry, this.sharkPKIComponent.getASAPKeyStore());

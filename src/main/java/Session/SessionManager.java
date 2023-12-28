@@ -1,5 +1,6 @@
 package Session;
 
+import DeliveryContract.IContractComponent;
 import Misc.LogEntry;
 import Misc.Utilities;
 import Setup.Channel;
@@ -27,7 +28,7 @@ public class SessionManager implements ISessionManager {
     private Advertisement advertisement;
     private LogEntry logEntry;
     private MessageBuilder messageBuilder;
-    private IShippingLabel shippingLabel;
+    private IContractComponent shippingLabel;
 
     public SessionManager() {}
 
@@ -53,7 +54,7 @@ public class SessionManager implements ISessionManager {
 
     @Override
     public boolean checkTransferorState() {
-        if (shippingLabel.getIsCreated()) {
+        if (shippingLabel.isCreated()) {
             DeviceState.Transferor.isActive();
             return true;
         }

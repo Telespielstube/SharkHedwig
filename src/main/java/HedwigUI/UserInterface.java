@@ -3,7 +3,11 @@ package HedwigUI;
 import java.text.DecimalFormat;
 import java.util.Scanner;
 
-
+/**
+ * The UserInterface is more or less a placeholder class and defietly needs to be replaced by a more advaned mobile device
+ * and desktop computer application. It simulates a user input and sends the verified data object to the protocol
+ * intern ShippingLabel object for processing.
+ */
 public class UserInterface implements IUserInterface, Runnable {
 
     private String sender = null;
@@ -82,7 +86,7 @@ public class UserInterface implements IUserInterface, Runnable {
     }
 
     /**
-     * starts the user interface thread. This methode is overridden from the 'runnable' interface.
+     * Starts the user interface thread. This methode is overridden from the 'runnable' interface.
      */
     @Override
     public void run() {
@@ -94,6 +98,7 @@ public class UserInterface implements IUserInterface, Runnable {
                 if (!acceptInput()) {
                     shippingLabelForm("Shipping label. Please fill in the required information.");
                 }
+                // saves the user input that the user interface does not access the shipping label directly.
                 new UserInputBuilder(this.sender, this.origin, this.latitudeOrigin, this.longitudeOrigin,
                         this.recipient, this.destination, this.latitudeDest, this.longitudeDest,
                         this.packageWeight);

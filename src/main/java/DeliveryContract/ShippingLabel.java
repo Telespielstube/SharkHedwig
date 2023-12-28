@@ -3,7 +3,6 @@ package DeliveryContract;
 import java.util.UUID;
 
 import HedwigUI.UserInputBuilder;
-import HedwigUI.UserInterface;
 import Location.Location;
 import Misc.Utilities;
 
@@ -53,6 +52,7 @@ public class ShippingLabel implements IContractComponent {
      * Creates a new ShippingLabel object passed from the UserInputBuilder object.
      * @param object
      */
+    @Override
     public Object create(Object object) {
         UserInputBuilder userInput = (UserInputBuilder) object;
         return (ShippingLabel) new ShippingLabel(Utilities.createUUID(), userInput.getSender(), userInput.getOrigin(),
@@ -61,8 +61,13 @@ public class ShippingLabel implements IContractComponent {
                 userInput.getLongitudeDest()), userInput.getPackageWeight());
     }
 
+    @Override
+    public Object get() {
+        return this;
+    }
 
-    public boolean getIsCreated() {
+    @Override
+    public boolean isCreated() {
         return this.isCreated;
     }
 
