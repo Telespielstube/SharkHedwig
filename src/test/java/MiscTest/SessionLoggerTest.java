@@ -6,9 +6,10 @@ import Misc.LogEntry;
 import Misc.SessionLogger;
 import Misc.Utilities;
 import SetupTest.TestConstant;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,11 +17,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static SetupTest.TestConstant.*;
-import static org.junit.Assert.assertTrue;
+
 
 public class SessionLoggerTest {
 
-    @Before
+    @BeforeAll
     public void testIfDirectoryAndFileAreCreated() {
         try {
             SessionLogger.createLogDirectory(TestConstant.PeerFolder.getTestConstant(), LogFolder.getTestConstant());
@@ -54,16 +55,16 @@ public class SessionLoggerTest {
         assertTrue(written);
     }
 
-//    @After
-//    public void clear() {
-//        Path requestfilePath = Paths.get(String.format(PeerFolder.getTestConstant() + "/" + LogFolder.getTestConstant() + "/" + RequestLog.getTestConstant()));
-//       Path contractfilePath = Paths.get(String.format(PeerFolder.getTestConstant() + "/" + LogFolder.getTestConstant() + "/" + ContractLog.getTestConstant()));
-//        try {
-//            Files.delete(requestfilePath);
-//            //Files.delete(contractfilePath);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//    }
+    @AfterAll
+    public void clear() {
+        Path requestfilePath = Paths.get(String.format(PeerFolder.getTestConstant() + "/" + LogFolder.getTestConstant() + "/" + RequestLog.getTestConstant()));
+       Path contractfilePath = Paths.get(String.format(PeerFolder.getTestConstant() + "/" + LogFolder.getTestConstant() + "/" + ContractLog.getTestConstant()));
+        try {
+            Files.delete(requestfilePath);
+            //Files.delete(contractfilePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 }

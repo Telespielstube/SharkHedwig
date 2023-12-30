@@ -4,11 +4,11 @@ import DeliveryContract.*;
 import Location.Location;
 import Session.SessionManager;
 import Setup.DeviceState;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static Setup.DeviceState.Transferee;
 import static Setup.DeviceState.Transferor;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DeviceStateTest {
 
@@ -17,9 +17,10 @@ public class DeviceStateTest {
 
     @Test
     public void testIfStateIsTransfereeAfterShippingLabelCreatedButEmpty() {
-        shippingLabel = new ShippingLabel();
+        shippingLabel = new ShippingLabel(null, null, null, null, null,
+                null, null, 0.0);
 
-        assertFalse(ShippingLabel.labelCreated);
+        assertFalse(shippingLabel.isCreated());
         assertEquals(Transferee, DeviceState.Transferee.isActive());
     }
 
@@ -28,7 +29,7 @@ public class DeviceStateTest {
         shippingLabel = new ShippingLabel(null, "Alice", "HTW-Berlin",
                 new Location(52.456931, 13.526444), "Bob", "Ostbahnhof",
                 new Location(52.5105, 13.4346), 1.2);
-        assertTrue(ShippingLabel.labelCreated);
+        assertTrue(shippingLabel.isCreated());
         assertEquals(Transferor, Transferor.isActive());
     }
 

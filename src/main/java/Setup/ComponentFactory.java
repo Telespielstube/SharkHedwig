@@ -4,6 +4,9 @@ import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkComponentFactory;
 import net.sharksystem.pki.SharkPKIComponent;
 
+import javax.crypto.NoSuchPaddingException;
+import java.security.NoSuchAlgorithmException;
+
 public class ComponentFactory implements SharkComponentFactory {
     private final SharkPKIComponent sharkPKIComponent;
     public ComponentFactory(SharkPKIComponent sharkPKIComponent){
@@ -12,6 +15,10 @@ public class ComponentFactory implements SharkComponentFactory {
 
     @Override
     public SharkComponent getComponent() {
-        return new Component(sharkPKIComponent);
+        try {
+            return new Component(sharkPKIComponent);
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

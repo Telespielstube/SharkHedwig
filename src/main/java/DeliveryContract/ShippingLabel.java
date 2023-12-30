@@ -1,10 +1,14 @@
 package DeliveryContract;
 
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import HedwigUI.UserInputBuilder;
 import Location.Location;
 import Misc.Utilities;
+import jdk.nashorn.internal.ir.IfNode;
 
 
 /**
@@ -45,20 +49,23 @@ public class ShippingLabel implements IContractComponent {
         this.destination = destination;
         this.locationDest = locationDest;
         this.packageWeight = packageWeight;
-        this.isCreated = true;
     }
+
+    public ShippingLabel() {}
 
     /**
      * Creates a new ShippingLabel object passed from the UserInputBuilder object.
      * @param object
      */
     @Override
-    public Object create(Object object) {
+    public ShippingLabel create(Object object) {
         UserInputBuilder userInput = (UserInputBuilder) object;
-        return (ShippingLabel) new ShippingLabel(Utilities.createUUID(), userInput.getSender(), userInput.getOrigin(),
+        this.isCreated = true;
+        return new ShippingLabel(Utilities.createUUID(), userInput.getSender(), userInput.getOrigin(),
                 new Location(userInput.getLatitudeOrigin(), userInput.getLongitudeOrigin()),
                 userInput.getRecipient(), userInput.getDestination(), new Location(userInput.getLatitudeDest(),
                 userInput.getLongitudeDest()), userInput.getPackageWeight());
+
     }
 
     @Override
@@ -71,6 +78,9 @@ public class ShippingLabel implements IContractComponent {
         return this.isCreated;
     }
 
+    private boolean checkNullField(Object userInput) {
+        return Stream.of(userInput).allMatch(Objects::nonNull);
+    }
 
     // Getter methods to get the value of the Object field.
     public UUID getUUID() {

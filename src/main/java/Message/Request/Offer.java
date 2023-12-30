@@ -28,6 +28,11 @@ public class Offer extends AbstractRequest {
         this.messageFlag = messageFlag;
     }
 
+    @Override
+    public Object getContent() {
+        return null;
+    }
+
     public double getFlightRange() {
         return this.flightRange;
     }

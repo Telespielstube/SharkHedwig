@@ -2,53 +2,59 @@ package DeliveryContractTest;
 
 import DeliveryContract.*;
 import Location.Location;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.UUID;
-
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DeliveryContractTest {
 
-    private DeliveryContract deliveryContract;
-    private ShippingLabel shippingLabel;
-    private TransitRecord transitRecord;
+    private static DeliveryContract deliveryContract;
+    private static ShippingLabel shippingLabel;
+    private static TransitRecord transitRecord;
 
-    @Before
-    public void setup() {
-        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
-        shippingLabel = new ShippingLabel();
-        transitRecord = new TransitRecord();
-    }
 
     @Test
     public void testIfDeliveryContractIsCreatedButStillFalse() {
+        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
+        shippingLabel = new ShippingLabel();
+        transitRecord = new TransitRecord();
         assertNotNull(deliveryContract);
         assertFalse(deliveryContract.getContractSent());
-    }
-
-    @Test
-    public void testIfTrueIsReturnedWhenLAbelAndRecordArePassed() {
-        assertNotNull(deliveryContract = new DeliveryContract(shippingLabel, transitRecord));
-        assertTrue(deliveryContract.getContractSent());
-        assertFalse(shippingLabel.getIsCreated());
         assertNotNull(transitRecord.getClass());
     }
 
     @Test
-    public void testIfTransitRecordIsReturnedButFalseBecauseNoEntry() {
-        TransitRecord record = deliveryContract.getTransitRecord();
-        assertNull(record);
+    public void deliveryContractThrowsExceptionWhenShippingAndTransitNotPresent() {
+        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
+        shippingLabel = new ShippingLabel();
+        transitRecord = new TransitRecord();
+        assertFalse(shippingLabel.isCreated());
+        assertFalse(transitRecord.isCreated());
+    }
+    @Test
+    public void returnTrueIfContractSetMethodIsCalled() {
+        assertNotNull(deliveryContract = new DeliveryContract(shippingLabel, transitRecord));
+        deliveryContract.setContractSent(true);
+        assertTrue(deliveryContract.getContractSent());
     }
 
     @Test
-    public void testIfShippingLabelObjectIsReturned() {
-        ShippingLabel label = deliveryContract.getShippingLabel();
-        assertNotNull(label);
-        assertNotEquals(transitRecord.getClass(), shippingLabel.getClass());
-        assertEquals(null,label.getUUID());
+    public void returnFalseIfContractSetMethodIsNotCalled() {
+        assertNotNull(deliveryContract = new DeliveryContract(shippingLabel, transitRecord));
+        assertFalse(deliveryContract.getContractSent());
+
     }
+
+    @Test
+    public void testIfGetTransitRecordThrowsExceptionCauseNoObjectIsPresent() {
+        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
+        assertThrows(NullPointerException.class,
+                ()-> deliveryContract.getTransitRecord());
+        assertThrows(NullPointerException.class,
+                ()-> deliveryContract.getShippingLabel());
+    }
+
     @Test
     public void testIfTransitRecordEntryIsReturnedAndNotNull() {
         transitRecord.addEntry(new TransitEntry(2, null, "Alice", "Bobby", new Location(80.0,90.0), 45345345, null ));

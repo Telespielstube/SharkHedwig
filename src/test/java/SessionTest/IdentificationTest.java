@@ -1,53 +1,99 @@
 package SessionTest;
 
-import Message.MessageHandler;
+import Message.Advertisement;
+import Message.Identification.AbstractIdentification;
+import Message.Identification.Challenge;
+import Message.MessageFlag;
 import Misc.Utilities;
 import Session.Sessions.Identification;
-import net.sharksystem.asap.ASAPPeer;
+import SetupTest.TestConstant;
+import net.sharksystem.SharkComponent;
+import net.sharksystem.SharkException;
+import net.sharksystem.SharkPeer;
+import net.sharksystem.SharkTestPeerFS;
+import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.asap.crypto.ASAPKeyStore;
+import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
-import org.junit.Before;
-import org.junit.Test;
+import net.sharksystem.pki.SharkPKIComponentFactory;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 import javax.crypto.NoSuchPaddingException;
-import javax.rmi.CORBA.Util;
+import java.io.IOException;
+import java.io.ObjectOutput;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.sql.SQLOutput;
+import java.util.Optional;
 import java.util.UUID;
 
-import static Misc.Utilities.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IdentificationTest {
 
-    private final MessageHandler messageHandler = new MessageHandler();
-    private ASAPPeer peer;
-    private SharkPKIComponent sharkPKIComponent;
-    private final Identification identTest = new Identification(this.sharkPKIComponent);
-    private KeyPair pair;
-    public IdentificationTest() throws NoSuchPaddingException, NoSuchAlgorithmException {
+
+    private static SharkPKIComponent sharkPKIComponent;
+    private static Identification identification;
+    private static Challenge challenge;
+
+    @BeforeAll
+    public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
+
+        SharkPeer sharkTestPeer = new SharkTestPeerFS(TestConstant.PeerName.getTestConstant(), TestConstant.PeerFolder.getTestConstant() + "/" + TestConstant.PeerName.getTestConstant());
+        sharkPKIComponent = setupComponent(sharkTestPeer);
+
+        sharkTestPeer.start();
+
+        String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
+
+        ASAPKeyStore asapKeyStore = sharkPKIComponent.getASAPKeyStore();
+        String francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
+        PublicKey publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
+        identification = new Identification(sharkPKIComponent);
     }
 
-//    @Before
-//    public void setupKeyPair() {
-//        KeyPairGenerator generator = null;
-//        try {
-//            generator = KeyPairGenerator.getInstance("RSA");
-//        } catch (NoSuchAlgorithmException e) {
-//            throw new RuntimeException(e);
-//        }
-//        generator.initialize(2048);
-//        pair = generator.generateKeyPair();
-//    }
-//
-//    @Test
-//    public void testIfRandomNumberGetsEncryptedAndDecrypted() throws NoSuchAlgorithmException {
-//        byte[] random = identTest.generateRandomNumber();
-//        byte[] encrypted = Utilities.encryptRandomNumber(random, pair.getPublic());
-//        byte[] decrypted = ASAPCryptoAlgorithms.decryptAsymmetric(encrypted, (ASAPKeyStore) pair.getPrivate());
-//        assertEquals(new String(random, StandardCharsets.UTF_8), new String(decrypted, StandardCharsets.UTF_8));
-//        assertArrayEquals(random, decrypted);
-//    }
+    private static SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException {
+        SharkPKIComponentFactory certificateComponentFactory = new SharkPKIComponentFactory();
+
+        // register this component with shark peer - note: we use interface SharkPeer
+        try {
+            sharkPeer.addComponent(certificateComponentFactory, SharkPKIComponent.class);
+        } catch (SharkException e) {
+            throw new RuntimeException(e);
+        }
+        SharkComponent component = sharkPeer.getComponent(SharkPKIComponent.class);
+
+        // project "clean code" :) we only use interfaces - unfortunately casting is unavoidable
+        return (SharkPKIComponent) component;
+    }
+
+    @Test
+    public void testIfRandomNumberGetsEncryptedAndDecrypted() throws NoSuchAlgorithmException, ASAPSecurityException, NoSuchPaddingException {
+
+        byte[] random = identification.generateRandomNumber();
+
+        byte[] encrypted = Utilities.encryptAsymmetric(random, sharkPKIComponent.getASAPKeyStore().getPublicKey());
+        byte[] decrypted = ASAPCryptoAlgorithms.decryptAsymmetric(encrypted, sharkPKIComponent.getASAPKeyStore());
+        assertEquals(new String(random, StandardCharsets.UTF_8), new String(decrypted, StandardCharsets.UTF_8));
+        assertArrayEquals(random, decrypted);
+    }
+
+    @Test
+    public void createANewChallengeMessage() throws ASAPSecurityException {
+        Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.Challenge, Utilities.createTimestamp(), Utilities.encryptAsymmetric(identification.generateRandomNumber(), sharkPKIComponent.getPublicKey()));
+        assertInstanceOf(Challenge.class, challenge);
+    }
+
+    @Test
+    public void responseToAdvertisementIsChallengeMessage() {
+        Advertisement advertisement = new Advertisement(UUID.randomUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
+        Optional<Object> object = Optional.ofNullable(identification.transferor(advertisement, "Bobby"));
+        assertTrue(object.isPresent());
+        assertNotNull(object.get());
+    }
+
 }

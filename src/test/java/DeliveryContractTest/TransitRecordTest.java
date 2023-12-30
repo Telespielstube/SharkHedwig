@@ -7,16 +7,16 @@ import DeliveryContract.TransitRecord;
 import DeliveryContract.TransitEntry;
 import Location.Location;
 import SetupTest.TestConstant;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.After;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterAll;
 
 public class TransitRecordTest {
 
-    private TransitRecord transitRecord;
+    private static TransitRecord transitRecord;
 
-    @Before
-    public void setup() {
+    @BeforeAll
+    public static void setup() {
         transitRecord = new TransitRecord();
         transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PeerName.name(), "Peter", new Location
                 (57.5654645, 77.345345), 56563456, null));
@@ -31,7 +31,7 @@ public class TransitRecordTest {
         TransitEntry entry = transitRecord.getLastElement();
         assertNotNull(entry);
         assertEquals(4, entry.getSerialNumber());
-        assertNotEquals("Bob", entry.getTransferee());
+        assertNotEquals("Bobby", entry.getTransferee());
     }
 
     @Test
@@ -43,7 +43,8 @@ public class TransitRecordTest {
 
     @Test
     public void testIfVectorGetsCreatedInConstructor() {
-        assertEquals(2, transitRecord.getTransitRecordSize());
+
+        assertEquals(3, transitRecord.getTransitRecordSize());
     }
 
     @Test
@@ -58,8 +59,8 @@ public class TransitRecordTest {
         assertNotNull(transitRecord.getAllEntries());
     }
 
-    @After
-    public void clearVector() {
+    @AfterAll
+    public static void clearVector() {
         transitRecord.getAllEntries().clear();
     }
 

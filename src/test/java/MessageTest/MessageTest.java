@@ -1,8 +1,8 @@
 package MessageTest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import java.util.UUID;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import Message.Identification.Challenge;
 
@@ -12,7 +12,10 @@ import Message.Identification.Challenge;
  */
 public class MessageTest {
 
-   // private final Challenge challenge = new Challenge(UUID.randomUUID(), System.currentTimeMillis());
+
+    public void setup() {
+
+    }
 
 
 }

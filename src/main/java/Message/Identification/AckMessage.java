@@ -23,6 +23,11 @@ public class AckMessage extends AbstractIdentification {
         this.messageFlag = messageFlag;
     }
 
+    @Override
+    public Object getContent() {
+        return null;
+    }
+
     public boolean getIsAck() {
         return this.isAck;
     }

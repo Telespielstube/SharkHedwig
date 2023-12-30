@@ -34,7 +34,11 @@ public abstract class AbstractSession implements ISession {
 
     @Override
     public boolean sessionComplete(Object message) {
-        return message.equals(getLastValueFromList() instanceof AckMessage);
+        if (!this.messageList.isEmpty()) {
+            return message.equals(getLastValueFromList() instanceof AckMessage);
+        } else {
+            return false;
+        }
     }
 
     public void addMessageToList(IMessage message) {

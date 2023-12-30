@@ -1,5 +1,8 @@
 package DeliveryContract;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 public class DeliveryContract  {
 
     private final IContractComponent transitRecord;
@@ -9,7 +12,6 @@ public class DeliveryContract  {
     public DeliveryContract(IContractComponent shippingLabel, IContractComponent transitRecord) {
         this.shippingLabel = shippingLabel;
         this.transitRecord = transitRecord;
-        this.isSent = true;
     }
 
     public boolean getContractSent() {

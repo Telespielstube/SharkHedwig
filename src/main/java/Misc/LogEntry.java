@@ -2,8 +2,6 @@ package Misc;
 
 import java.io.Serializable;
 import Location.Location;
-import org.junit.Test;
-
 import java.util.UUID;
 
 public class LogEntry implements Serializable {

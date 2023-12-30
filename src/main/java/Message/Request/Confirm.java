@@ -23,6 +23,11 @@ public class Confirm extends AbstractRequest {
         this.messageFlag = messageFlag;
     }
 
+    @Override
+    public Object getContent() {
+        return null;
+    }
+
     public boolean getConfirmed() {
         return this.isConfirmed;
     }

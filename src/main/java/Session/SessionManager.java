@@ -1,6 +1,7 @@
 package Session;
 
 import DeliveryContract.IContractComponent;
+import DeliveryContract.ShippingLabel;
 import Misc.LogEntry;
 import Misc.Utilities;
 import Setup.Channel;
@@ -13,13 +14,14 @@ import net.sharksystem.pki.SharkPKIComponent;
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
+import java.util.UUID;
 
 public class SessionManager implements ISessionManager {
 
     private SharkPKIComponent sharkPKIComponent;
     private ASAPPeer peer;
     private SessionState sessionState;
-    private DeviceState isTransferor;
+    private DeviceState deviceState;
     private Identification identification;
     private Request request;
     private Contract contract;
@@ -28,7 +30,7 @@ public class SessionManager implements ISessionManager {
     private Advertisement advertisement;
     private LogEntry logEntry;
     private MessageBuilder messageBuilder;
-    private IContractComponent shippingLabel;
+    private IContractComponent shippingLabel = new ShippingLabel();
 
     public SessionManager() {}
 
@@ -36,7 +38,7 @@ public class SessionManager implements ISessionManager {
         this.messageHandler = messageHandler;
         this.peer = peer;
         this.sharkPKIComponent = sharkPKIComponent;
-        this.isTransferor = isTransferor;
+        this.deviceState = isTransferor;
         this.sessionState = sessionState;
         this.identification = new Identification(this.sharkPKIComponent);
         this.request = new Request();
@@ -49,27 +51,28 @@ public class SessionManager implements ISessionManager {
      * @return    Advertisement message object.
      */
     private Advertisement createAdvertisement() {
-        return new Advertisement(null, true, MessageFlag.Advertisement, Utilities.createTimestamp());
+        return new Advertisement(UUID.randomUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
     }
 
     @Override
     public boolean checkTransferorState() {
         if (shippingLabel.isCreated()) {
-            DeviceState.Transferor.isActive();
+            this.deviceState = DeviceState.Transferor.isActive();
             return true;
         }
+        this.deviceState = DeviceState.Transferee.isActive();
         return false;
     }
 
     /**
      * Method that handles all the sessions.
      *
-     * @param message    Incomming generic type Message object.
+     * @param message    Incoming Message object.
      * @param sender
      */
     @Override
     public MessageBuilder sessionHandling(IMessage message, String sender) {
-        Optional<Object> messageObject;
+        Optional<?> messageObject = Optional.empty();
         switch (this.sessionState) {
             case NoSession:
                 if (checkTransferorState()) {
@@ -78,7 +81,7 @@ public class SessionManager implements ISessionManager {
                 messageObject = Optional.of((createAdvertisement()));
                 this.sessionState.nextState();
 
-                messageBuilder = new MessageBuilder(messageObject, Channel.Advertisement.getChannelType(), sender);
+                messageBuilder = new MessageBuilder(messageObject.get(), Channel.Advertisement.getChannelType(), sender);
                 break;
 
             case Identification:
@@ -87,12 +90,12 @@ public class SessionManager implements ISessionManager {
                 } else {
                     messageObject = Optional.ofNullable(this.identification.transferee(message, sender).orElse(this.sessionState.resetState()));
                 }
-                if (messageObject.isPresent() && this.identification.sessionComplete(messageObject) ) {
+
+                if (messageObject.isPresent() && this.identification.sessionComplete(messageObject)) {
                     this.identification.clearMessageList();
                     this.sessionState.nextState();
                 }
-
-                messageBuilder = new MessageBuilder(messageObject, Channel.Identification.getChannelType(), sender);
+                messageBuilder = new MessageBuilder(messageObject.get(), Channel.Identification.getChannelType(), sender);
                 break;
 
             case Request:
@@ -105,7 +108,7 @@ public class SessionManager implements ISessionManager {
                     this.request.clearMessageList();
                     this.sessionState.nextState();
                 }
-                messageBuilder = new MessageBuilder(messageObject, Channel.Request.getChannelType(), sender);
+                messageBuilder = new MessageBuilder(messageObject.get(), Channel.Request.getChannelType(), sender);
                 break;
 
             case Contract:
@@ -118,9 +121,7 @@ public class SessionManager implements ISessionManager {
                     DeviceState.Transferee.isActive();
                     resetAll();
                 }
-
-
-                 messageBuilder = new MessageBuilder(messageObject, Channel.Contract.getChannelType(), sender);
+                 messageBuilder = new MessageBuilder(messageObject.get(), Channel.Contract.getChannelType(), sender);
                 break;
 
             default:

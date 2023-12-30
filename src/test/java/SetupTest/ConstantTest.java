@@ -1,11 +1,10 @@
 package SetupTest;
 
 import Setup.Constant;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class ConstantTest {
 
@@ -17,7 +16,7 @@ public class ConstantTest {
     }
     @Test
     public void testIfHedwigStringGetsReturnedFromAppConstantsEnumClass() {
-        Assert.assertEquals("hedwig" , Constant.AppFormat.getAppConstant());
+        assertEquals("hedwig" , Constant.AppFormat.getAppConstant());
     }
 
     @Test

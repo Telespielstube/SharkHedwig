@@ -19,7 +19,6 @@ public class UserInterface implements IUserInterface, Runnable {
     private double longitudeOrigin = 0.0;
     private double latitudeDest = 0.0;
     private double longitudeDest = 0.0;
-    private String cargo = "cargo";
 
     /**
      * Constructer prints out a helpful text on how to interact with the protocol.
@@ -35,26 +34,26 @@ public class UserInterface implements IUserInterface, Runnable {
     }
 
     public void shippingLabelForm(String infoText) {
-        DecimalFormat coordinates = new DecimalFormat("##.######");
+        DecimalFormat coordinates = new DecimalFormat("##.###");
         System.out.println(infoText);
         System.out.print("Sender: ");
-        this.sender = readUserInput().substring(0, 20);
+        this.sender = readUserInput();
         System.out.print("Origin: ");
-        this.origin = readUserInput().substring(0, 20);
+        this.origin = readUserInput();
         System.out.print("Longitude of the origin: ");
         this.longitudeOrigin = Double.parseDouble(coordinates.format(Double.parseDouble(readUserInput())));
         System.out.print("Latitude of the origin: ");
         this.latitudeOrigin = Double.parseDouble(coordinates.format(Double.parseDouble(readUserInput())));
         System.out.print("Recipient: ");
-        this.recipient = readUserInput().substring(0, 20);
+        this.recipient = readUserInput();
         System.out.print("Destination: ");
-        this.destination = readUserInput().substring(0, 20);
+        this.destination = readUserInput();
         System.out.print("Longitude of the origin: ");
         this.longitudeDest = Double.parseDouble(coordinates.format(Double.parseDouble(readUserInput())));
         System.out.print("Latitude of the origin: ");
-        this.latitudeDest = Double.parseDouble(coordinates.format(Double.parseDouble(readUserInput().substring(0, 7))));
+        this.latitudeDest = Double.parseDouble(coordinates.format(Double.parseDouble(readUserInput())));
         System.out.print("Package weight in grams: ");
-        this.packageWeight = Float.parseFloat(readUserInput().substring(0, 7));
+        this.packageWeight = Float.parseFloat(readUserInput());
     }
 
     public void checkFormData(String userInfo) {
@@ -67,19 +66,25 @@ public class UserInterface implements IUserInterface, Runnable {
     }
 
     public boolean acceptInput() {
-        boolean accepted = true;
+        boolean accepted = false;
         String userInput;
+        int counter = 0;
         System.out.println("Is the data correct? (yes/no): ");
         while (true) {
             userInput = readUserInput();
             if (userInput.equalsIgnoreCase("yes")) {
+                accepted = true;
                 break;
             }
             if (userInput.equalsIgnoreCase("no")) {
-                accepted = false;
                 break;
             } else {
                 System.out.println("This is very important. You need to type 'yes' to proceed or 'no' to start over.");
+                counter += 1;
+                if (counter == 2) {
+                    System.out.println("3 times wrong input.");
+                    break;
+                }
             }
         }
         return accepted;
@@ -92,6 +97,7 @@ public class UserInterface implements IUserInterface, Runnable {
     public void run() {
         while (true) {
             String input = readUserInput();
+            String cargo = "cargo";
             if (input.equalsIgnoreCase(cargo)) {
                 shippingLabelForm("Shipping label. Please fill in the required information.");
                 checkFormData("Please read very carefully because this is not reversible at a later date.");

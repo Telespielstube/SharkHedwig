@@ -1,6 +1,5 @@
 package Session.Sessions;
 
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
@@ -27,7 +26,6 @@ public class Identification extends AbstractSession {
     /**
      * Identification constructor
      *
-     * @param sharkPKIComponent
      * @throws NoSuchPaddingException
      * @throws NoSuchAlgorithmException
      */
@@ -60,15 +58,15 @@ public class Identification extends AbstractSession {
         } else {
             addMessageToList(messageObject.get());
         }
-        return Optional.ofNullable(messageObject);
+        return Optional.of(messageObject);
     }
 
     @Override
     public Optional<Object> transferee(IMessage message, String sender) {
-        Optional<AbstractIdentification> messageObject = null;
+        Optional<AbstractIdentification> messageObject = Optional.empty();
         switch(message.getMessageFlag()) {
             case Challenge:
-                messageObject = Optional.of(handleChallenge((Challenge) message).get());
+                messageObject = Optional.ofNullable(handleChallenge((Challenge) message).orElse(null));
                 break;
             case ResponseReply:
                 messageObject = Optional.ofNullable(handleResponseReply((Response) message).orElse(null));
@@ -83,6 +81,8 @@ public class Identification extends AbstractSession {
         }
         if (!messageObject.isPresent()) {
             clearMessageList();
+            // Empties the message that has an invalid flag.
+            messageObject= Optional.empty();
         } else {
             addMessageToList(messageObject.get());
         }
@@ -97,7 +97,7 @@ public class Identification extends AbstractSession {
     private Optional<Challenge> handleAdvertisement(Advertisement message) {
         if (message.getMessageFlag().equals(MessageFlag.Advertisement) && message.getAdTag()) {
             try {
-                return Optional.of(new Challenge(this.challenge.createUUID(), MessageFlag.Challenge, Utilities.createTimestamp(),
+                return Optional.of(new Challenge(Utilities.createUUID(), MessageFlag.Challenge, Utilities.createTimestamp(),
                         Utilities.encryptAsymmetric(generateRandomNumber(), this.sharkPKIComponent.getPublicKey())));
             } catch (ASAPSecurityException e) {
                 throw new RuntimeException(e);

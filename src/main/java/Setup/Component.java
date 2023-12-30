@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import Misc.SessionLogger;
 import Message.*;
@@ -28,9 +29,10 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     private DeviceState deviceState;
 
     public Component() {}
-    public Component(SharkPKIComponent pkiComponent) {
+    public Component(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.sharkPKIComponent = pkiComponent;
         this.messageHandler = new MessageHandler();
+        this.sessionManager = new SessionManager(this.messageHandler, SessionState.NoSession, DeviceState.Transferee ,this.peer, this.sharkPKIComponent);
     }
 
     /**
@@ -64,12 +66,11 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
         this.peer = asapPeer;
         this.peer.addASAPMessageReceivedListener(Constant.AppFormat.getAppConstant(), this);
         try {
-            this.sessionManager = new SessionManager(this.messageHandler, SessionState.NoSession, DeviceState.Transferee ,this.peer, this.sharkPKIComponent);
             this.peer.setASAPRoutingAllowed(Constant.AppFormat.getAppConstant(), true);
             this.setupChannel();
             this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).getOwner();
             this.setupLogger();
-        } catch (IOException | NoSuchPaddingException | NoSuchAlgorithmException e) {
+        } catch (IOException e) {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
         }
         new PKIManager(sharkPKIComponent);
@@ -138,26 +139,29 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
      * @return
      * @throws IOException
      */
-    private void processMessages(ASAPMessages messages, String senderE2E) {
-        IMessage message;
+    public void processMessages(ASAPMessages messages, String senderE2E) {
+        IMessage message = null;
+        byte[] encryptedMessage;
         try {
             for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
-                message = (IMessage) this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
+              //  message = (IMessage) this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
+                message = (IMessage) messageHandler.byteArrayToObject(it.next());
                 MessageBuilder messageBuilder = sessionManager.sessionHandling(message, senderE2E);
-                byte[] encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.getMessage(), messageBuilder.getUri(), messageBuilder.getSender(), sharkPKIComponent);
+                if (message.getContent() == null) {
+                    continue;
+                }
+                encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.getMessage(), messageBuilder.getUri(), messageBuilder.getSender(), sharkPKIComponent);
                 try {
-                    sendASAPMessage(messageBuilder.getUri(), encryptedMessage);
+                    this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), messageBuilder.getUri(), encryptedMessage);
                 } catch (ASAPException e) {
+                    e.printStackTrace();
                     throw new RuntimeException(e);
                 }
             }
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
-
-    public void sendASAPMessage(String uri, byte[] signedMessage) throws ASAPException {
-        this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), uri.toString(), signedMessage);
-    }
-
 }
+

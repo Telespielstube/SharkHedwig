@@ -1,11 +1,11 @@
 package SessionTest;
 
-import DeliveryContract.TransitRecord;
 import DeliveryContract.TransitEntry;
+import DeliveryContract.TransitRecord;
 import Location.Location;
 import SetupTest.TestConstant;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,7 +13,7 @@ public class ContractTest {
 
     private TransitRecord transitRecord;
 
-    @Before
+    @BeforeAll
     public void setup() {
         transitRecord = new TransitRecord();
         transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PeerName.name(), "Peter", new Location

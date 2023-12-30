@@ -1,6 +1,5 @@
 package Message.Contract;
 
-import Message.Identification.AbstractIdentification;
 import Message.MessageFlag;
 
 import java.util.UUID;
@@ -20,6 +19,11 @@ public class AckMessage extends AbstractContract {
 
     public void setMessageFlag(MessageFlag messageFlag) {
         this.messageFlag = messageFlag;
+    }
+
+    @Override
+    public Object getContent() {
+        return null;
     }
 
     public boolean getIsAck() {

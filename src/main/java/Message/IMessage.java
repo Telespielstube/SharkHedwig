@@ -37,4 +37,6 @@ public interface IMessage extends Serializable {
     long getTimestamp();
 
     void setTimestamp(long currentTime);
+
+    Object getContent();
 }

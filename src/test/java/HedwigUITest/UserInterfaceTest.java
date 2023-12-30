@@ -1,22 +1,20 @@
 package HedwigUITest;
 
 import HedwigUI.UserInterface;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
 import java.io.*;
+import java.util.NoSuchElementException;
 
-
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserInterfaceTest {
 
     private final UserInterface ui = new UserInterface("");
     private String data = "testcase";
-    InputStream resetSystemIn = System.in;
+    static InputStream resetSystemIn = System.in;
 
     @Test
     public void testUserInput() {
@@ -34,26 +32,27 @@ public class UserInterfaceTest {
         System.out.println(input);
         assertEquals(45.789866, input, 0.001);
     }
+
     @ParameterizedTest
-    @ValueSource(strings = {"yes", "no", "boo", "3434"})
-    public void testIfInputDataIsAccepted(String values) {
+    @ValueSource(strings = {"yes", "Yes", "YES", "YEs"})
+    public void testIfYesIsAccepted(String values) {
         ByteArrayInputStream in = new ByteArrayInputStream(values.getBytes());
         System.setIn(in);
         boolean accepted = ui.acceptInput();
         assertTrue(accepted);
-
     }
 
-    @Test
-    public void testIfInputDataIsNotAccepted() {
-        String yes = "no";
-        ByteArrayInputStream in = new ByteArrayInputStream(yes.getBytes());
+    @ParameterizedTest
+    @ValueSource(strings = {"no", "No", "NO"})
+    public void testIfNoIsAccepted(String values) {
+        ByteArrayInputStream in = new ByteArrayInputStream(values.getBytes());
         System.setIn(in);
-        assertFalse(ui.acceptInput());
+        boolean accepted = ui.acceptInput();
+        assertFalse(accepted);
     }
 
-    @After
-    public void resetSystemIn() {
+    @AfterAll
+    public static void resetSystemIn() {
         System.setIn(resetSystemIn);
     }
 }

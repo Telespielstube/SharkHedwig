@@ -20,6 +20,11 @@ public class ContractDocument extends AbstractContract {
         this.messageFlag = messageFlag;
     }
 
+    @Override
+    public Object getContent() {
+        return null;
+    }
+
     public DeliveryContract getDeliveryContract() {
         return this.deliveryContract;
     }

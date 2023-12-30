@@ -65,4 +65,9 @@ public class Response extends AbstractIdentification {
     public void setMessageFlag(MessageFlag messageFlag) {
         this.messageFlag = messageFlag;
     }
+
+    @Override
+    public Object getContent() {
+        return null;
+    }
 }

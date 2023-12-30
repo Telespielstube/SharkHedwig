@@ -27,6 +27,11 @@ public class OfferReply extends AbstractRequest {
         this.messageFlag = messageFlag;
     }
 
+    @Override
+    public Object getContent() {
+        return null;
+    }
+
     public double getActualFreightWeight() {
         return this.actualFreightWeight;
     }

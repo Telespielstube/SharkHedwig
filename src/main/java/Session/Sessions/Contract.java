@@ -114,6 +114,7 @@ public class Contract extends AbstractSession {
                 new TransitEntry(0, label.getUUID(), Constant.PeerName.getAppConstant(), "",
                         geoCalculation.getCurrentLocation(), Utilities.createTimestamp(), null));
         this.deliveryContract = new DeliveryContract(label, record);
+        this.deliveryContract.setContractSent(true);
         return new ContractDocument(Utilities.createUUID(), MessageFlag.ContractDocument,
                 Utilities.createTimestamp(), this.deliveryContract);
     }

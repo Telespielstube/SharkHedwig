@@ -15,15 +15,12 @@ import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.rmi.CORBA.Util;
-
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnitTest class for all message relevant tests. The method declarations are very self-explanatory.
@@ -33,9 +30,8 @@ public class UtilitiesTest {
 
     private SharkPeer sharkPeer;
     private SharkPKIComponent sharkPKIComponent;
-    private ASAPKeyStore asapKeyStore;
 
-    @Before
+    @BeforeAll
     public void setup() throws SharkException {
         try {
             SharkTestPeerFS sharkPeer = new SharkTestPeerFS("Alice", "tester123/Alice");
@@ -59,7 +55,7 @@ public class UtilitiesTest {
 
             String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
 
-            asapKeyStore = sharkPKIComponent.getASAPKeyStore();
+            ASAPKeyStore asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

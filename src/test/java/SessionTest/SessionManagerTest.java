@@ -2,14 +2,14 @@ package SessionTest;
 
 import DeliveryContract.ShippingLabel;
 import Location.Location;
+import Message.Advertisement;
 import Message.Identification.Challenge;
 import Message.Identification.Response;
 import Message.MessageBuilder;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import Misc.Utilities;
-import Session.SessionManager;
-import Session.SessionState;
+import Session.*;
 import Session.Sessions.Identification;
 import Setup.Channel;
 import Setup.DeviceState;
@@ -17,23 +17,22 @@ import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeer;
 import net.sharksystem.SharkTestPeerFS;
-import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
 
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SessionManagerTest {
 
@@ -41,19 +40,19 @@ public class SessionManagerTest {
     private Response response;
     private MessageHandler messageHandler = new MessageHandler();
     private SharkPKIComponent sharkPKIComponent;
-    private ASAPKeyStore asapKeyStore;
-    private String francisID;
-    private PublicKey publicKeyFrancis;
-    private Identification identification;
+    private static ASAPKeyStore asapKeyStore;
+    private static String francisID;
+    private static PublicKey publicKeyFrancis;
+    private static Identification identification;
 
     public SessionManagerTest() throws NoSuchPaddingException, NoSuchAlgorithmException {
     }
 
-    @Before
-    public void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
+    @BeforeAll
+    public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
 
         SharkTestPeerFS aliceSharkPeer = new SharkTestPeerFS("Alice", "tester123/Alice");
-        sharkPKIComponent = setupComponent(aliceSharkPeer);
+        SharkPKIComponent sharkPKIComponent = setupComponent(aliceSharkPeer);
 
         aliceSharkPeer.start();
 
@@ -65,7 +64,7 @@ public class SessionManagerTest {
         identification = new Identification(sharkPKIComponent);
     }
 
-    private SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException, NoSuchPaddingException, NoSuchAlgorithmException {
+    private static SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException, NoSuchPaddingException, NoSuchAlgorithmException {
         SharkPKIComponentFactory certificateComponentFactory = new SharkPKIComponentFactory();
 
         // register this component with shark peer - note: we use interface SharkPeer
@@ -83,10 +82,10 @@ public class SessionManagerTest {
 
         return sharkPKIComponent;
     }
+
     @Test
     public void testIfDeviceTransferorStateReturnsFalseWhenShippingLabelIsCreatedButEmpty() throws NoSuchPaddingException, NoSuchAlgorithmException {
         sessionManager = new SessionManager(messageHandler, SessionState.Identification, DeviceState.Transferee, null, sharkPKIComponent);
-        ShippingLabel shippingLabel = new ShippingLabel();
         assertFalse(sessionManager.checkTransferorState());
     }
 
@@ -131,5 +130,13 @@ public class SessionManagerTest {
         MessageBuilder messageBuilder = sessionManager.sessionHandling(challenge, "Marta");
         assertNotNull(messageBuilder.getMessage());
         assertEquals(Channel.Identification.getChannelType(), messageBuilder.getUri());
+    }
+
+    @Test
+    public void handleNoSession() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        sessionManager = new SessionManager(null, SessionState.Identification, DeviceState.Transferee, null, sharkPKIComponent);
+        Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
+        Optional<?> object = Optional.ofNullable(sessionManager.sessionHandling(advertisement,"Bobby"));
+        assertTrue(object.isPresent()); // This is true because uri and sender are present
     }
 }
