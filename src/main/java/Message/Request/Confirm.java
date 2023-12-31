@@ -24,8 +24,8 @@ public class Confirm extends AbstractRequest {
     }
 
     @Override
-    public Object getContent() {
-        return null;
+    public Confirm getContent() {
+        return this;
     }
 
     public boolean getConfirmed() {

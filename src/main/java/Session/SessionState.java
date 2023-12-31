@@ -12,7 +12,7 @@ public enum SessionState {
 
     NoSession {
         @Override
-        public SessionState resetState() {
+        public SessionState resetSessionState() {
             return NoSession;
         }
 
@@ -24,7 +24,7 @@ public enum SessionState {
 
     Identification {
         @Override
-        public SessionState resetState() {
+        public SessionState resetSessionState() {
             return NoSession;
         }
 
@@ -36,7 +36,7 @@ public enum SessionState {
 
     Request {
         @Override
-        public SessionState resetState() {
+        public SessionState resetSessionState() {
             return NoSession;
         }
         @Override
@@ -47,7 +47,7 @@ public enum SessionState {
 
     Contract() {
         @Override
-        public SessionState resetState() {
+        public SessionState resetSessionState() {
             return NoSession;
         }
 
@@ -62,7 +62,7 @@ public enum SessionState {
      *
      * @return    Session state enum object.
      */
-    public abstract SessionState resetState();
+    public abstract SessionState resetSessionState();
 
 
     /**

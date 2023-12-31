@@ -22,8 +22,8 @@ public class AckMessage extends AbstractContract {
     }
 
     @Override
-    public Object getContent() {
-        return null;
+    public AckMessage getContent() {
+        return this;
     }
 
     public boolean getIsAck() {

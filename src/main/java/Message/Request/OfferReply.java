@@ -28,7 +28,7 @@ public class OfferReply extends AbstractRequest {
     }
 
     @Override
-    public Object getContent() {
+    public OfferReply getContent() {
         return null;
     }
 

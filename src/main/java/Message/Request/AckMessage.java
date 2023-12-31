@@ -23,13 +23,14 @@ public class AckMessage extends AbstractRequest {
     }
 
     @Override
-    public Object getContent() {
-        return null;
+    public AckMessage getContent() {
+        return this;
     }
 
     public boolean getIsAck() {
         return this.isAck;
     }
+
     public void setIsAck(boolean isAck) {
         this.isAck = isAck;
     }

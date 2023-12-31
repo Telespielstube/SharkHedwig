@@ -23,8 +23,6 @@ import java.util.Vector;
 
 public class Contract extends AbstractSession {
 
-    public static boolean contractSent = false;
-
     private SharkPKIComponent sharkPKIComponent;
     private IMessageHandler messageHandler;
     private ContractDocument contractDocument;
@@ -223,5 +221,23 @@ public class Contract extends AbstractSession {
             return Optional.of(ackMessage);
         }
         return Optional.empty();
+    }
+
+    /**
+     * Gets the contractSent attribute from the DeliveryContract object.
+     *
+     * @return    true if sent, false if not.
+     */
+    public boolean getContractSent() {
+        return this.deliveryContract.getContractSent();
+    }
+
+    /**
+     * Enables the SessionManager resetAll() methode to reset the contractSent attribute.
+     *
+     * @param isContractSent    Sets the contractSent attribute to too true or false.
+     */
+    public void setContractSent(boolean isContractSent) {
+        this.deliveryContract.setContractSent(isContractSent);
     }
 }

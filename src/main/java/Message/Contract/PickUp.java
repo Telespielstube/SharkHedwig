@@ -21,8 +21,8 @@ public class PickUp extends AbstractContract {
     }
 
     @Override
-    public Object getContent() {
-        return null;
+    public PickUp getContent() {
+        return this;
     }
 
     public byte[] getSignedTransitRecord() {

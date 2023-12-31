@@ -21,8 +21,8 @@ public class ContractDocument extends AbstractContract {
     }
 
     @Override
-    public Object getContent() {
-        return null;
+    public ContractDocument getContent() {
+        return this;
     }
 
     public DeliveryContract getDeliveryContract() {

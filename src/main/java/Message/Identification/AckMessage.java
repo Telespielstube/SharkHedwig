@@ -24,8 +24,8 @@ public class AckMessage extends AbstractIdentification {
     }
 
     @Override
-    public Object getContent() {
-        return null;
+    public AckMessage getContent() {
+        return this;
     }
 
     public boolean getIsAck() {

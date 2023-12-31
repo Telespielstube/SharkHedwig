@@ -29,8 +29,8 @@ public class Offer extends AbstractRequest {
     }
 
     @Override
-    public Object getContent() {
-        return null;
+    public Offer getContent() {
+        return this;
     }
 
     public double getFlightRange() {

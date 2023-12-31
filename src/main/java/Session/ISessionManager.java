@@ -15,10 +15,10 @@ public interface ISessionManager {
     boolean checkTransferorState();
 
     /**
-     * The incming messages are handled differently based on the current device state.
+     * The incoming messages are handled differently based on the current device state.
      * This methode handles the transferor role.
      *
-     * @param message    Incomming generic type Message object.
+     * @param message    Incoming generic type Message object.
      */
      MessageBuilder sessionHandling(IMessage message, String sender);
 

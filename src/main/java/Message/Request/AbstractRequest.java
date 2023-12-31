@@ -41,5 +41,9 @@ public abstract class AbstractRequest implements IMessage {
     public abstract MessageFlag getMessageFlag();
     public abstract void setMessageFlag(MessageFlag messageFlag);
 
+    @Override
+    public Object getContent() {
+        return this;
+    }
 }
 

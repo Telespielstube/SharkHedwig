@@ -67,7 +67,7 @@ public class Response extends AbstractIdentification {
     }
 
     @Override
-    public Object getContent() {
-        return null;
+    public Response getContent() {
+        return this;
     }
 }

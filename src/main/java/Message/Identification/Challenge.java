@@ -38,7 +38,7 @@ public class Challenge extends AbstractIdentification {
     }
 
     @Override
-    public Object getContent() {
-        return null;
+    public Challenge getContent() {
+        return this;
     }
 }

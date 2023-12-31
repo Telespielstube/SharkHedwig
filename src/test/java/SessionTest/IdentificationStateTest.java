@@ -1,7 +1,6 @@
 package SessionTest;
 
 import Session.SessionState;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -10,15 +9,15 @@ public class IdentificationStateTest {
 
     @Test
     public void testIfStateVariableProceedsToNextState() {
-        SessionState state = SessionState.NoSession.resetState();
+        SessionState state = SessionState.NoSession.resetSessionState();
 
         //state.nextState();
         assertEquals("Identification", state.nextState().toString());
     }
     @Test
     public void testIfNoStateIsActive() {
-        SessionState state = SessionState.NoSession.resetState();
-        assertEquals(SessionState.NoSession.resetState(), state);
+        SessionState state = SessionState.NoSession.resetSessionState();
+        assertEquals(SessionState.NoSession.resetSessionState(), state);
     }
 
     @Test
@@ -30,12 +29,12 @@ public class IdentificationStateTest {
     @Test
     public void checkIfNextStateAfterIdentificationIsHandoverState() {
         SessionState state = SessionState.Request.nextState();
-        assertEquals(SessionState.Contract.resetState(), state);
+        assertEquals(SessionState.Contract.resetSessionState(), state);
     }
 
     @Test
     public void checkIfNextStateAfterHandoverIsNoState() {
         SessionState state = SessionState.Contract.nextState();
-        assertEquals(SessionState.NoSession.resetState(), state);
+        assertEquals(SessionState.NoSession.resetSessionState(), state);
     }
 }

@@ -32,14 +32,14 @@ public interface ISession {
      * @param timestamp    timestamp of received message.
      * @return             True if difference is less than offset. False if it is greater than.
      */
-    public boolean compareTimestamp(long timestamp);
+    boolean compareTimestamp(long timestamp);
 
     /**
      * Gets the last value from message TreeMap.
      *
      * @return               Last object from TreeMap.
      */
-    public Object getLastValueFromList();
+    Object getLastValueFromList();
 
     /**
      * If all messages of a session are exchanged the list needs to be checked if
@@ -53,7 +53,17 @@ public interface ISession {
     /**
      * Adds a message object to the TreeMap.
      */
-    public void addMessageToList(IMessage message);
+    void addMessageToList(IMessage message);
+
+    /**
+     * Sets the session complete attribute to true.
+     */
+    void setSessionComplete(boolean isComplete);
+
+    /**
+     * Gets the session complete attrubute.
+     */
+    boolean getSessionComplete();
 
     /**
      * Clears the messageList TreeMap object.

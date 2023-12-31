@@ -13,6 +13,7 @@ public abstract class AbstractSession implements ISession {
 
     protected SortedMap<Long, Object> messageList;
     private final long timeOffset = 5000;
+    private boolean sessionComplete = false;
 
     public abstract Optional<Object> transferor(IMessage message, String sender);
 
@@ -25,9 +26,11 @@ public abstract class AbstractSession implements ISession {
         return false;
     }
 
-    public Object getEntry(int index) {
-        return  this.messageList.get(index);
-    }
+    // Not in use yet
+//    public Object getEntry(int index) {
+//        return  this.messageList.get(index);
+//    }
+
     public Object getLastValueFromList() {
         return this.messageList.get(this.messageList.lastKey());
     }
@@ -36,9 +39,8 @@ public abstract class AbstractSession implements ISession {
     public boolean sessionComplete(Object message) {
         if (!this.messageList.isEmpty()) {
             return message.equals(getLastValueFromList() instanceof AckMessage);
-        } else {
-            return false;
         }
+        return false;
     }
 
     public void addMessageToList(IMessage message) {
@@ -48,6 +50,14 @@ public abstract class AbstractSession implements ISession {
     public boolean clearMessageList() {
         this.messageList.clear();
         return true;
+    }
+
+    public boolean getSessionComplete() {
+        return this.sessionComplete;
+    }
+
+    public void setSessionComplete(boolean sessionComplete) {
+        this.sessionComplete = sessionComplete;
     }
 }
 
