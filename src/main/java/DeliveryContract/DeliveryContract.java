@@ -1,8 +1,5 @@
 package DeliveryContract;
 
-import java.util.Objects;
-import java.util.stream.Stream;
-
 public class DeliveryContract  {
 
     private final IContractComponent transitRecord;

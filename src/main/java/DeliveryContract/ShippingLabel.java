@@ -1,14 +1,10 @@
 package DeliveryContract;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Stream;
-
 import HedwigUI.UserInputBuilder;
 import Location.Location;
 import Misc.Utilities;
-import jdk.nashorn.internal.ir.IfNode;
+
+import java.util.UUID;
 
 
 /**
@@ -76,10 +72,6 @@ public class ShippingLabel implements IContractComponent {
     @Override
     public boolean isCreated() {
         return this.isCreated;
-    }
-
-    private boolean checkNullField(Object userInput) {
-        return Stream.of(userInput).allMatch(Objects::nonNull);
     }
 
     // Getter methods to get the value of the Object field.

@@ -1,9 +1,6 @@
 package DeliveryContract;
 
 import Location.Location;
-import Misc.Utilities;
-
-import java.security.Signature;
 import java.util.UUID;
 
 public class TransitEntry {

@@ -1,7 +1,5 @@
 package Misc;
 
-import Setup.Constant;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;

@@ -22,12 +22,11 @@ public class Component implements IComponent, ASAPMessageReceivedListener {
 
     private ASAPPeer peer;
     private SharkPKIComponent sharkPKIComponent;
-    private MessageHandler messageHandler;
-    private ISessionManager sessionManager;
+    private final MessageHandler messageHandler;
+    private final ISessionManager sessionManager;
     private DeviceState deviceState;
-    private SharkPeerFS sharkPeerFS;
+    private final SharkPeerFS sharkPeerFS;
 
-    public Component() {}
     public Component(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         ErrorLogger.redirectErrorStream(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant(), "errorLog.txt");
         this.sharkPeerFS = new SharkPeerFS(Constant.PeerName.getAppConstant(), Constant.PeerFolder.getAppConstant() + "/" + Constant.PeerName.getAppConstant() );
