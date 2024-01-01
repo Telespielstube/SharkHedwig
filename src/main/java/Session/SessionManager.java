@@ -1,5 +1,6 @@
 package Session;
 
+import DeliveryContract.DeliveryContract;
 import DeliveryContract.IContractComponent;
 import DeliveryContract.ShippingLabel;
 import Misc.LogEntry;
@@ -32,6 +33,7 @@ public class SessionManager implements ISessionManager {
     private MessageBuilder messageBuilder;
     private IContractComponent shippingLabel = new ShippingLabel();
     private boolean noSession = false; // attribute because NoSession has no Session Object.
+    private DeliveryContract deliveryContract;
 
     public SessionManager() {}
 
@@ -150,6 +152,6 @@ public class SessionManager implements ISessionManager {
         this.request.clearMessageList();
         this.contract.clearMessageList();
         this.sessionState.resetSessionState();
-        this.contract.setContractSent(false);
+        this.deliveryContract.setContractSent(false);
     }
 }

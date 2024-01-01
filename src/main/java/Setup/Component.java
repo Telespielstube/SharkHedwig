@@ -1,9 +1,8 @@
 package Setup;
 
 
-import DeliveryContract.DeliveryContract;
+import Misc.ErrorLogger;
 import net.sharksystem.pki.SharkPKIComponentFactory;
-import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeerFS;
 import net.sharksystem.asap.*;
@@ -12,7 +11,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 import Misc.SessionLogger;
 import Message.*;
@@ -20,16 +18,19 @@ import Session.*;
 
 import javax.crypto.NoSuchPaddingException;
 
-public class Component implements SharkComponent, ASAPMessageReceivedListener {
+public class Component implements IComponent, ASAPMessageReceivedListener {
 
     private ASAPPeer peer;
     private SharkPKIComponent sharkPKIComponent;
     private MessageHandler messageHandler;
     private ISessionManager sessionManager;
     private DeviceState deviceState;
+    private SharkPeerFS sharkPeerFS;
 
     public Component() {}
     public Component(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
+        ErrorLogger.redirectErrorStream(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant(), "errorLog.txt");
+        this.sharkPeerFS = new SharkPeerFS(Constant.PeerName.getAppConstant(), Constant.PeerFolder.getAppConstant() + "/" + Constant.PeerName.getAppConstant() );
         this.sharkPKIComponent = pkiComponent;
         this.messageHandler = new MessageHandler();
         this.sessionManager = new SessionManager(this.messageHandler, SessionState.NoSession, DeviceState.Transferee ,this.peer, this.sharkPKIComponent);
@@ -41,18 +42,23 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
      * @param sharkPeerFS SharkPeerFS Object that the PKIComponent can be created.
      * @throws SharkException Is thrown if something goes wrong during the setup process.
      */
-    public void setupComponent(SharkPeerFS sharkPeerFS) throws SharkException {
+    public void setupComponent(SharkPeerFS sharkPeerFS) {
         SharkPKIComponentFactory sharkPkiComponentFactory = new SharkPKIComponentFactory();
         try {
             sharkPeerFS.addComponent(sharkPkiComponentFactory, SharkPKIComponent.class);
         } catch (SharkException e) {
             System.err.println("Caught an IOException: " + e.getMessage());
         }
-        ComponentFactory componentFactory = new ComponentFactory((SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class));
-        sharkPeerFS.addComponent(componentFactory, ComponentInterface.class);
-
-        // SharkPKIComponent is an Interface therefore --> Conversion from an interface type to a class type requires an explicit cast to the class type.
-        this.sharkPKIComponent = (SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class);
+        ComponentFactory componentFactory = null;
+        try {
+            componentFactory = new ComponentFactory((SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class));
+            sharkPeerFS.addComponent(componentFactory, IComponent.class);
+            // SharkPKIComponent is an Interface therefore --> Conversion from an interface type to a class type requires an explicit cast to the class type.
+            this.sharkPKIComponent = (SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class);
+            this.sharkPeerFS.start();
+        } catch (SharkException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -79,7 +85,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     /**
      * Setting up all component channels. Multiple channels allow us to control incoming and outgoing messages much better.
      */
-    private void setupChannel()  {
+    public void setupChannel()  {
         for (Channel type : Channel.values()) {
             try {
                 this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).createChannel(type.getChannelType());
@@ -92,7 +98,7 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
     /**
      * Setting up all things logging. The folder and the files to differentiate between request session and contract session.
      */
-    private void setupLogger() {
+    public void setupLogger() {
         String[] files = { Constant.RequestLog.getAppConstant(), Constant.ContractLog.getAppConstant() };
         try {
             SessionLogger.createLogDirectory(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant());
@@ -113,7 +119,6 @@ public class Component implements SharkComponent, ASAPMessageReceivedListener {
      * @throws IOException           Is thrown after a read/write error occurs
      *
      */
-    @Override
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) throws IOException {
         CharSequence uri = messages.getURI();
         while (uri != null) {

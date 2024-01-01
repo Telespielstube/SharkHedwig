@@ -1,8 +1,9 @@
 package DeliveryContract;
 
 import java.io.*;
-import java.util.Vector;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Class to add a new entry to the list of all previous handovers of this package.
@@ -10,14 +11,14 @@ import java.util.Vector;
 public class TransitRecord implements IContractComponent, Serializable {
 
     private TransitEntry transitEntry;
-    private Vector<TransitEntry> entryList = null;
+    private List<TransitEntry> entryList = null;
 
     /**
      * The TransitRecord object is a dynamic vector where TransitEntry objects are added.
      * The advantage of the Java Vector object is its threadsaty.
      */
     public TransitRecord() {
-        this.entryList = new Vector<TransitEntry>();
+        this.entryList = Collections.synchronizedList(new ArrayList<TransitEntry>());
     }
 
     /**
@@ -35,7 +36,7 @@ public class TransitRecord implements IContractComponent, Serializable {
      *
      * @param entries    All previous handover entries of the package.
      */
-    public TransitRecord(Vector<TransitEntry> entries) {
+    public TransitRecord(List<TransitEntry> entries) {
         this.entryList = entries;
     }
 
@@ -44,8 +45,8 @@ public class TransitRecord implements IContractComponent, Serializable {
         return new TransitRecord(entry);
     }
 
-    public Object get() {
-        return TransitRecord.class;
+    public TransitRecord get() {
+        return this;
     }
 
     @Override
@@ -66,14 +67,14 @@ public class TransitRecord implements IContractComponent, Serializable {
      * @return
      */
     public TransitEntry getLastElement() {
-        return entryList.lastElement();
+        return this.entryList.get(this.entryList.size() -1);
     }
     /**
      * Returns all entries.
      *
-     * @return    All entries fo the Vector.
+     * @return All entries fo the Vector.
      */
-    public Vector<TransitEntry> getAllEntries() {
+    public List<TransitEntry> getAllEntries() {
         return this.entryList;
     }
     /**

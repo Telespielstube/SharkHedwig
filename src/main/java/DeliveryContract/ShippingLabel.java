@@ -49,6 +49,7 @@ public class ShippingLabel implements IContractComponent {
         this.destination = destination;
         this.locationDest = locationDest;
         this.packageWeight = packageWeight;
+        this.isCreated = true;
     }
 
     public ShippingLabel() {}
@@ -60,7 +61,6 @@ public class ShippingLabel implements IContractComponent {
     @Override
     public ShippingLabel create(Object object) {
         UserInputBuilder userInput = (UserInputBuilder) object;
-        this.isCreated = true;
         return new ShippingLabel(Utilities.createUUID(), userInput.getSender(), userInput.getOrigin(),
                 new Location(userInput.getLatitudeOrigin(), userInput.getLongitudeOrigin()),
                 userInput.getRecipient(), userInput.getDestination(), new Location(userInput.getLatitudeDest(),

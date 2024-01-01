@@ -16,10 +16,7 @@ import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.util.*;
 
 public class Contract extends AbstractSession {
 
@@ -127,7 +124,7 @@ public class Contract extends AbstractSession {
     private Optional<PickUp> handleConfirm(Confirm message, String sender) {
         byte[] signedTransitEntry = new byte[0];
         if (compareTimestamp(message.getTimestamp()) && message.getConfirmed()) {
-            String transferee = message.getDeliveryContract().getTransitRecord().getAllEntries().lastElement().getTransferee();
+            String transferee = message.getDeliveryContract().getTransitRecord().getLastElement().getTransferee();
             if (transferee.equals(sender)) {
                 signedTransitEntry = signTransitEntry(message);
             }
@@ -145,7 +142,7 @@ public class Contract extends AbstractSession {
     private Optional<Confirm> handleContract(ContractDocument message) {
         if (message.getDeliveryContract() != null) {
             this.deliveryContract = storeDeliveryContract(message.getDeliveryContract());
-            fillTransfereeField(this.deliveryContract.getTransitRecord().getAllEntries());
+            fillTransfereeField(this.deliveryContract.getTransitRecord().getLastElement());
             TransitEntry transitEntry = null;
             return Optional.of(new Confirm(this.confirm.createUUID(), MessageFlag.Confirm, Utilities.createTimestamp(), this.deliveryContract, true));
         }
@@ -164,8 +161,8 @@ public class Contract extends AbstractSession {
         ShippingLabel label = message.getShippingLabel();
         this.shippingLabel = new ShippingLabel(label.getUUID(), label.getSender(), label.getOrigin(), label.getPackageOrigin(),
                 label.getRecipient(), label.getDestination(), label.getPackageDestination(), label.getPackageWeight());
-        Vector<TransitEntry> entries = message.getTransitRecord().getAllEntries();
-        this.geoCalculation.setPickUpLocation(entries.lastElement().getHandoverLocation());
+        List<TransitEntry> entries = message.getTransitRecord().getAllEntries();
+        this.geoCalculation.setPickUpLocation(entries.get(entries.size() -1).getHandoverLocation());
         this.transitRecord = new TransitRecord(entries);
         return new DeliveryContract(this.shippingLabel, this.transitRecord);
     }
@@ -174,9 +171,8 @@ public class Contract extends AbstractSession {
      * After receiving the DeliveryContract the potential next transferor needs to fill out the Transferee field in the TransitEntry.
      * Fills out the missing Transferee field in the TransitEntry object.
      */
-    private void fillTransfereeField(Vector<TransitEntry> transitRecord) {
-        TransitEntry lastEntry = transitRecord.lastElement();
-        lastEntry.setTransferee(Constant.PeerName.getAppConstant());
+    private void fillTransfereeField(TransitEntry transitRecord) {
+        transitRecord.setTransferee(Constant.PeerName.getAppConstant());
     }
 
     /**
@@ -185,7 +181,7 @@ public class Contract extends AbstractSession {
      * @param message    Confirm message holds the DeliveryContract + TransitRecor object.
      */
     public byte[] signTransitEntry(Confirm message) {
-        byte[] unsignedEntry = messageHandler.objectToByteArray(message.getDeliveryContract().getTransitRecord().getAllEntries().lastElement());
+        byte[] unsignedEntry = messageHandler.objectToByteArray(message.getDeliveryContract().getTransitRecord().getLastElement());
         byte[] signedEntry;
         try {
             signedEntry = ASAPCryptoAlgorithms.sign(unsignedEntry, this.sharkPKIComponent.getASAPKeyStore());
@@ -203,7 +199,7 @@ public class Contract extends AbstractSession {
      */
     private Optional<AckMessage> handlePickUp(PickUp message) {
         if (compareTimestamp(message.getTimestamp())) {
-            this.deliveryContract.getTransitRecord().getAllEntries().lastElement().setDigitalSignature(message.getSignedTransitRecord());
+            this.deliveryContract.getTransitRecord().getLastElement().setDigitalSignature(message.getSignedTransitRecord());
             return Optional.of(new AckMessage(this.ackMessage.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
@@ -223,21 +219,21 @@ public class Contract extends AbstractSession {
         return Optional.empty();
     }
 
-    /**
-     * Gets the contractSent attribute from the DeliveryContract object.
-     *
-     * @return    true if sent, false if not.
-     */
-    public boolean getContractSent() {
-        return this.deliveryContract.getContractSent();
-    }
-
-    /**
-     * Enables the SessionManager resetAll() methode to reset the contractSent attribute.
-     *
-     * @param isContractSent    Sets the contractSent attribute to too true or false.
-     */
-    public void setContractSent(boolean isContractSent) {
-        this.deliveryContract.setContractSent(isContractSent);
-    }
+//    /**
+//     * Gets the contractSent attribute from the DeliveryContract object.
+//     *
+//     * @return    true if sent, false if not.
+//     */
+//    public boolean getContractSent() {
+//        return this.deliveryContract.getContractSent();
+//    }
+//
+//    /**
+//     * Enables the SessionManager resetAll() methode to reset the contractSent attribute.
+//     *
+//     * @param isContractSent    Sets the contractSent attribute to too true or false.
+//     */
+//    public void setContractSent(boolean isContractSent) {
+//        this.deliveryContract.setContractSent(isContractSent);
+//    }
 }
