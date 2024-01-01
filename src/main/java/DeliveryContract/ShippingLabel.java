@@ -6,7 +6,6 @@ import Misc.Utilities;
 
 import java.util.UUID;
 
-
 /**
  * The shipping label object is a core function of the whole protocoll. The label is created after the user confirmed
  * their entry. The input is immutable that means it cannot be changed after confimration.
@@ -15,7 +14,7 @@ import java.util.UUID;
 public class ShippingLabel implements IContractComponent {
 
     private UUID packageUUID;
-    private String transferorID = null;
+    private final String transferorID = null;
     private String sender = null;
     private String origin = null;
     private String recipient = null;
@@ -74,7 +73,8 @@ public class ShippingLabel implements IContractComponent {
         return this.isCreated;
     }
 
-    // Getter methods to get the value of the Object field.
+    // Getter methods to get the value of the Object field. No setters because the attriibute values where set
+    // remote in the user interface.
     public UUID getUUID() {
         return this.packageUUID;
     }

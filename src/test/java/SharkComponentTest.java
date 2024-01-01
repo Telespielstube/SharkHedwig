@@ -1,4 +1,5 @@
 import Session.Sessions.Identification;
+import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeer;
@@ -10,6 +11,9 @@ import org.junit.jupiter.api.Test;
 
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 
@@ -24,7 +28,7 @@ public class SharkComponentTest {
     @Test
     public void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
 
-        SharkTestPeerFS aliceSharkPeer = new SharkTestPeerFS("Alice", "tester123/Alice");
+        SharkTestPeerFS aliceSharkPeer = new SharkTestPeerFS(TestConstant.PeerName.getTestConstant(), TestConstant.PeerFolder.getTestConstant());
         SharkPKIComponent sharkPKIComponent = setupComponent(aliceSharkPeer);
 
         aliceSharkPeer.start();
@@ -51,8 +55,6 @@ public class SharkComponentTest {
         SharkComponent component = sharkPeer.getComponent(SharkPKIComponent.class);
 
         // project "clean code" :) we only use interfaces - unfortunately casting is unavoidable
-        SharkPKIComponent sharkPKIComponent = (SharkPKIComponent) component;
-
-        return sharkPKIComponent;
+        return (SharkPKIComponent) component;
     }
 }
