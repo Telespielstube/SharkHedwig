@@ -28,4 +28,16 @@ public interface IUserInterface {
      * @return  True if the user confirmed their input data.
      */
     boolean acceptInput();
+
+    /**
+     * Notifies the HedwigComponent when a UserInputBuilder Object was created.
+     *
+     * @param userInputBuilder    UserInputBuilder object containing the user input data.
+     */
+    void notifyUserObserver(UserInputBuilder userInputBuilder);
+
+    /**
+     * Adds the Observer object that observes the user interface.
+     */
+    void addUserObserver();
 }

@@ -10,17 +10,23 @@ public class UserInputBuilder {
     private String origin = null;
     private String recipient = null;
     private String destination = null;
-    private double latitudeOrigin = 0.0;
-    private double longitudeOrigin = 0.0;
-    private double latitudeDest = 0.0;
-    private double longitudeDest = 0.0;
-    private double packageWeight = 0.0;
+    private Double latitudeOrigin = null;
+    private Double longitudeOrigin = null;
+    private Double latitudeDest = null;
+    private Double longitudeDest = null;
+    private Double packageWeight = null;
 
-    public UserInputBuilder() {}
-
-    public UserInputBuilder(String sender, String origin, double latitudeOrigin,
-                            double longitudeOrigin, String recipient, String destination,
-                            double latitudeDest, double longitudeDest, double packageWeight) {
+    public UserInputBuilder(String sender, String origin, Double latitudeOrigin, Double longitudeOrigin, String recipient,
+                            String destination, Double latitudeDest, Double longitudeDest, Double packageWeight) {
+        this.sender = sender;
+        this.origin = origin;
+        this.latitudeOrigin = latitudeOrigin;
+        this.longitudeOrigin = longitudeOrigin;
+        this.recipient = recipient;
+        this.destination = destination;
+        this.latitudeDest = latitudeDest;
+        this.longitudeDest = longitudeDest;
+        this.packageWeight = packageWeight;
     }
 
     public String getSender() {
@@ -39,23 +45,23 @@ public class UserInputBuilder {
         return destination;
     }
 
-    public double getLatitudeOrigin() {
+    public Double getLatitudeOrigin() {
         return latitudeOrigin;
     }
 
-    public double getLongitudeOrigin() {
+    public Double getLongitudeOrigin() {
         return longitudeOrigin;
     }
 
-    public double getLatitudeDest() {
+    public Double getLatitudeDest() {
         return latitudeDest;
     }
 
-    public double getLongitudeDest() {
+    public Double getLongitudeDest() {
         return longitudeDest;
     }
 
-    public double getPackageWeight() {
+    public Double getPackageWeight() {
         return packageWeight;
     }
 
@@ -67,11 +73,11 @@ public class UserInputBuilder {
         this.origin = origin;
     }
 
-    public void setLongitudeOrigin(double longitudeOrigin) {
+    public void setLongitudeOrigin(Double longitudeOrigin) {
         this.longitudeOrigin = longitudeOrigin;
     }
 
-    public void setLatitudeOrigin(double latitudeOrigin) {
+    public void setLatitudeOrigin(Double latitudeOrigin) {
         this.latitudeOrigin = latitudeOrigin;
     }
 
@@ -82,16 +88,15 @@ public class UserInputBuilder {
     public void setDestination(String destination) {
         this.destination = destination;
     }
-
-    public void setLongitudeDest(double longitudeDest) {
+    public void setLongitudeDest(Double longitudeDest) {
         this.longitudeOrigin = longitudeDest;
     }
 
-    public void setlatitudeDest(double latitudeDest) {
+    public void setlatitudeDest(Double latitudeDest) {
         this.latitudeDest = latitudeDest;
     }
 
-    public void setPackageWeight(float packageWeight) {
+    public void setPackageWeight(Double packageWeight) {
         this.packageWeight = packageWeight;
     }
 

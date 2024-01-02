@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class TransitEntryTest {
 
     private static TransitEntry transitEntry;
@@ -26,6 +28,7 @@ public class TransitEntryTest {
 
     @Test
     public void testIfSerialNumberGetCountUpByOne() {
-        System.out.println(transitEntry.countUp());
+        System.out.println(transitEntry.getSerialNumber());
+        assertEquals(3, transitEntry.getSerialNumber());
     }
 }

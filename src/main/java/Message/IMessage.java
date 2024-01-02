@@ -29,12 +29,14 @@ public interface IMessage extends Serializable {
      * @param messageFlag    Integer value of the message type.
      */
     void setMessageFlag(MessageFlag messageFlag);
+
     /**
      * Returns a timestamp in UNIX format
      *
      * @return    current time in millis.
      */
     long getTimestamp();
+
 
     void setTimestamp(long currentTime);
 

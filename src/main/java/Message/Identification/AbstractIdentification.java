@@ -12,10 +12,6 @@ public abstract class AbstractIdentification implements IMessage {
     protected MessageFlag messageFlag;;
     protected long timestamp;
 
-    public UUID createUUID() {
-        return UUID.randomUUID();
-    }
-
     public UUID getUuid() {
         return this.uuid;
     }

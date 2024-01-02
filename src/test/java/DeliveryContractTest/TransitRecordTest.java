@@ -42,12 +42,12 @@ public class TransitRecordTest {
     }
 
     @Test
-    public void testIfVectorGetsCreatedInConstructor() {
+    public void testIfListGetsCreatedInConstructor() {
         assertEquals(3, transitRecord.getTransitRecordSize());
     }
 
     @Test
-    public void testThatAnTransitEntryObjectGetsAddedToVector() {
+    public void testThatAnTransitEntryObjectGetsAddedToList() {
         transitRecord.addEntry(new TransitEntry(2, null, "Alice", "Bobby", new Location(80.0,90.0), 45345345, null ));
         assertEquals("Bobby", transitRecord.getLastElement().getTransferee());
         assertEquals(2, transitRecord.getLastElement().getSerialNumber());
@@ -60,8 +60,7 @@ public class TransitRecordTest {
     }
 
     @AfterAll
-    public static void clearVector() {
+    public static void clearList() {
         transitRecord.getAllEntries().clear();
     }
-
 }

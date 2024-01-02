@@ -15,7 +15,7 @@ public class DeliveryContractTest {
 
 
     @Test
-    public void testIfDeliveryContractIsCreatedButStillFalse() {
+    public void deliveryContractIsCreatedWithoutAttributes() {
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         shippingLabel = new ShippingLabel();
         transitRecord = new TransitRecord();
@@ -25,7 +25,7 @@ public class DeliveryContractTest {
     }
 
     @Test
-    public void deliveryContractThrowsExceptionWhenShippingAndTransitNotPresent() {
+    public void deliveryContractThrowsExceptionWhenShippingAndTransitRecordIsNotPresent() {
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         shippingLabel = new ShippingLabel();
         transitRecord = new TransitRecord();
@@ -47,7 +47,23 @@ public class DeliveryContractTest {
     }
 
     @Test
-    public void testIfGetTransitRecordThrowsExceptionCauseNoObjectIsPresent() {
+    public void ShippingLabelAndTransitRecordObjectsAreAccessible() {
+        transitRecord = new TransitRecord();
+        shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
+                new Location(80.67, 90.56), "Bob", "Ostbahnhof",
+                new Location(52.5105, 13.4346), 1.2);
+        transitRecord.addEntry(new TransitEntry(2, null, "Alice", "Bobby", new Location(80.0,90.0), 45345345, null ));
+        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
+        System.out.println(deliveryContract.getShippingLabel());
+        assertNotNull(deliveryContract.getShippingLabel());
+        System.out.println(deliveryContract.getTransitRecord().getAllEntries());
+        assertNotNull(deliveryContract.getTransitRecord().getAllEntries());
+        System.out.println(deliveryContract.getDeliveryContract());
+        assertNotNull(deliveryContract.getDeliveryContract());
+    }
+
+    @Test
+    public void getTransitRecordThrowsExceptionCauseNoObjectIsPresent() {
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         assertThrows(NullPointerException.class,
                 ()-> deliveryContract.getTransitRecord());
@@ -63,7 +79,6 @@ public class DeliveryContractTest {
         assertEquals(1, transitRecord.getTransitRecordSize());
 
     }
-
 
     @Test
     public void testIfShippingLabelIsReturned() {

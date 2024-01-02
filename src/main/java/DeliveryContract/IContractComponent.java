@@ -2,7 +2,7 @@ package DeliveryContract;
 
 public interface IContractComponent {
 
-    Object create(Object object);
+  //  boolean create(Object object);
     Object get();
 
     boolean isCreated();

@@ -40,11 +40,7 @@ public class TransitRecord implements IContractComponent, Serializable {
         this.entryList = entries;
     }
 
-    public Object create(Object object) {
-        TransitEntry entry = (TransitEntry) object;
-        return new TransitRecord(entry);
-    }
-
+    @Override
     public TransitRecord get() {
         return this;
     }
@@ -63,8 +59,9 @@ public class TransitRecord implements IContractComponent, Serializable {
     }
 
     /**
+     * Fetches the last entry in the list.
      *
-     * @return
+     * @return  Last added TransitEntry object in list.
      */
     public TransitEntry getLastElement() {
         return this.entryList.get(this.entryList.size() -1);
@@ -72,7 +69,7 @@ public class TransitRecord implements IContractComponent, Serializable {
     /**
      * Returns all entries.
      *
-     * @return All entries fo the Vector.
+     * @return All entries in list
      */
     public List<TransitEntry> getAllEntries() {
         return this.entryList;

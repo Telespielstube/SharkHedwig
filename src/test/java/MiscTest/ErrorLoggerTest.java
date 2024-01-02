@@ -23,7 +23,7 @@ public class ErrorLoggerTest {
     }
 
     @AfterAll
-    public void clear() {
+    public static void clear() {
         Path filePath = Paths.get(String.format(TestConstant.PeerFolder.getTestConstant() + "/" + TestConstant.LogFolder.getTestConstant() + "/" + TestConstant.ErrorLog.getTestConstant()));
         try {
             Files.delete(filePath);

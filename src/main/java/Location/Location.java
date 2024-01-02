@@ -8,8 +8,8 @@ import static java.lang.Math.sqrt;
 public class Location {
 
     private String name = null;
-    private double latitude = 0.0;
-    private double longitude = 0.0;
+    private Double latitude = 0.0;
+    private Double longitude = 0.0;
 
     public Location() {}
     /**
@@ -18,7 +18,7 @@ public class Location {
      * @param latitude  To make the location name more precise the latitude coordinate is given in degree
      * @param longitude To make the location name more precise the longitude coordinate is given in degree
      */
-    public Location(double latitude, double longitude) {
+    public Location( Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -30,7 +30,7 @@ public class Location {
      * @param latitude  To make the location name more precise the latitude coordinate is given in degree
      * @param longitude To make the location name more precise the longitude coordinate is given in degree
      */
-    public Location(String name, double latitude, double longitude) {
+    public Location(String name, Double latitude, Double longitude) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -40,23 +40,22 @@ public class Location {
         return this.name;
     }
 
-    public double getLatitude() {
+    public Double getLatitude() {
         return this.latitude;
     }
 
-    public double getLongitude() {
+    public Double getLongitude() {
         return this.longitude;
     }
 
     public void setName(String name) {
         this.name = name;
     }
-
-    public void setLatitude(double latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public void setLongitude(double longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 }

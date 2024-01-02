@@ -26,7 +26,7 @@ public class MessageHandler implements IMessageHandler {
         return object;
     }
 
-    public <T> byte[] buildOutgoingMessage(T object, String uri, String recipient, SharkPKIComponent sharkPKIComponent) {
+    public byte[] buildOutgoingMessage(Object object, String uri, String recipient, SharkPKIComponent sharkPKIComponent) {
         byte[] unencryptedByteMessage = objectToByteArray(object);
         byte[] encryptedMessage = new byte[0];
         byte[] signedMessage;
@@ -40,7 +40,7 @@ public class MessageHandler implements IMessageHandler {
         return encryptedMessage;
     }
 
-    public <T> byte[] objectToByteArray(T object) {
+    public byte[] objectToByteArray(Object object) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             ObjectOutputStream oos = new ObjectOutputStream(outputStream);

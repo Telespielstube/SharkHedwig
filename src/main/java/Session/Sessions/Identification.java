@@ -117,7 +117,7 @@ public class Identification extends AbstractSession {
         if ( compareTimestamp(response.getTimestamp()) && compareDecryptedNumber(response.getDecryptedNumber()) ) {
             try {
                 byte[] decryptedNumber = ASAPCryptoAlgorithms.decryptAsymmetric(response.getEncryptedNumber(), this.sharkPKIComponent.getASAPKeyStore());
-                return Optional.of(new Response(this.response.createUUID(), decryptedNumber, MessageFlag.Response, Utilities.createTimestamp() ));
+                return Optional.of(new Response(Utilities.createUUID(), decryptedNumber, MessageFlag.Response, Utilities.createTimestamp() ));
             } catch (ASAPSecurityException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);

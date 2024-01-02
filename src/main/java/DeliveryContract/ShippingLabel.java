@@ -4,7 +4,9 @@ import HedwigUI.UserInputBuilder;
 import Location.Location;
 import Misc.Utilities;
 
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 /**
  * The shipping label object is a core function of the whole protocoll. The label is created after the user confirmed
@@ -14,11 +16,10 @@ import java.util.UUID;
 public class ShippingLabel implements IContractComponent {
 
     private UUID packageUUID;
-    private final String transferorID = null;
     private String sender = null;
     private String origin = null;
     private String recipient = null;
-    private double packageWeight = 0.0;
+    private Double packageWeight = null;
     private String destination = null;
     private Location locationOrigin = null;
     private Location locationDest = null;
@@ -44,23 +45,39 @@ public class ShippingLabel implements IContractComponent {
         this.destination = destination;
         this.locationDest = locationDest;
         this.packageWeight = packageWeight;
-        this.isCreated = true;
     }
 
     public ShippingLabel() {}
 
     /**
      * Creates a new ShippingLabel object passed from the UserInputBuilder object.
-     * @param object
+     *
+     * @param object    UserInputBuilder object sent from the user interface.
      */
-    @Override
-    public ShippingLabel create(Object object) {
-        UserInputBuilder userInput = (UserInputBuilder) object;
-        return new ShippingLabel(Utilities.createUUID(), userInput.getSender(), userInput.getOrigin(),
-                new Location(userInput.getLatitudeOrigin(), userInput.getLongitudeOrigin()),
-                userInput.getRecipient(), userInput.getDestination(), new Location(userInput.getLatitudeDest(),
-                userInput.getLongitudeDest()), userInput.getPackageWeight());
 
+    public boolean create(UserInputBuilder object) {
+        if (verifyUserData(object)) {
+            new ShippingLabel(Utilities.createUUID(), object.getSender(), object.getOrigin(), new Location(object.getLatitudeOrigin(),
+                    object.getLongitudeOrigin()), object.getRecipient(), object.getDestination(), new Location(object.getLatitudeDest(),
+                    object.getLongitudeDest()), object.getPackageWeight());
+            this.isCreated = true;
+            return true;
+        }
+        this.isCreated = false;
+        return false;
+    }
+
+    /**
+     * Verifies the user input if no attribute has a null value. If only one field is null no schipping
+     * label is created.
+     *
+     * @param userInput    UserInputBuilder oject this one needs to be checked before the label gets created.
+     */
+    public boolean verifyUserData(UserInputBuilder userInput) {
+        return Stream.of(userInput.getSender(), userInput.getOrigin(), userInput.getLatitudeOrigin(), userInput.getLongitudeOrigin(),
+                userInput.getRecipient(), userInput.getDestination(), userInput.getLatitudeDest(), userInput.getLongitudeDest(),
+                userInput.getPackageWeight())
+                .anyMatch(Objects::nonNull);
     }
 
     @Override
@@ -104,7 +121,7 @@ public class ShippingLabel implements IContractComponent {
         return this.locationDest;
     }
 
-    public double getPackageWeight() {
+    public Double getPackageWeight() {
         return this.packageWeight;
     }
 
@@ -115,8 +132,7 @@ public class ShippingLabel implements IContractComponent {
      */
     @Override
     public String toString() {
-        return String.format(this.packageUUID + this.transferorID + this.sender + this.origin +
-                this.locationOrigin + this.recipient + this.destination +
-                this.locationDest + this.packageWeight);
+        return String.format(this.packageUUID + this.sender + this.origin + this.locationOrigin + this.recipient +
+                this.destination + this.locationDest + this.packageWeight);
     }
 }

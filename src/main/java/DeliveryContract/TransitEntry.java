@@ -20,8 +20,8 @@ public class TransitEntry {
     /**
      * Constructor to write the transit record entry.
      *
-     * @param serialNumber           Counting number for eveery entry.
-     * @param packageUUID            Package UUID to ifentifiy the package.
+     * @param serialNumber           Counting number for every entry.
+     * @param packageUUID            Package UUID to identify the package.
      * @param transferor             Sender of the package.
      * @param transferee             Recipient of the package.
      * @param timestamp              Timestamp of the package handover.
@@ -30,6 +30,7 @@ public class TransitEntry {
     public TransitEntry(int serialNumber, UUID packageUUID, String transferor, String transferee, Location handoverLocation,
                         long timestamp, byte[] digitalSignature) {
         this.serialNumber = serialNumber;
+        countUp();
         this.packageUUID = packageUUID;
         this.transferor = transferor;
         this.transferee = transferee;
@@ -44,7 +45,7 @@ public class TransitEntry {
      * @return    serial number plus 1.
      */
     public int countUp() {
-        return this.serialNumber+1;
+        return this.serialNumber++;
     }
 
     /**

@@ -7,9 +7,11 @@ import net.sharksystem.SharkTestPeerFS;
 import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.NoSuchPaddingException;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,6 +26,7 @@ public class SharkComponentTest {
     String francisID;
     PublicKey publicKeyFrancis;
     Identification identification;
+
 
     @Test
     public void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
@@ -56,5 +59,13 @@ public class SharkComponentTest {
 
         // project "clean code" :) we only use interfaces - unfortunately casting is unavoidable
         return (SharkPKIComponent) component;
+    }
+
+    @Test
+    public void clearUp() {
+        File certificates = Paths.get(String.format("./src/test/resources/TestStorage/ASAPSharkCertificates")).toFile();
+        File credentials = Paths.get(String.format("./src/test/resources/TestStorage/SharkCredentials")).toFile();
+        certificates.deleteOnExit();
+        credentials.deleteOnExit();
     }
 }

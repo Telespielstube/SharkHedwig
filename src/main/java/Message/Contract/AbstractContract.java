@@ -10,9 +10,6 @@ public abstract class AbstractContract implements IMessage {
     protected UUID uuid;
     protected MessageFlag messageFlag;
     protected long timestamp;
-    public UUID createUUID() {
-        return UUID.randomUUID();
-    }
 
     public UUID getUuid() {
         return this.uuid;
@@ -30,5 +27,6 @@ public abstract class AbstractContract implements IMessage {
         this.timestamp = timestamp;
     }
     public abstract MessageFlag getMessageFlag();
+
     public abstract void setMessageFlag(MessageFlag messageFlag);
 }

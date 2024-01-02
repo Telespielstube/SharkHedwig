@@ -19,6 +19,7 @@ public class UserInterface implements IUserInterface, Runnable {
     private double longitudeOrigin = 0.0;
     private double latitudeDest = 0.0;
     private double longitudeDest = 0.0;
+    private IUserObserver userObserver;
 
     /**
      * Constructer prints out a helpful text on how to interact with the protocol.
@@ -90,6 +91,16 @@ public class UserInterface implements IUserInterface, Runnable {
         return accepted;
     }
 
+    @Override
+    public void notifyUserObserver(UserInputBuilder userInputBuilder) {
+        userObserver.userObjectCreated(userInputBuilder);
+        
+    }
+
+    @Override
+    public void addUserObserver() {
+        userObserver = new UserObserver();
+    }
     /**
      * Starts the user interface thread. This methode is overridden from the 'runnable' interface.
      */
@@ -105,9 +116,10 @@ public class UserInterface implements IUserInterface, Runnable {
                     shippingLabelForm("Shipping label. Please fill in the required information.");
                 }
                 // saves the user input that the user interface does not access the shipping label directly.
-                new UserInputBuilder(this.sender, this.origin, this.latitudeOrigin, this.longitudeOrigin,
+                UserInputBuilder userInputBuilder = new UserInputBuilder(this.sender, this.origin, this.latitudeOrigin, this.longitudeOrigin,
                         this.recipient, this.destination, this.latitudeDest, this.longitudeDest,
                         this.packageWeight);
+                notifyUserObserver(userInputBuilder);
                 System.out.println("Shipping label created!");
             }
         }

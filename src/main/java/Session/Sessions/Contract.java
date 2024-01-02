@@ -27,7 +27,7 @@ public class Contract extends AbstractSession {
     private IContractComponent shippingLabel;
     private IContractComponent transitRecord;
     private UserInputBuilder userInputBuilder;
-    private IGeoSpatial geoCalculation;
+    private IGeoSpatial geoSpatial;
     private Location location;
     private Confirm confirm;
     private PickUp pickUp;
@@ -99,19 +99,19 @@ public class Contract extends AbstractSession {
     }
 
     /**
-     * Creates the contract document object.
+     * Creates the contract document object. The ShippingLabel object is already in memory and the TransitRecord object
+     * gets created now.
      *
      * @return    new ContractDocument message object.
      */
     public ContractDocument createDeliveryContract() {
-        ShippingLabel label = (ShippingLabel) shippingLabel.create(userInputBuilder);
-        TransitRecord record = (TransitRecord) transitRecord.create(
-                new TransitEntry(0, label.getUUID(), Constant.PeerName.getAppConstant(), "",
-                        geoCalculation.getCurrentLocation(), Utilities.createTimestamp(), null));
-        this.deliveryContract = new DeliveryContract(label, record);
+        ShippingLabel label = this.deliveryContract.getShippingLabel();
+        TransitRecord record = new TransitRecord();
+        record.addEntry(new TransitEntry(0, label.getUUID(), Constant.PeerName.getAppConstant(),
+                "", geoSpatial.getCurrentLocation(), Utilities.createTimestamp(), null));
         this.deliveryContract.setContractSent(true);
         return new ContractDocument(Utilities.createUUID(), MessageFlag.ContractDocument,
-                Utilities.createTimestamp(), this.deliveryContract);
+                Utilities.createTimestamp(), new DeliveryContract(label, record));
     }
 
     /**
@@ -142,9 +142,10 @@ public class Contract extends AbstractSession {
     private Optional<Confirm> handleContract(ContractDocument message) {
         if (message.getDeliveryContract() != null) {
             this.deliveryContract = storeDeliveryContract(message.getDeliveryContract());
-            fillTransfereeField(this.deliveryContract.getTransitRecord().getLastElement());
-            TransitEntry transitEntry = null;
-            return Optional.of(new Confirm(this.confirm.createUUID(), MessageFlag.Confirm, Utilities.createTimestamp(), this.deliveryContract, true));
+            TransitEntry lastEntry = this.deliveryContract.getTransitRecord().getLastElement();
+            fillTransfereeField(lastEntry);
+            this.geoSpatial.setPickUpLocation(lastEntry.getHandoverLocation());
+            return Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.Confirm, Utilities.createTimestamp(), this.deliveryContract, true));
         }
         return Optional.empty();
     }
@@ -162,9 +163,7 @@ public class Contract extends AbstractSession {
         this.shippingLabel = new ShippingLabel(label.getUUID(), label.getSender(), label.getOrigin(), label.getPackageOrigin(),
                 label.getRecipient(), label.getDestination(), label.getPackageDestination(), label.getPackageWeight());
         List<TransitEntry> entries = message.getTransitRecord().getAllEntries();
-        this.geoCalculation.setPickUpLocation(entries.get(entries.size() -1).getHandoverLocation());
-        this.transitRecord = new TransitRecord(entries);
-        return new DeliveryContract(this.shippingLabel, this.transitRecord);
+        return new DeliveryContract(this.shippingLabel, new TransitRecord(entries));
     }
 
     /**
@@ -200,7 +199,7 @@ public class Contract extends AbstractSession {
     private Optional<AckMessage> handlePickUp(PickUp message) {
         if (compareTimestamp(message.getTimestamp())) {
             this.deliveryContract.getTransitRecord().getLastElement().setDigitalSignature(message.getSignedTransitRecord());
-            return Optional.of(new AckMessage(this.ackMessage.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true));
+            return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
     }
@@ -218,22 +217,4 @@ public class Contract extends AbstractSession {
         }
         return Optional.empty();
     }
-
-//    /**
-//     * Gets the contractSent attribute from the DeliveryContract object.
-//     *
-//     * @return    true if sent, false if not.
-//     */
-//    public boolean getContractSent() {
-//        return this.deliveryContract.getContractSent();
-//    }
-//
-//    /**
-//     * Enables the SessionManager resetAll() methode to reset the contractSent attribute.
-//     *
-//     * @param isContractSent    Sets the contractSent attribute to too true or false.
-//     */
-//    public void setContractSent(boolean isContractSent) {
-//        this.deliveryContract.setContractSent(isContractSent);
-//    }
 }
