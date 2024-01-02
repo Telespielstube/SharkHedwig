@@ -11,10 +11,10 @@ public class GeoSpatial implements IGeoSpatial {
     /**
      * For now this is the hard coded location for the HTW-Berlin Building C.
      *
-     * @return    The hard coded HTW-Berlin building C location.
+     * @return    Current location of Hedwig drone.
      */
     public Location getCurrentLocation() {
-        return new Location(52.456931, 13.526444);
+        return new Location();
     }
 
     /**

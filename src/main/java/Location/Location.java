@@ -51,6 +51,7 @@ public class Location {
     public void setName(String name) {
         this.name = name;
     }
+
     public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }

@@ -72,7 +72,6 @@ public class UtilitiesTest {
         return (SharkPKIComponent) component;
     }
 
-
     @Test
     public void testIfTwoUUIDsDifferFromEachOther() {
         UUID uuid1 = Utilities.createUUID();

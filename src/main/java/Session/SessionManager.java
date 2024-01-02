@@ -11,6 +11,7 @@ import Message.*;
 import Session.Sessions.*;
 import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.pki.SharkPKIComponent;
+import sun.awt.windows.ThemeReader;
 
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
@@ -19,33 +20,27 @@ import java.util.UUID;
 
 public class SessionManager implements ISessionManager {
 
-    private SharkPKIComponent sharkPKIComponent;
-    private ASAPPeer peer;
     private SessionState sessionState;
     private DeviceState deviceState;
     private Identification identification;
     private Request request;
     private Contract contract;
-    private IMessageHandler messageHandler;
     private String sender;
     private Advertisement advertisement;
     private LogEntry logEntry;
     private MessageBuilder messageBuilder;
-    private IContractComponent shippingLabel = new ShippingLabel();
+    private final IContractComponent shippingLabel = new ShippingLabel();
     private boolean noSession = false; // attribute because NoSession has no Session Object.
     private DeliveryContract deliveryContract;
 
     public SessionManager() {}
 
-    public SessionManager(MessageHandler messageHandler, SessionState sessionState, DeviceState isTransferor, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
-        this.messageHandler = messageHandler;
-        this.peer = peer;
-        this.sharkPKIComponent = sharkPKIComponent;
-        this.deviceState = isTransferor;
+    public SessionManager(MessageHandler messageHandler, SessionState sessionState, DeviceState deviceState, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
+        this.deviceState = deviceState;
         this.sessionState = sessionState;
-        this.identification = new Identification(this.sharkPKIComponent);
+        this.identification = new Identification(sharkPKIComponent);
         this.request = new Request();
-        this.contract = new Contract(this.messageHandler, this.sharkPKIComponent);
+        this.contract = new Contract(messageHandler, sharkPKIComponent);
     }
 
     /**
@@ -58,8 +53,9 @@ public class SessionManager implements ISessionManager {
     }
 
     @Override
+    // Second condition is necessary because the changeDeviceState() switches only deviceState not shippingLabel state.
     public boolean checkTransferorState() {
-        if (shippingLabel.isCreated()) {
+        if (shippingLabel.isCreated() || this.deviceState.equals(DeviceState.Transferor.isActive())) {
             this.deviceState = DeviceState.Transferor.isActive();
             return true;
         }
@@ -124,7 +120,7 @@ public class SessionManager implements ISessionManager {
                     }
                     if (messageObject.isPresent() && this.contract.sessionComplete(messageObject)) {
                         this.contract.setSessionComplete(true);
-                        DeviceState.Transferee.isActive();
+                        changeDeviceState();
                         resetAll();
                     }
                     messageObject = Optional.empty();
@@ -138,6 +134,18 @@ public class SessionManager implements ISessionManager {
                 break;
         }
         return messageBuilder;
+    }
+
+    /**
+     * After the contract log is written it is assumed that the package is exchanged. Therefore, the states must switch
+     * vice versa.
+     */
+    public void changeDeviceState() {
+        if (deviceState.equals(DeviceState.Transferor)) {
+            deviceState = DeviceState.Transferee.isActive();
+        } else {
+            deviceState = DeviceState.Transferor.isActive();
+        }
     }
 
     /**

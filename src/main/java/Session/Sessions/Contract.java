@@ -42,7 +42,7 @@ public class Contract extends AbstractSession {
 
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
-        Optional<AbstractContract> messageObject = null;
+        Optional<AbstractContract> messageObject = Optional.empty();
         // Check object state to make sure to send the contract documents only once.
         if (!this.deliveryContract.getContractSent()) {
             messageObject = Optional.of(createDeliveryContract());
@@ -54,7 +54,9 @@ public class Contract extends AbstractSession {
                 break;
             case Ack:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
-                LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(), new Location(52.456931, 13.526444), true, Constant.PeerName.getAppConstant(), sender);
+                LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(),
+                                    new Location(pickupLocation.getLatitude(), pickupLocation.getLongitude()),
+                          true, Constant.PeerName.getAppConstant(), sender);
                 SessionLogger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
                 break;
             default:
@@ -67,12 +69,12 @@ public class Contract extends AbstractSession {
         } else {
             addMessageToList(messageObject.get());
         }
-        return Optional.ofNullable(messageObject);
+        return Optional.of(messageObject);
     }
 
     @Override
     public Optional<Object> transferee(IMessage message, String sender) {
-        Optional<AbstractContract> messageObject = null;
+        Optional<AbstractContract> messageObject = Optional.empty();
         switch(message.getMessageFlag()) {
             case ContractDocument:
                 messageObject = Optional.ofNullable(handleContract((ContractDocument) message).orElse(null));
@@ -82,7 +84,9 @@ public class Contract extends AbstractSession {
                 break;
             case Ack:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
-                LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(), new Location(52.456931, 13.526444), true, Constant.PeerName.getAppConstant(), sender);
+                LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(),
+                                    new Location(pickupLocation.getLatitude(), pickupLocation.getLongitude()),
+                          true, Constant.PeerName.getAppConstant(), sender);
                 SessionLogger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
                 break;
             default:
@@ -134,7 +138,7 @@ public class Contract extends AbstractSession {
     }
 
     /**
-     * Handles all things data processing after of the received shipping document.
+     * Handles all things data processing after receiving contract documents.
      *
      * @param message    PickUp message object.
      * @return           An optional if the message passed the timestamp and flag checks or empty if not.
@@ -143,7 +147,7 @@ public class Contract extends AbstractSession {
         if (message.getDeliveryContract() != null) {
             this.deliveryContract = storeDeliveryContract(message.getDeliveryContract());
             TransitEntry lastEntry = this.deliveryContract.getTransitRecord().getLastElement();
-            fillTransfereeField(lastEntry);
+            lastEntry.setTransferee(Constant.PeerName.getAppConstant());
             this.geoSpatial.setPickUpLocation(lastEntry.getHandoverLocation());
             return Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.Confirm, Utilities.createTimestamp(), this.deliveryContract, true));
         }
@@ -164,14 +168,6 @@ public class Contract extends AbstractSession {
                 label.getRecipient(), label.getDestination(), label.getPackageDestination(), label.getPackageWeight());
         List<TransitEntry> entries = message.getTransitRecord().getAllEntries();
         return new DeliveryContract(this.shippingLabel, new TransitRecord(entries));
-    }
-
-    /**
-     * After receiving the DeliveryContract the potential next transferor needs to fill out the Transferee field in the TransitEntry.
-     * Fills out the missing Transferee field in the TransitEntry object.
-     */
-    private void fillTransfereeField(TransitEntry transitRecord) {
-        transitRecord.setTransferee(Constant.PeerName.getAppConstant());
     }
 
     /**
@@ -205,7 +201,7 @@ public class Contract extends AbstractSession {
     }
 
     /**
-     * An Acknowledgment massage to signal that the PickUpMessage was received.
+     * An Acknowledgment maesage to signal that the PickUpMessage was received.
      *
      * @param ackMessage    The received AckMessage object.
      * @return              An otional AckMessage object if timestamp and ack flag are ok

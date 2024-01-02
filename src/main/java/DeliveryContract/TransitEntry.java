@@ -30,7 +30,7 @@ public class TransitEntry {
     public TransitEntry(int serialNumber, UUID packageUUID, String transferor, String transferee, Location handoverLocation,
                         long timestamp, byte[] digitalSignature) {
         this.serialNumber = serialNumber;
-        countUp();
+       // countUp();
         this.packageUUID = packageUUID;
         this.transferor = transferor;
         this.transferee = transferee;

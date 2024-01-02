@@ -24,34 +24,27 @@ public class SessionLoggerTest {
     @BeforeAll
     public static void testIfDirectoryAndFileAreCreated() {
         try {
-            SessionLogger.createLogDirectory(TestConstant.PeerFolder.getTestConstant(), LogFolder.getTestConstant());
+            SessionLogger.createLogDirectory(PeerFolder.getTestConstant(), LogFolder.getTestConstant());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
     @Test
-    public void testIfAckMessageGetsSavedInRequestFile(){
-        try {
-            SessionLogger.createLogFile(TestConstant.PeerFolder.getTestConstant(), LogFolder.getTestConstant(), TestConstant.RequestLog.getTestConstant());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void testIfAckMessageGetsSavedInRequestFile() throws IOException {
+        SessionLogger.createLogFile(PeerFolder.getTestConstant(), LogFolder.getTestConstant(), TestConstant.RequestLog.getTestConstant());
         AckMessage ackMessage = new AckMessage(Utilities.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true);
-        LogEntry logEntry = new LogEntry(ackMessage.getUuid(), ackMessage.getTimestamp(), ackMessage.getIsAck(), TestConstant.PeerName.getTestConstant(), "Bobby");
+        LogEntry logEntry = new LogEntry(ackMessage.getUuid(), ackMessage.getTimestamp(), ackMessage.getIsAck(), PeerName.getTestConstant(), "Bobby");
         boolean written = SessionLogger.writeEntry(logEntry.toString(), RequestLogPath.getTestConstant());
         System.out.println(written + ": " + logEntry);
         assertTrue(written);
     }
 
     @Test
-    public void testIfAckMessageGetsSavedInContractFile(){
-        try {
-            SessionLogger.createLogFile(TestConstant.PeerFolder.getTestConstant(), LogFolder.getTestConstant(), TestConstant.ContractLog.getTestConstant());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void testIfAckMessageGetsSavedInContractFile() throws IOException {
+        SessionLogger.createLogFile(PeerFolder.getTestConstant(), LogFolder.getTestConstant(), ContractLog.getTestConstant());
         AckMessage ackMessage = new AckMessage(Utilities.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true);
-        LogEntry logEntry = new LogEntry(ackMessage.getUuid(), ackMessage.getTimestamp(), ackMessage.getIsAck(), TestConstant.PeerName.getTestConstant(), "Bobby");
+        LogEntry logEntry = new LogEntry(ackMessage.getUuid(), ackMessage.getTimestamp(), ackMessage.getIsAck(), PeerName.getTestConstant(), "Bobby");
         boolean written = SessionLogger.writeEntry(logEntry.toString(), ContractLogPath.getTestConstant());
         System.out.println(written + ": " + logEntry);
         assertTrue(written);
@@ -59,11 +52,9 @@ public class SessionLoggerTest {
 
     @AfterAll
     public static void clear() throws IOException {
-        Path requestFilePath = Paths.get(String.format(PeerFolder.getTestConstant() + "/" + LogFolder.getTestConstant() + "/" + RequestLog.getTestConstant()));
-        Path contractFilePath = Paths.get(String.format(PeerFolder.getTestConstant() + "/" + LogFolder.getTestConstant() + "/" + ContractLog.getTestConstant()));
-        File logFile = Paths.get(String.format(TestConstant.PeerFolder.getTestConstant() +"/"+ LogFolder.getTestConstant())).toFile();
-        logFile.deleteOnExit();
-        Files.delete(requestFilePath);
-        Files.delete(contractFilePath);
+        String logPath = PeerFolder.getTestConstant() + "/" + LogFolder.getTestConstant();
+        Files.deleteIfExists(Paths.get(String.format( logPath + "/" + RequestLog.getTestConstant())));
+        Files.deleteIfExists(Paths.get(String.format(logPath + "/" + ContractLog.getTestConstant())));
+        Files.delete(Paths.get(String.format(logPath)));
     }
 }

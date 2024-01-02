@@ -26,11 +26,6 @@ public abstract class AbstractSession implements ISession {
         return false;
     }
 
-    // Not in use yet
-//    public Object getEntry(int index) {
-//        return  this.messageList.get(index);
-//    }
-
     public Object getLastValueFromList() {
         return this.messageList.get(this.messageList.lastKey());
     }
