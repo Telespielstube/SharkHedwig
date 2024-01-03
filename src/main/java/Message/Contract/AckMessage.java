@@ -21,10 +21,6 @@ public class AckMessage extends AbstractContract {
         this.messageFlag = messageFlag;
     }
 
-    @Override
-    public AckMessage getContent() {
-        return this;
-    }
 
     public boolean getIsAck() {
         return this.isAck;

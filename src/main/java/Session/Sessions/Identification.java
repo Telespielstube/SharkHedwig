@@ -90,9 +90,11 @@ public class Identification extends AbstractSession {
     }
 
     /**
+     * Handles a received Advertisement message.
      *
-     * @param message
-     * @return
+     * @param message    Advertisement message.
+     *
+     * @return           if message was valid a Challenge message, if not an empty Optional.
      */
     private Optional<Challenge> handleAdvertisement(Advertisement message) {
         if (message.getMessageFlag().equals(MessageFlag.Advertisement) && message.getAdTag()) {
@@ -151,15 +153,15 @@ public class Identification extends AbstractSession {
      * @return
      */
     private Optional<Response> handleChallenge(Challenge message) {
-        try {
-            //byte[] decryptedNumber = Utilities.decryptRandomNumber(message.getChallengeNumber(), this.sharkPKIComponent.getPublicKey());
-            byte[] decryptedNumber = ASAPCryptoAlgorithms.decryptAsymmetric(message.getChallengeNumber(), this.sharkPKIComponent.getASAPKeyStore());
-
-            this.response = Optional.of(new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), Utilities.encryptAsymmetric(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()), decryptedNumber)).get();
-        } catch (ASAPSecurityException e) {
-            throw new RuntimeException(e);
+        if (message.getMessageFlag().equals(MessageFlag.Challenge)) {
+            try {
+                byte[] decryptedNumber = ASAPCryptoAlgorithms.decryptAsymmetric(message.getChallengeNumber(), this.sharkPKIComponent.getASAPKeyStore());
+                return Optional.ofNullable(new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), Utilities.encryptAsymmetric(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()), decryptedNumber));
+            } catch (ASAPSecurityException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return Optional.of(this.response);
+        return Optional.empty();
     }
 
     /**

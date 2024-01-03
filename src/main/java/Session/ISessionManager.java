@@ -5,14 +5,14 @@ import Message.MessageBuilder;
 import Setup.DeviceState;
 import net.sharksystem.pki.SharkPKIComponent;
 
+import java.util.Optional;
+
 public interface ISessionManager {
 
     /**
-     * Checks if the current device state is transferor or transferee.
-     *
-     * @return    True if state is Tranferor else false;
+     * Checks if the current device state is transferor or transferee based on the creation of the ShippingLabel object.
      */
-    boolean checkTransferorState();
+    void checkDeviceState();
 
     /**
      * The incoming messages are handled differently based on the current device state.
@@ -20,12 +20,7 @@ public interface ISessionManager {
      *
      * @param message    Incoming generic type Message object.
      */
-     MessageBuilder sessionHandling(IMessage message, String sender);
+     Optional<MessageBuilder> sessionHandling(IMessage message, String sender);
 
     public void resetAll();
-
-//    /**
-//     * Methode to convert the Message object to an encrypted signed byte[] and send it as an ASAPMessage.
-//     */
-//    void handleOutgoing(Object messageObject, String uri, String sender, SharkPKIComponent sharkPKIComponent);
 }

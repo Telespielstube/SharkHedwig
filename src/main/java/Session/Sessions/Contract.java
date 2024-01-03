@@ -24,8 +24,8 @@ public class Contract extends AbstractSession {
     private IMessageHandler messageHandler;
     private ContractDocument contractDocument;
     private DeliveryContract deliveryContract;
-    private IContractComponent shippingLabel;
-    private IContractComponent transitRecord;
+    private IDeliveryContract shippingLabel;
+    private IDeliveryContract transitRecord;
     private UserInputBuilder userInputBuilder;
     private IGeoSpatial geoSpatial;
     private Location location;
@@ -33,6 +33,7 @@ public class Contract extends AbstractSession {
     private PickUp pickUp;
     private Location pickupLocation;
     private AckMessage ackMessage;
+    private TransitRecord record;
 
     public Contract(IMessageHandler messageHandler, SharkPKIComponent sharkPKIComponent) {
         this.messageHandler = messageHandler;
@@ -99,7 +100,7 @@ public class Contract extends AbstractSession {
         } else {
             addMessageToList(messageObject.get());
         }
-        return Optional.empty();
+        return Optional.of(messageObject);
     }
 
     /**
@@ -110,12 +111,14 @@ public class Contract extends AbstractSession {
      */
     public ContractDocument createDeliveryContract() {
         ShippingLabel label = this.deliveryContract.getShippingLabel();
-        TransitRecord record = new TransitRecord();
+        if (!record.getIsCreated()) {
+            this.record = new TransitRecord();
+        }
         record.addEntry(new TransitEntry(0, label.getUUID(), Constant.PeerName.getAppConstant(),
                 "", geoSpatial.getCurrentLocation(), Utilities.createTimestamp(), null));
         this.deliveryContract.setContractSent(true);
         return new ContractDocument(Utilities.createUUID(), MessageFlag.ContractDocument,
-                Utilities.createTimestamp(), new DeliveryContract(label, record));
+                Utilities.createTimestamp(), new DeliveryContract(label, this.record));
     }
 
     /**

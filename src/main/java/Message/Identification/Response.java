@@ -66,8 +66,4 @@ public class Response extends AbstractIdentification {
         this.messageFlag = messageFlag;
     }
 
-    @Override
-    public Response getContent() {
-        return this;
-    }
 }

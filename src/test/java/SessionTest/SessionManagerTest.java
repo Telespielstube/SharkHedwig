@@ -1,6 +1,7 @@
 package SessionTest;
 
 import DeliveryContract.ShippingLabel;
+import HedwigUI.UserInputBuilder;
 import Location.Location;
 import Message.Advertisement;
 import Message.Identification.Challenge;
@@ -24,6 +25,7 @@ import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
+import sun.plugin2.message.Message;
 
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
@@ -44,6 +46,7 @@ public class SessionManagerTest {
     private static String francisID;
     private static PublicKey publicKeyFrancis;
     private static Identification identification;
+    private static ShippingLabel shippingLabel;
 
     public SessionManagerTest() throws NoSuchPaddingException, NoSuchAlgorithmException {
     }
@@ -84,29 +87,42 @@ public class SessionManagerTest {
     }
 
     @Test
-    public void testIfDeviceTransferorStateReturnsFalseWhenShippingLabelIsCreatedButEmpty() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public void testIfNextStateIsActive() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        //sessionManager = new SessionManager(messageHandler, SessionState.Identification, DeviceState.Transferee, null, sharkPKIComponent);
+        assertEquals(SessionState.Request, SessionState.Identification.nextState());
+    }
+
+    @Test
+    public void testIfDeviceTransferorIsUnchangedWhenShippingLabelIsCreatedButEmpty() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        ShippingLabel shippingLabel = new ShippingLabel();
         sessionManager = new SessionManager(messageHandler, SessionState.Identification, DeviceState.Transferee, null, sharkPKIComponent);
-        assertFalse(sessionManager.checkTransferorState());
+        assertFalse(shippingLabel.getIsCreated());
+        sessionManager.checkDeviceState();
+        assertNotEquals(DeviceState.Transferor, DeviceState.Transferee);
     }
 
     @Test
-    public void testIfTransferorIsSetAndTrueWhenDeliveryContractIsCreated() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public void transfereeIsNotChangedIfCreateMethodeIsNotCalled() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        shippingLabel = new ShippingLabel();
         sessionManager = new SessionManager(messageHandler, SessionState.NoSession, DeviceState.Transferee, null, sharkPKIComponent);
-        assertFalse(sessionManager.checkTransferorState());
-        new ShippingLabel(null, "Alice", "HTW-Berlin",
+        sessionManager.checkDeviceState();
+        assertEquals(DeviceState.Transferee, DeviceState.Transferee);
+        shippingLabel = new ShippingLabel(null, "Alice", "HTW-Berlin",
                 new Location(52.456931, 13.526444), "Bob", "Ostbahnhof",
                 new Location(52.5105, 13.4346), 1.2);
-        assertTrue(sessionManager.checkTransferorState());
+        assertEquals(DeviceState.Transferee, DeviceState.Transferee);
     }
 
     @Test
-    public void testIfTransferorRamainsUnchanged() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        sessionManager = new SessionManager(messageHandler, SessionState.Identification, DeviceState.Transferor, null, sharkPKIComponent);
-        assertFalse(sessionManager.checkTransferorState());
-        new ShippingLabel(null, "Alice", "HTW-Berlin",
-                new Location(52.456931, 13.526444), "Bob", "Ostbahnhof",
-                new Location(52.5105, 13.4346), 1.2);
-        assertTrue(sessionManager.checkTransferorState());
+    public void transfereeStateChangesWhenCreateIsCalled() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        shippingLabel = new ShippingLabel();
+        sessionManager = new SessionManager(messageHandler, SessionState.Identification, DeviceState.Transferee, null, sharkPKIComponent);
+        sessionManager.checkDeviceState();
+        UserInputBuilder userInputBuilder = new UserInputBuilder("Alice", "HTW-Berlin",
+                52.456931, 13.526444, "Bob", "Ostbahnhof", 52.5105, 13.4346, 1.2);
+        shippingLabel.create(userInputBuilder);
+        sessionManager.checkDeviceState();
+        assertNotEquals(DeviceState.Transferee, DeviceState.Transferor);
     }
 
     @Test
@@ -114,29 +130,43 @@ public class SessionManagerTest {
         sessionManager = new SessionManager(messageHandler, SessionState.NoSession, DeviceState.Transferor, null, sharkPKIComponent);
         byte[] encryptedNumber = Utilities.encryptAsymmetric("3345".getBytes(), asapKeyStore.getPublicKey());
         Challenge challenge = new Challenge(UUID.randomUUID(), MessageFlag.Challenge, System.currentTimeMillis(), encryptedNumber );
-        MessageBuilder messageBuilder = sessionManager.sessionHandling(challenge, "Marta");
+        MessageBuilder messageBuilder = sessionManager.sessionHandling(challenge, "Marta").get();
         assertEquals(Channel.Advertisement.getChannelType(), messageBuilder.getUri());
     }
-    // BadPadding Exception in decrypting Random Number.
+
     @Test
-    public void testIfChallengeMessageGetsTheRightResponse() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
+    public void handleNoSessionAsTransferee() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        sessionManager = new SessionManager(null, SessionState.NoSession, DeviceState.Transferee, null, sharkPKIComponent);
+        Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
+        Optional<Object> object = Optional.ofNullable(sessionManager.sessionHandling(advertisement,"Bobby"));
+        assertTrue(object.isPresent()); // This is true because uri and sender are present
+    }
+
+    @Test
+    public void sendAdvertisementIfStateIsTransferorWithoutAShippingLabel() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        sessionManager = new SessionManager(null, SessionState.NoSession, DeviceState.Transferor, null, sharkPKIComponent);
+        Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
+        Optional<Object> object = Optional.ofNullable(sessionManager.sessionHandling(advertisement,"Bobby"));
+        assertTrue(object.isPresent()); // This is true because uri and sender are present
+    }
+
+    @Test
+    public void testIfChallengeMessageGetsRejectedWithoutAdvertisement() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
         response = new Response();
         sessionManager = new SessionManager(null, SessionState.Identification, DeviceState.Transferor, null, sharkPKIComponent);
         byte[] number = "4634563456".getBytes();
         byte[] encryptedNumber = Utilities.encryptAsymmetric(number, asapKeyStore.getPublicKey());
-
-
-        Challenge challenge = new Challenge(UUID.randomUUID(), MessageFlag.Challenge, System.currentTimeMillis(), encryptedNumber );
-        MessageBuilder messageBuilder = sessionManager.sessionHandling(challenge, "Marta");
-        assertNotNull(messageBuilder.getMessage());
-        assertEquals(Channel.Identification.getChannelType(), messageBuilder.getUri());
+        Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.Challenge, System.currentTimeMillis(), encryptedNumber );
+        Optional<MessageBuilder> messageBuilder = Optional.ofNullable(sessionManager.sessionHandling(challenge, "Marta")).orElse(null);
+        assertFalse(messageBuilder.isPresent());
     }
 
     @Test
-    public void handleNoSession() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        sessionManager = new SessionManager(null, SessionState.Identification, DeviceState.Transferee, null, sharkPKIComponent);
-        Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
-        Optional<?> object = Optional.ofNullable(sessionManager.sessionHandling(advertisement,"Bobby"));
-        assertTrue(object.isPresent()); // This is true because uri and sender are present
+    public void testIfResponseGetsProcessedCorrectly() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
+        sessionManager = new SessionManager(null, SessionState.Identification, DeviceState.Transferor, null, sharkPKIComponent);
+        byte[] number = "4634563456".getBytes();
+        byte[] encrypted = Utilities.encryptAsymmetric(number, asapKeyStore.getPublicKey());
+        Response response = new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), encrypted, number);
+        Optional<MessageBuilder> messageBuilder = Optional.ofNullable(sessionManager.sessionHandling(response, "Marta")).orElse(null);
     }
 }

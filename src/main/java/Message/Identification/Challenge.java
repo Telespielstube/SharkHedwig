@@ -36,9 +36,4 @@ public class Challenge extends AbstractIdentification {
     public void setMessageFlag(MessageFlag messageFlag) {
         this.messageFlag = messageFlag;
     }
-
-    @Override
-    public Challenge getContent() {
-        return this;
-    }
 }

@@ -50,9 +50,4 @@ public class Advertisement implements IMessage, Serializable {
     public void setTimestamp(long currentTime) {
 
     }
-
-    @Override
-    public Object getContent() {
-        return this;
-    }
 }

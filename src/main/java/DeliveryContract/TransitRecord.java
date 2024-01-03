@@ -8,10 +8,11 @@ import java.util.List;
 /**
  * Class to add a new entry to the list of all previous handovers of this package.
  */
-public class TransitRecord implements IContractComponent, Serializable {
+public class TransitRecord implements IDeliveryContract, Serializable {
 
     private TransitEntry transitEntry;
     private List<TransitEntry> entryList = null;
+    private boolean isCreated = false;
 
     /**
      * The TransitRecord object is a dynamic vector where TransitEntry objects are added.
@@ -19,6 +20,7 @@ public class TransitRecord implements IContractComponent, Serializable {
      */
     public TransitRecord() {
         this.entryList = Collections.synchronizedList(new ArrayList<TransitEntry>());
+        this.isCreated = true;
     }
 
     /**
@@ -46,8 +48,13 @@ public class TransitRecord implements IContractComponent, Serializable {
     }
 
     @Override
-    public boolean isCreated() {
-        return false;
+    public boolean getIsCreated() {
+        return this.isCreated;
+    }
+
+    @Override
+    public void setIsCreated(boolean isCreated) {
+        this.isCreated = isCreated;
     }
 
     /**

@@ -17,20 +17,20 @@ public class ShippingLabelTest {
     public void testIfCreateReturnsFalseWhenPassedObjectHasNullValue() {
         boolean created = shippingLabel.create(nullUserInputBuilder);
         assertFalse(created);
-        assertFalse(shippingLabel.isCreated());
+        assertFalse(shippingLabel.getIsCreated());
     }
 
     @Test
     public void testIfCreateReturnsTrueWhenPassedUserDataObjectHasValues() {
         boolean created = shippingLabel.create(userInputBuilder);
         assertTrue(created);
-        assertTrue(shippingLabel.isCreated());
+        assertTrue(shippingLabel.getIsCreated());
     }
 
     @Test
     public void testIfEmptyShippingLabelReturnsFalseWhenCreatedIsNotCalled() {
         shippingLabel = new ShippingLabel(null, null, null, null, null,
                 null, null, 0.0);
-        assertFalse(shippingLabel.isCreated());
+        assertFalse(shippingLabel.getIsCreated());
     }
 }

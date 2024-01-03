@@ -30,10 +30,10 @@ public abstract class AbstractSession implements ISession {
         return this.messageList.get(this.messageList.lastKey());
     }
 
-    @Override
-    public boolean sessionComplete(Object message) {
-        if (!this.messageList.isEmpty()) {
-            return message.equals(getLastValueFromList() instanceof AckMessage);
+    public boolean setSessionComplete(Object message) {
+        if (!this.messageList.isEmpty() && message.equals(getLastValueFromList() instanceof AckMessage)) {
+            this.sessionComplete = true;
+            return true;
         }
         return false;
     }
@@ -50,9 +50,4 @@ public abstract class AbstractSession implements ISession {
     public boolean getSessionComplete() {
         return this.sessionComplete;
     }
-
-    public void setSessionComplete(boolean sessionComplete) {
-        this.sessionComplete = sessionComplete;
-    }
 }
-

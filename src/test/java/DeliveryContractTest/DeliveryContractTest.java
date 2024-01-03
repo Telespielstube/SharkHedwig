@@ -3,7 +3,7 @@ package DeliveryContractTest;
 import DeliveryContract.*;
 import Location.Location;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeAll;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,8 +29,8 @@ public class DeliveryContractTest {
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         shippingLabel = new ShippingLabel();
         transitRecord = new TransitRecord();
-        assertFalse(shippingLabel.isCreated());
-        assertFalse(transitRecord.isCreated());
+        assertFalse(shippingLabel.getIsCreated());
+        assertFalse(transitRecord.getIsCreated());
     }
     @Test
     public void returnTrueIfContractSetMethodIsCalled() {
@@ -58,8 +58,8 @@ public class DeliveryContractTest {
         assertNotNull(deliveryContract.getShippingLabel());
         System.out.println(deliveryContract.getTransitRecord().getAllEntries());
         assertNotNull(deliveryContract.getTransitRecord().getAllEntries());
-        System.out.println(deliveryContract.getDeliveryContract());
-        assertNotNull(deliveryContract.getDeliveryContract());
+        System.out.println(deliveryContract.get());
+        assertNotNull(deliveryContract.get());
     }
 
     @Test

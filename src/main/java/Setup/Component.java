@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import Misc.SessionLogger;
@@ -163,13 +164,13 @@ public class Component implements IComponent, ASAPMessageReceivedListener {
             for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
               //  message = (IMessage) this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
                 message = (IMessage) messageHandler.byteArrayToObject(it.next());
-                MessageBuilder messageBuilder = sessionManager.sessionHandling(message, senderE2E);
-                if (Stream.of(messageBuilder.getMessage()).allMatch(Objects::isNull)) {
+                Optional<MessageBuilder> messageBuilder = Optional.ofNullable(sessionManager.sessionHandling(message, senderE2E).get());
+                if (!messageBuilder.isPresent()) {
                     continue;
                 }
-                encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.getMessage(), messageBuilder.getUri(), messageBuilder.getSender(), sharkPKIComponent);
+                encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.get().getMessage(), messageBuilder.get().getUri(), messageBuilder.get().getSender(), sharkPKIComponent);
                 try {
-                    this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), messageBuilder.getUri(), encryptedMessage);
+                    this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), messageBuilder.get().getUri(), encryptedMessage);
                 } catch (ASAPException e) {
                     e.printStackTrace();
                     throw new RuntimeException(e);

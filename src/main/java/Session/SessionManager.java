@@ -1,7 +1,7 @@
 package Session;
 
 import DeliveryContract.DeliveryContract;
-import DeliveryContract.IContractComponent;
+import DeliveryContract.IDeliveryContract;
 import DeliveryContract.ShippingLabel;
 import Misc.LogEntry;
 import Misc.Utilities;
@@ -11,7 +11,6 @@ import Message.*;
 import Session.Sessions.*;
 import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.pki.SharkPKIComponent;
-import sun.awt.windows.ThemeReader;
 
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
@@ -29,9 +28,10 @@ public class SessionManager implements ISessionManager {
     private Advertisement advertisement;
     private LogEntry logEntry;
     private MessageBuilder messageBuilder;
-    private final IContractComponent shippingLabel = new ShippingLabel();
+    private final IDeliveryContract shippingLabel = new ShippingLabel();
     private boolean noSession = false; // attribute because NoSession has no Session Object.
     private DeliveryContract deliveryContract;
+    private Optional<Object> messageObject;
 
     public SessionManager() {}
 
@@ -41,6 +41,7 @@ public class SessionManager implements ISessionManager {
         this.identification = new Identification(sharkPKIComponent);
         this.request = new Request();
         this.contract = new Contract(messageHandler, sharkPKIComponent);
+        this.messageObject = Optional.empty();
     }
 
     /**
@@ -49,83 +50,63 @@ public class SessionManager implements ISessionManager {
      * @return    Advertisement message object.
      */
     private Advertisement createAdvertisement() {
-        return new Advertisement(UUID.randomUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
+        return new Advertisement(Utilities.createUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
     }
 
     @Override
-    // Second condition is necessary because the changeDeviceState() switches only deviceState not shippingLabel state.
-    public boolean checkTransferorState() {
-        if (shippingLabel.isCreated() || this.deviceState.equals(DeviceState.Transferor.isActive())) {
+    public void checkDeviceState() {
+        if (this.shippingLabel.getIsCreated() ) {
             this.deviceState = DeviceState.Transferor.isActive();
-            return true;
         }
         this.deviceState = DeviceState.Transferee.isActive();
-        return false;
     }
 
     @Override
-    public MessageBuilder sessionHandling(IMessage message, String sender) {
-        Optional<Object> messageObject = Optional.empty();
+    public Optional<MessageBuilder> sessionHandling(IMessage message, String sender) {
+        checkDeviceState();
         switch (this.sessionState) {
             case NoSession:
-                if (checkTransferorState()) {
-                    messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
+                if (this.deviceState.equals(DeviceState.Transferor.isActive())) {
+                    this.messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
                 }
-                messageObject = Optional.of((createAdvertisement()));
+                // NoSession and Transferee state only creates an Advertisement message.
+                this.messageObject = Optional.of((createAdvertisement()));
                 this.noSession = true;
-                this.sessionState.nextState();
-                messageBuilder = new MessageBuilder(messageObject.get(), Channel.Advertisement.getChannelType(), sender);
+                this.sessionState = SessionState.NoSession.nextState();
+                messageBuilder = Optional.of(new MessageBuilder(this.messageObject.get(), Channel.Advertisement.getChannelType(), sender)).get();
                 break;
 
             case Identification:
-                if (this.noSession) {
-                    if (checkTransferorState()) {
-                        messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
-                    } else {
-                        messageObject = Optional.ofNullable(this.identification.transferee(message, sender).orElse(this.sessionState.resetSessionState()));
-                    }
-                    if (messageObject.isPresent() && this.identification.sessionComplete(messageObject)) {
-                        this.identification.setSessionComplete(true);
-                        this.identification.clearMessageList();
-                        this.sessionState.nextState();
-                    }
-                    messageObject = Optional.empty();
+                if (!this.noSession) {
+                    this.messageObject = Optional.empty();
+                } else {
+                    processIdentification(message);
                 }
-                messageBuilder = new MessageBuilder(messageObject.get(), Channel.Identification.getChannelType(), sender);
+                if (this.messageObject.isPresent()) {
+                    messageBuilder = Optional.of(new MessageBuilder(this.messageObject.get(), Channel.Identification.getChannelType(), sender)).get();
+                }
                 break;
 
             case Request:
-                if (this.noSession && this.identification.getSessionComplete()) {
-                    if (checkTransferorState()) {
-                        messageObject = Optional.ofNullable(this.request.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
-                    } else {
-                        messageObject = Optional.ofNullable(this.request.transferee(message, sender).orElse(this.sessionState.resetSessionState()));
-                    }
-                    if (messageObject.isPresent() && this.request.sessionComplete(messageObject)) {
-                        this.request.setSessionComplete(true);
-                        this.request.clearMessageList();
-                        this.sessionState.nextState();
-                    }
-                    messageObject = Optional.empty();
+                if (!this.noSession && !this.identification.getSessionComplete()) {
+                    this.messageObject = Optional.empty();
+                } else {
+                    processRequest(message);
                 }
-                messageBuilder = new MessageBuilder(messageObject.get(), Channel.Request.getChannelType(), sender);
+                if (this.messageObject.isPresent()) {
+                    messageBuilder = new MessageBuilder(this.messageObject.get(), Channel.Request.getChannelType(), sender);
+                }
                 break;
 
             case Contract:
-                if (this.noSession && this.identification.getSessionComplete() && this.request.getSessionComplete()) {
-                    if (checkTransferorState()) {
-                        messageObject = Optional.ofNullable(this.contract.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
-                    } else {
-                        messageObject = Optional.ofNullable(this.contract.transferee(message, sender).orElse(this.sessionState.resetSessionState()));
-                    }
-                    if (messageObject.isPresent() && this.contract.sessionComplete(messageObject)) {
-                        this.contract.setSessionComplete(true);
-                        changeDeviceState();
-                        resetAll();
-                    }
-                    messageObject = Optional.empty();
+                if (!this.noSession && !this.identification.getSessionComplete() && !this.request.getSessionComplete()) {
+                    this.messageObject = Optional.empty();
+                } else {
+                    processContract(message);
                 }
-                messageBuilder = new MessageBuilder(messageObject.get(), Channel.Contract.getChannelType(), sender);
+                if (this.messageObject.isPresent()) {
+                    messageBuilder = new MessageBuilder(this.messageObject.get(), Channel.Contract.getChannelType(), sender);
+                }
                 break;
 
             default:
@@ -133,23 +114,77 @@ public class SessionManager implements ISessionManager {
                 resetAll();
                 break;
         }
-        return messageBuilder;
+        return Optional.ofNullable(messageBuilder);
     }
 
     /**
+     * If the previous session is completed the received identification message gets processed.
+     *
+     * @param message    Received identification message
+     */
+    private void processIdentification(IMessage message) {
+        if (this.deviceState.equals(DeviceState.Transferor.isActive())) {
+            this.messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
+        } else {
+            this.messageObject = Optional.ofNullable(this.identification.transferee(message, sender).orElse(this.sessionState.resetSessionState()));
+        }
+        if (this.messageObject.isPresent() && this.identification.setSessionComplete(this.messageObject)) {
+            this.identification.clearMessageList();
+            this.sessionState = SessionState.Identification.nextState();
+        }
+        this.messageObject = Optional.empty();
+    }
+
+    /**
+     * If the previous session is completed the received request message gets processed.
+     *
+     * @param message    Received request message
+     */
+    private void processRequest(IMessage message) {
+        if (this.deviceState.equals(DeviceState.Transferor.isActive())) {
+            this.messageObject = Optional.ofNullable(this.request.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
+        } else {
+            this.messageObject = Optional.ofNullable(this.request.transferee(message, sender).orElse(this.sessionState.resetSessionState()));
+        }
+        if (this.messageObject.isPresent() && this.request.setSessionComplete(this.messageObject)) {
+            this.request.clearMessageList();
+            this.sessionState = SessionState.Request.nextState();
+        }
+        this.messageObject = Optional.empty();
+    }
+
+    /**
+     * If the previous session is completed the received contract message gets processed.
+     *
+     * @param message    Received contract message
+     */
+    private void processContract(IMessage message) {
+        if (deviceState.equals(DeviceState.Transferor.isActive())) {
+            this.messageObject = Optional.ofNullable(this.contract.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
+        } else {
+            this.messageObject = Optional.ofNullable(this.contract.transferee(message, sender).orElse(this.sessionState.resetSessionState()));
+        }
+        if (this.messageObject.isPresent() && this.contract.setSessionComplete(this.messageObject)) {
+            changeDeviceState();
+            resetAll();
+        }
+        this.messageObject = Optional.empty();
+    }
+    /**
      * After the contract log is written it is assumed that the package is exchanged. Therefore, the states must switch
-     * vice versa.
+     * vice versa= and the ShippingLabel state must change as well.
      */
     public void changeDeviceState() {
         if (deviceState.equals(DeviceState.Transferor)) {
             deviceState = DeviceState.Transferee.isActive();
-        } else {
+            this.deliveryContract.resetContractState();
+        } else { // New transferor does not have to set the contract state. Already set in 'storeDeliveryContract' methode.
             deviceState = DeviceState.Transferor.isActive();
         }
     }
 
     /**
-     * Method to reset every list and current state.
+     * Method to reset every list and current state, but not the ShippingLabel state!!!
      */
     public void resetAll() {
         this.noSession = false;

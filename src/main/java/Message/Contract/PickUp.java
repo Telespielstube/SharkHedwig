@@ -20,11 +20,6 @@ public class PickUp extends AbstractContract {
         this.messageFlag = messageFlag;
     }
 
-    @Override
-    public PickUp getContent() {
-        return this;
-    }
-
     public byte[] getSignedTransitRecord() {
         return this.signedTransitEntry;
 

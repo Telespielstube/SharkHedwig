@@ -13,7 +13,7 @@ import java.util.stream.Stream;
  * their entry. The input is immutable that means it cannot be changed after confimration.
  * That is why there are no set methods in this class.
  */
-public class ShippingLabel implements IContractComponent {
+public class ShippingLabel implements IDeliveryContract {
 
     private UUID packageUUID;
     private String sender = null;
@@ -86,8 +86,13 @@ public class ShippingLabel implements IContractComponent {
     }
 
     @Override
-    public boolean isCreated() {
+    public boolean getIsCreated() {
         return this.isCreated;
+    }
+
+    @Override
+    public void setIsCreated(boolean isCreated) {
+        this.isCreated = isCreated;
     }
 
     // Getter methods to get the value of the Object field. No setters because the attriibute values where set
@@ -115,7 +120,6 @@ public class ShippingLabel implements IContractComponent {
     public String getDestination() {
         return this.destination;
     }
-
 
     public Location getPackageDestination() {
         return this.locationDest;
