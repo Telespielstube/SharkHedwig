@@ -22,8 +22,7 @@ public class ShippingLabelTest {
 
     @Test
     public void testIfCreateReturnsTrueWhenPassedUserDataObjectHasValues() {
-        boolean created = shippingLabel.create(userInputBuilder);
-        assertTrue(created);
+        assertTrue(shippingLabel.create(userInputBuilder));
         assertTrue(shippingLabel.getIsCreated());
     }
 

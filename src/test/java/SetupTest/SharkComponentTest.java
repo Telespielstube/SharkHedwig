@@ -1,4 +1,7 @@
+package SetupTest;
+
 import Session.Sessions.Identification;
+import Setup.Channel;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -18,6 +21,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class SharkComponentTest {
@@ -59,6 +64,13 @@ public class SharkComponentTest {
 
         // project "clean code" :) we only use interfaces - unfortunately casting is unavoidable
         return (SharkPKIComponent) component;
+    }
+
+
+    @Test
+    public void testIfChannelAdvertisementEqualsReceivedURI() {
+        String uri = "sn2://Advertisement";
+        assertEquals(uri, Channel.Advertisement.getChannelType());
     }
 
     @Test

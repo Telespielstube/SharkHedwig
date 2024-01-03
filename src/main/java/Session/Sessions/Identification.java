@@ -32,6 +32,7 @@ public class Identification extends AbstractSession {
     public Identification(SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.sharkPKIComponent = sharkPKIComponent;
         this.messageList = Collections.synchronizedSortedMap(new TreeMap<>());// A HashMap to store sent and Received Messages with their timestamps as key and the Message as value.
+        this.secureNumber = new byte[0];
     }
 
     @Override

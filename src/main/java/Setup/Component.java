@@ -29,18 +29,19 @@ public class Component implements IComponent, ASAPMessageReceivedListener {
     private ASAPPeer peer;
     private SharkPKIComponent sharkPKIComponent;
     private final MessageHandler messageHandler;
-    private final ISessionManager sessionManager;
+    private ISessionManager sessionManager;
     private DeviceState deviceState;
     private final SharkPeerFS sharkPeerFS;
     private UserInterface userInterface;
     private IUserObserver userObserver;
+    private ASAPMessages messages;
 
     public Component(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         ErrorLogger.redirectErrorStream(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant(), "errorLog.txt");
         this.sharkPeerFS = new SharkPeerFS(Constant.PeerName.getAppConstant(), Constant.PeerFolder.getAppConstant() + "/" + Constant.PeerName.getAppConstant() );
         this.sharkPKIComponent = pkiComponent;
         this.messageHandler = new MessageHandler();
-        this.sessionManager = new SessionManager(this.messageHandler, SessionState.NoSession, DeviceState.Transferee ,this.peer, this.sharkPKIComponent);
+
     }
 
     /**
@@ -91,6 +92,12 @@ public class Component implements IComponent, ASAPMessageReceivedListener {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
         }
         new PKIManager(sharkPKIComponent);
+        try {
+            this.sessionManager = new SessionManager(this.messageHandler, SessionState.NoSession, DeviceState.Transferee , this.peer, this.sharkPKIComponent);
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     /**

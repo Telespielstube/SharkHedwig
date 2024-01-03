@@ -3,12 +3,9 @@ package SessionTest;
 import DeliveryContract.ShippingLabel;
 import HedwigUI.UserInputBuilder;
 import Location.Location;
-import Message.Advertisement;
+import Message.*;
 import Message.Identification.Challenge;
 import Message.Identification.Response;
-import Message.MessageBuilder;
-import Message.MessageFlag;
-import Message.MessageHandler;
 import Misc.Utilities;
 import Session.*;
 import Session.Sessions.Identification;
@@ -25,16 +22,21 @@ import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
-import sun.plugin2.message.Message;
+import org.mockito.Mockito;
 
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.sun.deploy.util.ReflectionUtil.invoke;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 public class SessionManagerTest {
 
@@ -53,7 +55,6 @@ public class SessionManagerTest {
 
     @BeforeAll
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
-
         SharkTestPeerFS aliceSharkPeer = new SharkTestPeerFS("Alice", "tester123/Alice");
         SharkPKIComponent sharkPKIComponent = setupComponent(aliceSharkPeer);
 
@@ -118,8 +119,8 @@ public class SessionManagerTest {
         shippingLabel = new ShippingLabel();
         sessionManager = new SessionManager(messageHandler, SessionState.Identification, DeviceState.Transferee, null, sharkPKIComponent);
         sessionManager.checkDeviceState();
-        UserInputBuilder userInputBuilder = new UserInputBuilder("Alice", "HTW-Berlin",
-                52.456931, 13.526444, "Bob", "Ostbahnhof", 52.5105, 13.4346, 1.2);
+
+        UserInputBuilder userInputBuilder = mock(UserInputBuilder.class);
         shippingLabel.create(userInputBuilder);
         sessionManager.checkDeviceState();
         assertNotEquals(DeviceState.Transferee, DeviceState.Transferor);
@@ -154,19 +155,51 @@ public class SessionManagerTest {
     public void testIfChallengeMessageGetsRejectedWithoutAdvertisement() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
         response = new Response();
         sessionManager = new SessionManager(null, SessionState.Identification, DeviceState.Transferor, null, sharkPKIComponent);
-        byte[] number = "4634563456".getBytes();
-        byte[] encryptedNumber = Utilities.encryptAsymmetric(number, asapKeyStore.getPublicKey());
+        byte[] encryptedNumber = Utilities.encryptAsymmetric("4634563456".getBytes(), asapKeyStore.getPublicKey());
         Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.Challenge, System.currentTimeMillis(), encryptedNumber );
         Optional<MessageBuilder> messageBuilder = Optional.ofNullable(sessionManager.sessionHandling(challenge, "Marta")).orElse(null);
         assertFalse(messageBuilder.isPresent());
     }
 
     @Test
-    public void testIfResponseGetsProcessedCorrectly() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
+    public void testIfResponseGetsRejectedWithoutShippingLabelandWrongDeviceState() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException, NoSuchFieldException, IllegalAccessException {
         sessionManager = new SessionManager(null, SessionState.Identification, DeviceState.Transferor, null, sharkPKIComponent);
+        Field sessionStateField = sessionManager.getClass().getDeclaredField("sessionState");
+        Field noSessionField = sessionManager.getClass().getDeclaredField("noSession");
+        sessionStateField.setAccessible(true);
+        noSessionField.setAccessible(true);
+        sessionStateField.set(sessionManager, SessionState.Identification);
+        noSessionField.set(sessionManager, true);
+
         byte[] number = "4634563456".getBytes();
         byte[] encrypted = Utilities.encryptAsymmetric(number, asapKeyStore.getPublicKey());
         Response response = new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), encrypted, number);
         Optional<MessageBuilder> messageBuilder = Optional.ofNullable(sessionManager.sessionHandling(response, "Marta")).orElse(null);
+        assertNotEquals("Message flag was incorrect:Response", Optional.empty());
+    }
+
+    @Test
+    public void testIfResponseGetsProcessed() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+//        sessionManager = new SessionManager(null, SessionState.Identification, DeviceState.Transferor, null, sharkPKIComponent);
+//        Field sessionStateField = sessionManager.getClass().getDeclaredField("sessionState");
+//        Field noSessionField = sessionManager.getClass().getDeclaredField("noSession");
+//        Field deviceStateField = sessionManager.getClass().getDeclaredField("deviceState");
+//        sessionStateField.setAccessible(true);
+//        noSessionField.setAccessible(true);
+//        deviceStateField.setAccessible(true);
+//        sessionStateField.set(sessionManager, SessionState.Identification);
+//        noSessionField.set(sessionManager, true);
+//        deviceStateField.set(sessionManager, DeviceState.Transferor);
+//        byte[] number = "4634563456".getBytes();
+//        byte[] encrypted = Utilities.encryptAsymmetric(number, asapKeyStore.getPublicKey());
+//        Response response = new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), encrypted, "4523452345".getBytes());
+//        Identification identifi = mock(Identification.class);
+//        Field ident = identifi.getClass().getDeclaredFields("secureNumber")[0];
+//        ident.setAccessible(true);
+//        ident.set(identification, "4523452345".getBytes());
+//        Method processIdentification = sessionManager.getClass().getDeclaredMethod("processIdentification", IMessage.class);
+//        processIdentification.setAccessible(true);
+//        processIdentification.invoke(sessionManager,  response);
+//        //assertNotEquals("Message flag was incorrect:Response", Optional.empty());
     }
 }

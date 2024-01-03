@@ -1,30 +1,28 @@
 package SetupTest;
 
-import DeliveryContract.TransitEntry;
 import net.sharksystem.asap.ASAPChunk;
 import net.sharksystem.asap.ASAPException;
 import net.sharksystem.asap.ASAPMessages;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
-public class ASAPMessageList implements ASAPMessages {
+public class ASAPMessageListTest implements ASAPMessages {
 
-    private Vector<byte[]> entryList = null;
+    private List<byte[]> messageList;
 
-    public ASAPMessageList() {
-        this.entryList = new Vector<>();
+    public ASAPMessageListTest() {
+        this.messageList = new ArrayList<>();
     }
 
     public void addMessage(byte[] message) {
-        entryList.add(message);
+        this.messageList.add(message);
     }
     @Override
     public int size() throws IOException {
-        return entryList.size();
+        return 0;
     }
 
     @Override
@@ -44,9 +42,7 @@ public class ASAPMessageList implements ASAPMessages {
 
     @Override
     public Iterator<byte[]> getMessages() throws IOException {
-        return entryList.iterator();
-
-
+        return this.messageList.iterator();
     }
 
     @Override
