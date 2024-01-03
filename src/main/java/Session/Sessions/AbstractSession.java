@@ -12,7 +12,6 @@ import java.util.SortedMap;
 public abstract class AbstractSession implements ISession {
 
     protected SortedMap<Long, Object> messageList;
-    private final long timeOffset = 5000;
     private boolean sessionComplete = false;
 
     public abstract Optional<Object> transferor(IMessage message, String sender);
@@ -20,7 +19,8 @@ public abstract class AbstractSession implements ISession {
     public abstract Optional<Object> transferee(IMessage message, String sender);
 
     public boolean compareTimestamp(long timestamp) {
-        if (timestamp - this.messageList.lastKey() < this.timeOffset) {
+        long timeOffset = 5000;
+        if (timestamp - this.messageList.lastKey() < timeOffset) {
             return true;
         }
         return false;

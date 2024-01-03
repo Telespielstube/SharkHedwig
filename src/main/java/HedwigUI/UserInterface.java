@@ -1,6 +1,7 @@
 package HedwigUI;
 
 import java.text.DecimalFormat;
+import java.util.Observer;
 import java.util.Scanner;
 
 /**
