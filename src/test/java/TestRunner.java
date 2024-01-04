@@ -6,7 +6,7 @@ import org.junit.platform.suite.api.Suite;
  * This class runs all test cases automatically. No need to
  */
 @Suite
-@SelectPackages({"DeliveryContractTest", "HedwigUITest","LocationTest","MessageTest"})
+@SelectPackages({"DeliveryContractTest","LocationTest","MessageTest", "MiscTest", "SessionTest", "SetupTest"})
 public class TestRunner {}
 
 

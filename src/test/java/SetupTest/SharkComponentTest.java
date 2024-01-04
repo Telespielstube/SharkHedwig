@@ -8,6 +8,7 @@ import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeer;
 import net.sharksystem.SharkTestPeerFS;
 import net.sharksystem.asap.crypto.ASAPKeyStore;
+import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import org.junit.jupiter.api.AfterAll;

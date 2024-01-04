@@ -1,9 +1,5 @@
 package Setup;
 
-
-import DeliveryContract.ShippingLabel;
-import HedwigUI.*;
-
 import Misc.ErrorLogger;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkException;
@@ -14,9 +10,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import Misc.SessionLogger;
 import Message.*;
@@ -24,7 +18,7 @@ import Session.*;
 
 import javax.crypto.NoSuchPaddingException;
 
-public class Component implements IComponent, ASAPMessageReceivedListener {
+public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageReceivedListener {
 
     private ASAPPeer peer;
     private SharkPKIComponent sharkPKIComponent;
@@ -32,11 +26,9 @@ public class Component implements IComponent, ASAPMessageReceivedListener {
     private ISessionManager sessionManager;
     private DeviceState deviceState;
     private final SharkPeerFS sharkPeerFS;
-    private UserInterface userInterface;
-    private IUserObserver userObserver;
     private ASAPMessages messages;
 
-    public Component(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public SharkHedwigComponent(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         ErrorLogger.redirectErrorStream(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant(), "errorLog.txt");
         this.sharkPeerFS = new SharkPeerFS(Constant.PeerName.getAppConstant(), Constant.PeerFolder.getAppConstant() + "/" + Constant.PeerName.getAppConstant() );
         this.sharkPKIComponent = pkiComponent;
@@ -60,14 +52,10 @@ public class Component implements IComponent, ASAPMessageReceivedListener {
         ComponentFactory componentFactory = null;
         try {
             componentFactory = new ComponentFactory((SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class));
-            sharkPeerFS.addComponent(componentFactory, IComponent.class);
+            sharkPeerFS.addComponent(componentFactory, ISharkHedwigComponent.class);
             // SharkPKIComponent is an Interface therefore --> Conversion from an interface type to a class type requires an explicit cast to the class type.
             this.sharkPKIComponent = (SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class);
             this.sharkPeerFS.start();
-
-            // User interface observer pattern and thread.
-            this.userInterface.addUserObserver();
-            this.userInterface.run();
         } catch (SharkException e) {
             throw new RuntimeException(e);
         }

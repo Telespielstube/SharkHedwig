@@ -1,6 +1,5 @@
 package DeliveryContract;
 
-import HedwigUI.UserInputBuilder;
 import Location.Location;
 import Misc.Utilities;
 
@@ -55,7 +54,7 @@ public class ShippingLabel implements IDeliveryContract {
      * @param object    UserInputBuilder object sent from the user interface.
      */
 
-    public boolean create(UserInputBuilder object) {
+    public boolean create(IUserInput object) {
         if (verifyUserData(object)) {
             new ShippingLabel(Utilities.createUUID(), object.getSender(), object.getOrigin(), new Location(object.getLatitudeOrigin(),
                     object.getLongitudeOrigin()), object.getRecipient(), object.getDestination(), new Location(object.getLatitudeDest(),

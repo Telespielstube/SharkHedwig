@@ -5,25 +5,23 @@ import DeliveryContract.IDeliveryContract;
 import DeliveryContract.ShippingLabel;
 import Misc.LogEntry;
 import Misc.Utilities;
+import Session.Sessions.*;
 import Setup.Channel;
 import Setup.DeviceState;
 import Message.*;
-import Session.Sessions.*;
 import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.pki.SharkPKIComponent;
-
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
-import java.util.UUID;
 
 public class SessionManager implements ISessionManager {
 
     private SessionState sessionState;
     private DeviceState deviceState;
-    private Identification identification;
-    private Request request;
-    private Contract contract;
+    private AbstractSession identification;
+    private AbstractSession request;
+    private AbstractSession contract;
     private String sender;
     private Advertisement advertisement;
     private LogEntry logEntry;

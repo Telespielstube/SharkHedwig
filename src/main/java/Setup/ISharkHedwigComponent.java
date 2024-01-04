@@ -4,15 +4,13 @@ import net.sharksystem.ASAPFormats;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeerFS;
-import net.sharksystem.asap.ASAPHop;
 import net.sharksystem.asap.ASAPMessages;
 import net.sharksystem.asap.ASAPPeer;
 
 import java.io.IOException;
-import java.util.List;
 
 @ASAPFormats(formats = {"hedwig"})
-public interface IComponent extends SharkComponent {
+public interface ISharkHedwigComponent extends SharkComponent {
 
     /**
      * Setup process for the SkarkPKIComponent.

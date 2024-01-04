@@ -26,7 +26,7 @@ public class Contract extends AbstractSession {
     private DeliveryContract deliveryContract;
     private IDeliveryContract shippingLabel;
     private IDeliveryContract transitRecord;
-    private UserInputBuilder userInputBuilder;
+    private UserInput userInputBuilder;
     private IGeoSpatial geoSpatial;
     private Location location;
     private Confirm confirm;

@@ -16,7 +16,7 @@ public class ComponentFactory implements SharkComponentFactory {
     @Override
     public SharkComponent getComponent() {
         try {
-            return new Component(sharkPKIComponent);
+            return new SharkHedwigComponent(sharkPKIComponent);
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
