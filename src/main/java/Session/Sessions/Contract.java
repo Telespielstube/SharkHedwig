@@ -1,7 +1,7 @@
 package Session.Sessions;
 
 import DeliveryContract.*;
-import HedwigUI.UserInputBuilder;
+import HedwigUI.UserInput;
 import Location.Location;
 import Location.IGeoSpatial;
 import Message.Contract.*;

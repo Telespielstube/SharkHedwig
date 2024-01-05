@@ -1,7 +1,7 @@
 package SessionTest;
 
 import DeliveryContract.ShippingLabel;
-import HedwigUI.UserInputBuilder;
+import HedwigUI.UserInput;
 import Location.Location;
 import Message.*;
 import Message.Identification.Challenge;
@@ -11,6 +11,7 @@ import Session.*;
 import Session.Sessions.Identification;
 import Setup.Channel;
 import Setup.DeviceState;
+import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeer;
@@ -22,21 +23,15 @@ import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
-import org.mockito.Mockito;
-
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.Optional;
 import java.util.UUID;
-
-import static com.sun.deploy.util.ReflectionUtil.invoke;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 public class SessionManagerTest {
 
@@ -55,13 +50,10 @@ public class SessionManagerTest {
 
     @BeforeAll
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
-        SharkTestPeerFS aliceSharkPeer = new SharkTestPeerFS("Alice", "tester123/Alice");
-        SharkPKIComponent sharkPKIComponent = setupComponent(aliceSharkPeer);
-
-        aliceSharkPeer.start();
-
+        SharkTestPeerFS testSharkPeer = new SharkTestPeerFS(TestConstant.PeerName.getTestConstant(), TestConstant.PeerFolder.getTestConstant());
+        SharkPKIComponent sharkPKIComponent = setupComponent(testSharkPeer);
+        testSharkPeer.start();
         String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
-
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
@@ -119,9 +111,9 @@ public class SessionManagerTest {
         shippingLabel = new ShippingLabel();
         sessionManager = new SessionManager(messageHandler, SessionState.Identification, DeviceState.Transferee, null, sharkPKIComponent);
         sessionManager.checkDeviceState();
-
-        UserInputBuilder userInputBuilder = mock(UserInputBuilder.class);
-        shippingLabel.create(userInputBuilder);
+        UserInput userInput = new UserInput("Alice", "HTW-Berlin", 52.456931, 13.526444,
+                "Bob", "Ostbahnhof", 52.5105, 13.4346, 1.2);
+        shippingLabel.create(userInput);
         sessionManager.checkDeviceState();
         assertNotEquals(DeviceState.Transferee, DeviceState.Transferor);
     }

@@ -165,7 +165,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
                 }
                 encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.get().getMessage(), messageBuilder.get().getUri(), messageBuilder.get().getSender(), sharkPKIComponent);
                 try {
-                    this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), messageBuilder.get().getUri(), encryptedMessage);
+                    this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), Constant.Scheme.getAppConstant() + messageBuilder.get().getUri(), encryptedMessage);
                 } catch (ASAPException e) {
                     e.printStackTrace();
                     throw new RuntimeException(e);
