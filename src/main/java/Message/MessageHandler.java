@@ -27,6 +27,27 @@ public class MessageHandler implements IMessageHandler {
         return object;
     }
 
+    /**
+     * Verifies the decrypted message by splitting the message part in 2 byte[]. Because verification needs the
+     * signed message part and the unisgned message part to verify if the identity of the sender is corrent.
+     *
+     * @return    the verified byte[] message.
+     */
+    private byte[] verifySignedMessage(byte[] decryptedSignedMessage, String senderE2E, SharkPKIComponent sharkPKIComponent) {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(decryptedSignedMessage);
+        byte[] byteMessage;
+        byte[] signedMessage;
+        byte[] verifiedMessage;
+        try {
+            byteMessage = ASAPSerialization.readByteArray(inputStream);
+            signedMessage = ASAPSerialization.readByteArray(inputStream);
+            verifiedMessage = ASAPCryptoAlgorithms.verify(signedMessage, byteMessage, senderE2E, sharkPKIComponent.getASAPKeyStore()
+        } catch (ASAPException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        return verifiedMessage;
+    }
+
     public byte[] buildOutgoingMessage(Object object, String uri, String recipient, SharkPKIComponent sharkPKIComponent) {
         byte[] byteMessage = objectToByteArray(object);
         byte[] encryptedMessage = new byte[0];
@@ -40,6 +61,14 @@ public class MessageHandler implements IMessageHandler {
         return encryptedMessage;
     }
 
+    /**
+     * Composes a signature message package from the passed byte message and the byte message. The package consists of the
+     * signed message and the unsigned message.
+     *
+     * @param byteMessage    The message  object as byte[].
+     * @param sharkPKIComponent         PKIComponent to be able to sign the byte[] message.
+     * @return                          byte[] containing the signed and unsigned message.
+     */
     private byte[] composeSignedMessage(byte[] byteMessage, SharkPKIComponent sharkPKIComponent) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] signedMessagePackage;
@@ -53,20 +82,6 @@ public class MessageHandler implements IMessageHandler {
             throw new RuntimeException(e);
         }
         return signedMessagePackage;
-    }
-
-    private byte[] verifySignedMessage(byte[] decryptedSignedMessage, String senderE2E, SharkPKIComponent sharkPKIComponent) {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(decryptedSignedMessage);
-        byte[] byteMessage;
-        byte[] signedMessage[];
-        try {
-            byteMessage = ASAPSerialization.readByteArray(inputStream);
-            signedMessage = ASAPSerialization.readByteArray(inputStream);
-            ASAPCryptoAlgorithms.verify(signedMessage, byteMessage, senderE2E, sharkPKIComponent.getASAPKeyStore()
-        } catch (ASAPException | IOException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     public byte[] objectToByteArray(Object object) {
