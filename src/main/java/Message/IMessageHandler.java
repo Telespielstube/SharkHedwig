@@ -22,6 +22,17 @@ public interface IMessageHandler {
      */
     byte[] buildOutgoingMessage(Object object, String uri, String recipient, SharkPKIComponent sharkPKIComponent);
 
+    /**
+     * Composes a signature message package from the passed byte message and the byte message. The package consists of the
+     * signed message and the unsigned message.
+     *
+     * @param unencryptedByteMessage    The message  object as byte[].
+     * @param sharkPKIComponent         PKIComponent to be able to sign the byte[] message.
+     * @return                          byte[] containing the signed and unsigned message.
+     */
+    byte[] composeSignedMessage(byte[] unencryptedByteMessage, SharkPKIComponent sharkPKIComponent);
+
+
    // void sendMessage(APP_FORMAT, String uri.toString(), byte[] signedMessage);
     /**
      * Convert the passed message object to a byte array.
