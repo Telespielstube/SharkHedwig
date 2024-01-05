@@ -31,21 +31,22 @@ public class MessageHandler implements IMessageHandler {
      * Verifies the decrypted message by splitting the message part in 2 byte[]. Because verification needs the
      * signed message part and the unisgned message part to verify if the identity of the sender is corrent.
      *
-     * @return    the verified byte[] message.
+     * @return    the verified byte[] message .
      */
     private byte[] verifySignedMessage(byte[] decryptedSignedMessage, String senderE2E, SharkPKIComponent sharkPKIComponent) {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(decryptedSignedMessage);
         byte[] byteMessage;
         byte[] signedMessage;
-        byte[] verifiedMessage;
         try {
             byteMessage = ASAPSerialization.readByteArray(inputStream);
             signedMessage = ASAPSerialization.readByteArray(inputStream);
-            verifiedMessage = ASAPCryptoAlgorithms.verify(signedMessage, byteMessage, senderE2E, sharkPKIComponent.getASAPKeyStore()
+            if (ASAPCryptoAlgorithms.verify(signedMessage, byteMessage, senderE2E, sharkPKIComponent.getASAPKeyStore())) {
+                return byteMessage;
+            }
         } catch (ASAPException | IOException e) {
             throw new RuntimeException(e);
         }
-        return verifiedMessage;
+        return new byte[0];
     }
 
     public byte[] buildOutgoingMessage(Object object, String uri, String recipient, SharkPKIComponent sharkPKIComponent) {

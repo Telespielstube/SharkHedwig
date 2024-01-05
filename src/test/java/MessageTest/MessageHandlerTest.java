@@ -76,6 +76,7 @@ public class MessageHandlerTest {
 //    public void testIfByteMessageGetsParsedToMessageObject() throws ASAPSecurityException {
 //        Challenge challenge = new Challenge(UUID.randomUUID(), MessageFlag.Challenge, System.currentTimeMillis(), ASAPCryptoAlgorithms.sign("342532452345".getBytes(), sharkPKIComponent.getASAPKeyStore()));
 //        byte[] outgoingMessage = messageHandler.buildOutgoingMessage(challenge, MessageFlag.Challenge.toString(), francisID, sharkPKIComponent);
+//        System.out.println(outgoingMessage);
 //        Object object = messageHandler.parseMessage(outgoingMessage, francisID, sharkPKIComponent);
 //        assertEquals(object.getClass(), challenge.getClass());
 //    }
