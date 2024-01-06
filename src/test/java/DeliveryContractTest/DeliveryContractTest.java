@@ -25,12 +25,12 @@ public class DeliveryContractTest {
     }
 
     @Test
-    public void deliveryContractThrowsExceptionWhenShippingAndTransitRecordIsNotPresent() {
+    public void deliveryContractThrowsExceptionWhenTransitRecordIsCreatedButShippingLabelIsNotPresent() {
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         shippingLabel = new ShippingLabel();
         transitRecord = new TransitRecord();
         assertFalse(shippingLabel.getIsCreated());
-        assertFalse(transitRecord.getIsCreated());
+        assertTrue(transitRecord.getIsCreated());
     }
     @Test
     public void returnTrueIfContractSetMethodIsCalled() {

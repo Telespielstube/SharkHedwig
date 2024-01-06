@@ -2,7 +2,11 @@ package Misc;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 /**
@@ -20,9 +24,12 @@ public class ErrorLogger {
      *
      */
     public static void redirectErrorStream(String peerFolder, String logFolder, String errorLog) {
+        String path = peerFolder + "/" + logFolder + "/" + errorLog;
         try {
-            System.setErr(new PrintStream(new FileOutputStream("./" + peerFolder + "/" + logFolder + "/" + errorLog)));
-        } catch (FileNotFoundException e) {
+            Files.createDirectories(Paths.get(peerFolder + "/" + logFolder));
+            Files.createFile(Paths.get(path));
+            System.setErr(new PrintStream(new FileOutputStream(path)));
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

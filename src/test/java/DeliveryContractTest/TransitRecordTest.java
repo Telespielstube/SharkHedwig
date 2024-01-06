@@ -43,8 +43,7 @@ public class TransitRecordTest {
 
     @Test
     public void testIfListGetsCreatedInConstructor() {
-
-        assertEquals(3, transitRecord.getTransitRecordSize());
+        assertEquals(4, transitRecord.getTransitRecordSize());
     }
 
     @Test

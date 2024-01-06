@@ -23,13 +23,13 @@ public class IdentificationStateTest {
     @Test
     public void checkIfNextStateAfterNoStateIsIdentificationState() {
         SessionState state = SessionState.NoSession.nextState();
-        assertEquals(SessionState.Identification.nextState(), state);
+        assertEquals(SessionState.Identification, state);
     }
 
     @Test
-    public void checkIfNextStateAfterIdentificationIsHandoverState() {
+    public void checkIfNextStateAfterRequestIsContractState() {
         SessionState state = SessionState.Request.nextState();
-        assertEquals(SessionState.Contract.resetSessionState(), state);
+        assertEquals(SessionState.Contract, state);
     }
 
     @Test

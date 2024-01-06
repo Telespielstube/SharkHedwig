@@ -53,8 +53,8 @@ public class SessionLoggerTest {
     @AfterAll
     public static void clear() throws IOException {
         String logPath = PeerFolder.getTestConstant() + "/" + LogFolder.getTestConstant();
-        Files.deleteIfExists(Paths.get(String.format( logPath + "/" + RequestLog.getTestConstant())));
-        Files.deleteIfExists(Paths.get(String.format(logPath + "/" + ContractLog.getTestConstant())));
-        Files.delete(Paths.get(String.format(logPath)));
+        Files.delete(Paths.get(logPath + "/" + RequestLog.getTestConstant()));
+        Files.delete(Paths.get(logPath + "/" + ContractLog.getTestConstant()));
+     //   Files.delete(Paths.get(logPath));
     }
 }

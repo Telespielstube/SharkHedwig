@@ -11,10 +11,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ContractTest {
 
-    private TransitRecord transitRecord;
+    private static TransitRecord transitRecord;
 
     @BeforeAll
-    public void setup() {
+    public static void setup() {
         transitRecord = new TransitRecord();
         transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PeerName.name(), "Peter", new Location
                 (57.5654645, 77.345345), 56563456, null));
@@ -29,7 +29,8 @@ public class ContractTest {
         TransitEntry entry = transitRecord.getLastElement();
         assertNotNull(entry);
         assertEquals(4, entry.getSerialNumber());
-        assertNotEquals("Bob", entry.getTransferee());
+        System.out.println(entry.getTransferee());
+        assertEquals("Bob", entry.getTransferee());
     }
 
     @Test

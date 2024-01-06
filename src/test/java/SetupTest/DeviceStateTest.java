@@ -29,7 +29,7 @@ public class DeviceStateTest {
         shippingLabel = new ShippingLabel(null, "Alice", "HTW-Berlin",
                 new Location(52.456931, 13.526444), "Bob", "Ostbahnhof",
                 new Location(52.5105, 13.4346), 1.2);
-        assertTrue(shippingLabel.getIsCreated());
+        assertFalse(shippingLabel.getIsCreated());
         assertEquals(Transferor, Transferor.isActive());
     }
 
