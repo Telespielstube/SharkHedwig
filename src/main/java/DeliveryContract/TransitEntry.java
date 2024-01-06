@@ -1,21 +1,21 @@
 package DeliveryContract;
 
 import Location.Location;
+
+import java.io.Serializable;
+import java.util.Arrays;
 import java.util.UUID;
 
-public class TransitEntry {
+public class TransitEntry implements Serializable {
 
     private int serialNumber = 0;
     private UUID packageUUID;
     private String transferor;
     private String transferee;
-    private Location handoverLocation;
+    private Location pickUpLocation;
     private long timestamp;
-    private byte[] digitalSignature;
-
-    public TransitEntry(int serialNumber) {
-        this.serialNumber = serialNumber;
-    }
+    private byte[] signatureTransferee;
+    private byte[] signatureTransferor;
 
     /**
      * Constructor to write the transit record entry.
@@ -25,26 +25,19 @@ public class TransitEntry {
      * @param transferor             Sender of the package.
      * @param transferee             Recipient of the package.
      * @param timestamp              Timestamp of the package handover.
-     * @param digitalSignature       digitalSignature of the newly adeed entry.
+     * @param signatureTransferee    Transferee signature.
+     * @param signatureTransferor    Transferor signature.
      */
     public TransitEntry(int serialNumber, UUID packageUUID, String transferor, String transferee, Location handoverLocation,
-                        long timestamp, byte[] digitalSignature) {
+                        long timestamp, byte[] signatureTransferee, byte[] signatureTransferor) {
         this.serialNumber = serialNumber;
         this.packageUUID = packageUUID;
         this.transferor = transferor;
         this.transferee = transferee;
-        this.handoverLocation = handoverLocation;
+        this.pickUpLocation = handoverLocation;
         this.timestamp = timestamp;
-        this.digitalSignature = digitalSignature;
-    }
-
-    /**
-     * Just adds 1 tho the serialNumber.
-     *
-     * @return    serial number plus 1.
-     */
-    public int countUp() {
-        return this.serialNumber++;
+        this.signatureTransferee = signatureTransferee;
+        this.signatureTransferor = signatureTransferor;
     }
 
     /**
@@ -69,20 +62,36 @@ public class TransitEntry {
         return this.transferee;
     }
 
-    public Location getHandoverLocation() {
-        return this.handoverLocation;
+    public Location getPickUpLocation() {
+        return this.pickUpLocation;
     }
 
-    public void setDigitalSignature(byte[] digitalSignature) {
-        this.digitalSignature = digitalSignature;
+    public byte[] getSignatureTransferee() {
+        return this.signatureTransferee;
     }
+
+    public void setSignatureTransferee(byte[] signatureTransferee) {
+        this.signatureTransferee = signatureTransferee;
+    }
+
+    public byte[] getSignatureTransferor() {
+        return this.signatureTransferor;
+    }
+
+    public void setSignatureTransferor(byte[] signatureTransferor) {
+        this.signatureTransferor = signatureTransferor;
+    }
+
     /**
      * Writes all attributes of the Entry object as String representation.
      *
-     * @return    String object of  all class attributes.
+     * @return    String object of  all attributes.
      */
     public String toString() {
-        return String.format(this.serialNumber + " " + this.packageUUID + " " + this.transferor + " " + this.transferee
-                + " " + this.handoverLocation + " " + this.timestamp + " " + this.digitalSignature);
+        return String.format("S/N: " + this.serialNumber + "; PackageUUID: " + this.packageUUID + "; Transferor: " +
+                this.transferor + "; Transferee: " + this.transferee + "; Pick up Location: " +
+                this.pickUpLocation + "; Timestamp: " + this.timestamp + "; Signature Transferee: " +
+                Arrays.toString(this.signatureTransferee) + "; Signature Transferor: " +
+                Arrays.toString(this.signatureTransferor) + "\n");
     }
 }

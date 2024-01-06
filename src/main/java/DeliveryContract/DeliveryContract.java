@@ -73,4 +73,23 @@ public class DeliveryContract implements IDeliveryContract {
     public TransitRecord getTransitRecord() {
         return (TransitRecord) this.transitRecord.get();
     }
+
+    /**
+     * Writes all entries in the transit record list to a locally stored file.
+     * @param file    "./TransitRecordList.txt"
+     */
+//    public void writeRecordToFile(String file) {
+//        try (FileWriter fileWriter = new FileWriter(file)) {
+//            for (TransitEntry entry : this.entryList) {
+//                fileWriter.append(entry.toString());
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
+    public String toString() {
+        return "DeliveryContract\n-----------------\n\n" + "Shipping label\n--------------\n" + getShippingLabel().toString() +
+                "\n\n" + "Transit record\n--------------\n" + getTransitRecord().toString() + "\n";
+    }
 }

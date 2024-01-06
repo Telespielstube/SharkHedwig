@@ -4,6 +4,7 @@ import DeliveryContract.*;
 import Location.Location;
 import java.util.UUID;
 
+import SetupTest.TestConstant;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,10 +16,27 @@ public class DeliveryContractTest {
 
 
     @Test
-    public void deliveryContractIsCreatedWithoutAttributes() {
+    public void getShippingLabelAndTransitRecord() {
+        shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
+                new Location(80.67, 90.56), "Bob", "Ostbahnhof",
+                new Location(52.5105, 13.4346), 1.2);
+        transitRecord = new TransitRecord();
+        transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PeerName.name(), "Peter", new Location
+                (57.5654645, 77.345345), 56563456, null, null));
+        transitRecord.addEntry(new TransitEntry(2, null, TestConstant.PeerName.name(), "Peter", new Location
+                (55.5654645, 76.345345), 54863456, null, null));
+        transitRecord.addEntry(new TransitEntry(4, null, TestConstant.PeerName.name(), "Bob", new Location
+                (55.5654645, 76.345345), 54566456, null, null));
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
+        assertNotNull(deliveryContract.getShippingLabel());
+        assertNotNull(deliveryContract.getTransitRecord());
+    }
+
+    @Test
+    public void deliveryContractIsCreatedWithoutAttributes() {
         shippingLabel = new ShippingLabel();
         transitRecord = new TransitRecord();
+        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         assertNotNull(deliveryContract);
         assertFalse(deliveryContract.getContractSent());
         assertNotNull(transitRecord.getClass());
@@ -26,9 +44,9 @@ public class DeliveryContractTest {
 
     @Test
     public void deliveryContractThrowsExceptionWhenTransitRecordIsCreatedButShippingLabelIsNotPresent() {
-        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         shippingLabel = new ShippingLabel();
         transitRecord = new TransitRecord();
+        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         assertFalse(shippingLabel.getIsCreated());
         assertTrue(transitRecord.getIsCreated());
     }
@@ -52,7 +70,7 @@ public class DeliveryContractTest {
         shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",
                 new Location(52.5105, 13.4346), 1.2);
-        transitRecord.addEntry(new TransitEntry(2, null, "Alice", "Bobby", new Location(80.0,90.0), 45345345, null ));
+        transitRecord.addEntry(new TransitEntry(2, null, "Alice", "Bobby", new Location(80.0,90.0), 45345345, null, null ));
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         System.out.println(deliveryContract.getShippingLabel());
         assertNotNull(deliveryContract.getShippingLabel());
@@ -73,7 +91,7 @@ public class DeliveryContractTest {
 
     @Test
     public void testIfTransitRecordEntryIsReturnedAndNotNull() {
-        transitRecord.addEntry(new TransitEntry(2, null, "Alice", "Bobby", new Location(80.0,90.0), 45345345, null ));
+        transitRecord.addEntry(new TransitEntry(2, null, "Alice", "Bobby", new Location(80.0,90.0), 45345345, null, null ));
         System.out.println(transitRecord.toString());
         assertNotNull(transitRecord);
         assertEquals(1, transitRecord.getTransitRecordSize());
@@ -88,5 +106,21 @@ public class DeliveryContractTest {
         assertNotNull(shippingLabel.getUUID());
         assertEquals("Bob", shippingLabel.getRecipient());
         assertNotNull(shippingLabel);
+    }
+
+    @Test
+    public void printOutDeliveryContract() {
+        shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
+                new Location(80.67, 90.56), "Bob", "Ostbahnhof",
+                new Location(52.5105, 13.4346), 1.2);
+        transitRecord = new TransitRecord();
+        transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PeerName.name(), "Peter", new Location
+                (57.5654645, 77.345345), 56563456, null, null));
+        transitRecord.addEntry(new TransitEntry(2, null, TestConstant.PeerName.name(), "Peter", new Location
+                (55.5654645, 76.345345), 54863456, null, null));
+        transitRecord.addEntry(new TransitEntry(4, null, TestConstant.PeerName.name(), "Bob", new Location
+                (55.5654645, 76.345345), 54566456, null, null));
+        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
+        System.out.println(deliveryContract.toString());
     }
 }

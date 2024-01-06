@@ -17,20 +17,17 @@ public class GeoSpatial implements IGeoSpatial {
         return new Location();
     }
 
-    /**
-     * Sets the location for package handover.
-     *
-     * @param pickUp    Location object where the handover happens.
-     */
     public void setPickUpLocation(Location pickUp) {
         this.pickUp = pickUp;
     }
 
     /**
+     * Calculates the distance in kilometers from one point to another point.
      *
      * @param sender       Location object that holds the latitude and longitude coordinates of the origin.
      * @param recipient    Location object that holds the latitude and longitude coordinates of the destination.
-     * @return
+     *
+     * @return             Distance in kilometers.
      */
     @Override
     public double pointToPointDistance(Location sender, Location recipient) {
@@ -47,16 +44,6 @@ public class GeoSpatial implements IGeoSpatial {
      */
     @Override
     public double toDestination(Location sender, Location packageDestination) {
-        return 0;
-    }
-
-    /**
-     *
-     * @param sender
-     * @return
-     */
-    @Override
-    public double toDestination(Location sender) {
         return 0;
     }
 }

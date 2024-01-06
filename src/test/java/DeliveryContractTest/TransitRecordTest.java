@@ -1,8 +1,5 @@
 package DeliveryContractTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import DeliveryContract.TransitRecord;
 import DeliveryContract.TransitEntry;
 import Location.Location;
@@ -10,6 +7,11 @@ import SetupTest.TestConstant;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterAll;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TransitRecordTest {
 
@@ -19,11 +21,11 @@ public class TransitRecordTest {
     public static void setup() {
         transitRecord = new TransitRecord();
         transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PeerName.name(), "Peter", new Location
-                (57.5654645, 77.345345), 56563456, null));
+                (57.5654645, 77.345345), 56563456, null, null));
         transitRecord.addEntry(new TransitEntry(2, null, TestConstant.PeerName.name(), "Peter", new Location
-                (55.5654645, 76.345345), 54863456, null));
+                (55.5654645, 76.345345), 54863456, null, null));
         transitRecord.addEntry(new TransitEntry(4, null, TestConstant.PeerName.name(), "Bob", new Location
-                (55.5654645, 76.345345), 54566456, null));
+                (55.5654645, 76.345345), 54566456, null, null));
     }
 
     @Test
@@ -48,7 +50,7 @@ public class TransitRecordTest {
 
     @Test
     public void testThatAnTransitEntryObjectGetsAddedToList() {
-        transitRecord.addEntry(new TransitEntry(2, null, "Alice", "Bobby", new Location(80.0,90.0), 45345345, null ));
+        transitRecord.addEntry(new TransitEntry(2, null, "Alice", "Bobby", new Location(80.0,90.0), 45345345, null, null ));
         assertEquals("Bobby", transitRecord.getLastElement().getTransferee());
         assertEquals(2, transitRecord.getLastElement().getSerialNumber());
     }
@@ -57,6 +59,23 @@ public class TransitRecordTest {
     public void testIfAllEntriesGetReturned() {
         System.out.println(transitRecord.getAllEntries());
         assertNotNull(transitRecord.getAllEntries());
+    }
+
+    @Test
+    public void printAllTransitEntries() {
+        System.out.println(transitRecord.toString());
+            //    replace("[", "").replace("]", "").replace(",", ""));
+
+    }
+
+    @Test
+    public void createNewTransitRecordFromEntyList() {
+        System.out.println(transitRecord.getAllEntries());
+        transitRecord.getLastElement().setSignatureTransferee("12345".getBytes());
+        List<TransitEntry> list = transitRecord.getAllEntries();
+        TransitRecord record = new TransitRecord(list);
+        System.out.println(record.getAllEntries());
+        assertArrayEquals("12345".getBytes(), transitRecord.getLastElement().getSignatureTransferee());
     }
 
     @AfterAll

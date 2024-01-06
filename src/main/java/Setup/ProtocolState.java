@@ -7,20 +7,20 @@ package Setup;
  * the protocol hands over a carriage to a different device or destination.
  * This would change the state back to transferee.
  */
-public enum DeviceState {
+public enum ProtocolState {
     Transferor {
 
         @Override
-        public DeviceState isActive() {
+        public ProtocolState isActive() {
             return Transferor;
         }
     },
     Transferee {
         @Override
-        public DeviceState isActive() {
+        public ProtocolState isActive() {
             return Transferee;
         }
     };
 
-    public abstract DeviceState isActive();
+    public abstract ProtocolState isActive();
 }

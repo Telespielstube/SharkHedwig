@@ -32,10 +32,10 @@ public interface ISession {
      * @param timestamp    timestamp of received message.
      * @return             True if difference is less than offset. False if it is greater than.
      */
-    boolean compareTimestamp(long timestamp);
+    boolean compareTimestamp(long timestamp, int timeOffset);
 
     /**
-     * Gets the last value from message TreeMap.
+     * Gets the last value from the message TreeMap, which is a (K,V) map.
      *
      * @return               Last object from TreeMap.
      */

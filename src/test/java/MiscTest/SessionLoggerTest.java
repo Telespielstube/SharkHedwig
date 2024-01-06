@@ -3,16 +3,16 @@ package MiscTest;
 import Message.Contract.AckMessage;
 import Message.MessageFlag;
 import Misc.*;
+import Session.LogEntry;
+import Session.Logger;
 import SetupTest.TestConstant;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static SetupTest.TestConstant.*;
@@ -24,7 +24,7 @@ public class SessionLoggerTest {
     @BeforeAll
     public static void testIfDirectoryAndFileAreCreated() {
         try {
-            SessionLogger.createLogDirectory(PeerFolder.getTestConstant(), LogFolder.getTestConstant());
+            Logger.createLogDirectory(PeerFolder.getTestConstant(), LogFolder.getTestConstant());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -32,20 +32,20 @@ public class SessionLoggerTest {
 
     @Test
     public void testIfAckMessageGetsSavedInRequestFile() throws IOException {
-        SessionLogger.createLogFile(PeerFolder.getTestConstant(), LogFolder.getTestConstant(), TestConstant.RequestLog.getTestConstant());
+        Logger.createLogFile(PeerFolder.getTestConstant(), LogFolder.getTestConstant(), TestConstant.RequestLog.getTestConstant());
         AckMessage ackMessage = new AckMessage(Utilities.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true);
-        LogEntry logEntry = new LogEntry(ackMessage.getUuid(), ackMessage.getTimestamp(), ackMessage.getIsAck(), PeerName.getTestConstant(), "Bobby");
-        boolean written = SessionLogger.writeEntry(logEntry.toString(), RequestLogPath.getTestConstant());
+        LogEntry logEntry = new LogEntry(ackMessage.getUuid(), Utilities.createReadableTimestamp(), ackMessage.getIsAck(), PeerName.getTestConstant(), "Bobby");
+        boolean written = Logger.writeEntry(logEntry.toString(), RequestLogPath.getTestConstant());
         System.out.println(written + ": " + logEntry);
         assertTrue(written);
     }
 
     @Test
     public void testIfAckMessageGetsSavedInContractFile() throws IOException {
-        SessionLogger.createLogFile(PeerFolder.getTestConstant(), LogFolder.getTestConstant(), ContractLog.getTestConstant());
+        Logger.createLogFile(PeerFolder.getTestConstant(), LogFolder.getTestConstant(), ContractLog.getTestConstant());
         AckMessage ackMessage = new AckMessage(Utilities.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true);
-        LogEntry logEntry = new LogEntry(ackMessage.getUuid(), ackMessage.getTimestamp(), ackMessage.getIsAck(), PeerName.getTestConstant(), "Bobby");
-        boolean written = SessionLogger.writeEntry(logEntry.toString(), ContractLogPath.getTestConstant());
+        LogEntry logEntry = new LogEntry(ackMessage.getUuid(), Utilities.createReadableTimestamp(), ackMessage.getIsAck(), PeerName.getTestConstant(), "Bobby");
+        boolean written = Logger.writeEntry(logEntry.toString(), ContractLogPath.getTestConstant());
         System.out.println(written + ": " + logEntry);
         assertTrue(written);
     }

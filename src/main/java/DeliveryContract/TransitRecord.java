@@ -13,6 +13,7 @@ public class TransitRecord implements IDeliveryContract, Serializable {
     private TransitEntry transitEntry;
     private List<TransitEntry> entryList = null;
     private boolean isCreated = false;
+    private int serialNumber = 0;
 
     /**
      * The TransitRecord object is a dynamic vector where TransitEntry objects are added.
@@ -24,22 +25,22 @@ public class TransitRecord implements IDeliveryContract, Serializable {
     }
 
     /**
-     * Contructor expects a TransitEntry object.
-     *
-     * @param transitEntry    TransitEntry object.
-     */
-    public TransitRecord(TransitEntry transitEntry) {
-        this.transitEntry = transitEntry;
-    }
-
-    /**
-     * Adds Vector entries to a newly instantiated TransitRecord object.
+     * Adds entries to a newly instantiated TransitRecord object.
      * Only called by transferees.
      *
      * @param entries    All previous handover entries of the package.
      */
     public TransitRecord(List<TransitEntry> entries) {
         this.entryList = entries;
+    }
+
+    /**
+     * Just adds 1 tho the serialNumber.
+     *
+     * @return    serial number plus 1.
+     */
+    public int countUp() {
+        return this.serialNumber++;
     }
 
     @Override
@@ -84,23 +85,13 @@ public class TransitRecord implements IDeliveryContract, Serializable {
     /**
      * The size of the current transit record list.
      *
-     * @return    integer which represents the entries in the vecotr.
+     * @return    integer which represents the entries in the list.
      */
     public int getTransitRecordSize() {
         return this.entryList.size();
     }
 
-    /**
-     * Writes all entries in the transit record list to a locally stored file.
-     * @param file    "./TransitRecordList.txt"
-     */
-    public void writeRecordToFile(String file) {
-        try (FileWriter fileWriter = new FileWriter(file)) {
-            for (TransitEntry entry : this.entryList) {
-                fileWriter.append(entry.toString());
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public String toString() {
+        return this.entryList.toString().replace("[","").replace("]","").replace(", ", "");
     }
 }

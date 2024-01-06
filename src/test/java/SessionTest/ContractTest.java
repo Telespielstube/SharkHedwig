@@ -17,11 +17,11 @@ public class ContractTest {
     public static void setup() {
         transitRecord = new TransitRecord();
         transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PeerName.name(), "Peter", new Location
-                (57.5654645, 77.345345), 56563456, null));
+                (57.5654645, 77.345345), 56563456, null, null));
         transitRecord.addEntry(new TransitEntry(2, null, TestConstant.PeerName.name(), "Peter", new Location
-                (55.5654645, 76.345345), 54863456, null));
+                (55.5654645, 76.345345), 54863456, null, null));
         transitRecord.addEntry(new TransitEntry(4, null, TestConstant.PeerName.name(), "Bob", new Location
-                (55.5654645, 76.345345), 54566456, null));
+                (55.5654645, 76.345345), 54566456, null, null));
     }
 
     @Test

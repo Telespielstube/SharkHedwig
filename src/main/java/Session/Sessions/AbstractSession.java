@@ -13,13 +13,13 @@ public abstract class AbstractSession implements ISession {
 
     protected SortedMap<Long, Object> messageList;
     private boolean sessionComplete = false;
+    protected int timeOffset;
 
     public abstract Optional<Object> transferor(IMessage message, String sender);
 
     public abstract Optional<Object> transferee(IMessage message, String sender);
 
-    public boolean compareTimestamp(long timestamp) {
-        long timeOffset = 5000;
+    public boolean compareTimestamp(long timestamp, int timeOffset) {
         if (timestamp - this.messageList.lastKey() < timeOffset) {
             return true;
         }

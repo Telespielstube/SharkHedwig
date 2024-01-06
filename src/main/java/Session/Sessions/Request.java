@@ -5,10 +5,8 @@ import DeliveryContract.ShippingLabel;
 import Message.IMessage;
 import Message.MessageFlag;
 import Message.Request.*;
-import Battery.Battery;
-import Location.GeoSpatial;
-import Misc.LogEntry;
-import Misc.SessionLogger;
+import Session.LogEntry;
+import Session.Logger;
 import Misc.Utilities;
 import Setup.Constant;
 
@@ -21,20 +19,16 @@ public class Request extends AbstractSession {
     private Offer offer;
     private OfferReply offerReply;
     private Confirm confirm;
-    private Battery battery;
-    private GeoSpatial geoCalculation;
     private DeliveryContract deliveryContract;
     private AckMessage ackMessage;
 
     public Request() {
-        this.battery = new Battery();
-        this.geoCalculation = new GeoSpatial();
         this.messageList = Collections.synchronizedSortedMap(new TreeMap<>());
     }
 
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
-        Optional<AbstractRequest> messageObject = null;
+        Optional<AbstractRequest> messageObject = Optional.empty();
         LogEntry logEntry;
         switch(message.getMessageFlag()) {
             case Offer:
@@ -42,13 +36,14 @@ public class Request extends AbstractSession {
                 break;
             case Confirm:
                 messageObject = Optional.ofNullable(handleConfirm((Confirm) message).orElse(null));
-                logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(), false, Constant.PeerName.getAppConstant(), sender);
-                SessionLogger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
+                break;
             case Ready:
-                //If the isAck flag is set to 'true' in the Ready message. The transferor sets the concluded flag from 'false' to 'true'.
+                //If the isAck flag is set to 'true' in the Ready message. The transferor sets the concluded flag from 'false' to 'true' and saves the session
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
-                logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(), true, Constant.PeerName.getAppConstant(), sender);
-                SessionLogger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
+                if (messageObject.isPresent()) {
+                    logEntry = new LogEntry(messageObject.get().getUuid(), Utilities.createReadableTimestamp(), true, Constant.PeerName.getAppConstant(), sender);
+                    Logger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
+                }
                 break;
             default:
                 System.err.println("Missing message flag.");
@@ -59,9 +54,9 @@ public class Request extends AbstractSession {
         } else {
             addMessageToList(messageObject.get());
 
-            SessionLogger.writeEntry(null, Constant.RequestLogPath.getAppConstant());
+            Logger.writeEntry(null, Constant.RequestLogPath.getAppConstant());
         }
-        return Optional.ofNullable(messageObject);
+        return Optional.of(messageObject);
     }
 
     @Override
@@ -77,8 +72,9 @@ public class Request extends AbstractSession {
                 break;
             case Ack:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
-                LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), messageObject.get().getTimestamp(), true, Constant.PeerName.getAppConstant(), sender);
-                SessionLogger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
+                LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), Utilities.createReadableTimestamp(),
+                        true, Constant.PeerName.getAppConstant(), sender);
+                Logger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
                 break;
             default:
                 clearMessageList();
@@ -89,16 +85,17 @@ public class Request extends AbstractSession {
         } else {
             addMessageToList(messageObject.get());
         }
-        return Optional.ofNullable(messageObject);
+        return Optional.of(messageObject);
     }
 
     /**
-     * Processes the data
-     * @param message
-     * @return
+     * Processes the Offer data received from the Transferee.
+     *
+     * @param message    Offer message object.
+     * @return           OfferReply object, or and enpty object if data were not verified.
      */
     private Optional<OfferReply> handleOffer(Offer message) {
-       ShippingLabel shippingData = this.deliveryContract.getShippingLabel();
+        ShippingLabel shippingData = this.deliveryContract.getShippingLabel();
        if (processOfferData(shippingData, message)) {
            return Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OfferReply, Utilities.createTimestamp(), shippingData.getPackageWeight(), shippingData.getPackageDestination()));
        }
@@ -114,8 +111,7 @@ public class Request extends AbstractSession {
      * @return           Optional.empty if the calculation did not get verified, or Corfim message if data got verified.
      */
     private Optional<Confirm> handleOfferReply(OfferReply message) {
-
-        if (compareTimestamp(message.getTimestamp())) {
+        if (compareTimestamp(message.getTimestamp(), timeOffset) && processOfferReplyData(message)) {
             return Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.Confirm, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
@@ -130,7 +126,7 @@ public class Request extends AbstractSession {
      */
     private Optional<Confirm> handleConfirm(Confirm message) {
         Object object = getLastValueFromList();
-        if (compareTimestamp(message.getTimestamp()) && message.getConfirmed() && (!(object instanceof Confirm))) {
+        if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getConfirmed() && (!(object instanceof Confirm))) {
             return Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.Confirm, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
@@ -141,8 +137,8 @@ public class Request extends AbstractSession {
      *
      * @return    True if message check was valid. False if not
      */
-    public Optional<AckMessage> handleAckMessage(AckMessage ackMessage)  {
-        boolean isFirstAck = compareTimestamp(ackMessage.getTimestamp()) && ackMessage.getIsAck() && ackMessage.getMessageFlag().equals(MessageFlag.Ack);
+    private Optional<AckMessage> handleAckMessage(AckMessage ackMessage)  {
+        boolean isFirstAck = compareTimestamp(ackMessage.getTimestamp(), timeOffset) && ackMessage.getIsAck() && ackMessage.getMessageFlag().equals(MessageFlag.Ack);
         if (isFirstAck) {
             return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.Ready, Utilities.createTimestamp(), true));
         }
@@ -150,12 +146,24 @@ public class Request extends AbstractSession {
     }
 
     /**
-     * This method processes the received offer data and calculates from the crucial data set if the
+     * Processes the received OfferReply attributes. This serves as a double check of the necessary delivery data.
+     *
+     * @param message    OfferReply message object
+     * @return           True if the transferee is able to deliver, false if not.
+     */
+    private boolean processOfferReplyData(OfferReply message) {
+        return true;
+    }
+
+    /**
+     * This method processes the received offer data and calculates the crucial data set if the
      * delivery service is possible. This need to be done!!!
      *
      * @return    True if all data is valid and package can be delivered to destination.
      */
-    private boolean processOfferData(ShippingLabel shippingLabel, Offer message) {
+    private boolean processOfferData(ShippingLabel label, Offer message) {
+
+        // This need to be done when the battery and location component is implemented.
         return true;
     }
 }

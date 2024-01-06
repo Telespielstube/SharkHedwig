@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import Misc.SessionLogger;
+import Session.Logger;
 import Message.*;
 import Session.*;
 
@@ -24,7 +24,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
     private SharkPKIComponent sharkPKIComponent;
     private final MessageHandler messageHandler;
     private ISessionManager sessionManager;
-    private DeviceState deviceState;
+    private ProtocolState protocolState;
     private final SharkPeerFS sharkPeerFS;
     private ASAPMessages messages;
 
@@ -81,7 +81,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
         }
         new PKIManager(sharkPKIComponent);
         try {
-            this.sessionManager = new SessionManager(this.messageHandler, SessionState.NoSession, DeviceState.Transferee , this.peer, this.sharkPKIComponent);
+            this.sessionManager = new SessionManager(this.messageHandler, SessionState.NoSession, ProtocolState.Transferee , this.peer, this.sharkPKIComponent);
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -106,11 +106,11 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
      * Setting up all things logging. The folder and the files to differentiate between request session and contract session.
      */
     public void setupLogger() {
-        String[] files = { Constant.RequestLog.getAppConstant(), Constant.ContractLog.getAppConstant() };
+        String[] directories = { Constant.RequestLog.getAppConstant(), Constant.ContractLog.getAppConstant(), Constant.DeliveryContract.getAppConstant() };
         try {
-            SessionLogger.createLogDirectory(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant());
-            for (String logFile : files) {
-                SessionLogger.createLogFile(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant(), logFile);
+
+            for (String directory : directories) {
+                Logger.createLogDirectory(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant(), directory);
             }
         } catch (IOException e) {
             throw new RuntimeException("Could not create logger files for request and contract sessions: " + e);
@@ -118,7 +118,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
     }
 
     /**
-     * If an encounter occurs all messages are being exchanged.
+     * If an encounter occurs all messages are being exchanged and this method is called to process them.
      *
      * @param messages               a chunk of messages from the encountered device.
      * @param senderE2E              The encountered device.
@@ -127,25 +127,21 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
      *
      */
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) throws IOException {
-
         CharSequence uri = messages.getURI();
-        while (uri != null) {
-            if ( uri.equals(Channel.Advertisement.getChannelType()) ) {
-                processMessages(messages, senderE2E);
-            } else if ( (uri.equals(Channel.Identification.getChannelType()))) {
-                processMessages(messages, senderE2E);
-            } else if (uri.equals(Channel.Request.toString()))  {
-                processMessages(messages, senderE2E);
-            } else if (uri.equals(Channel.Contract.toString()))  {
-                processMessages(messages, senderE2E);
-            }
-            System.err.println("Message has invalid format: ");
+        if ( uri.equals(Channel.Advertisement.getChannelType()) ) {
+            processMessages(messages, senderE2E);
+        } else if ( (uri.equals(Channel.Identification.getChannelType()))) {
+            processMessages(messages, senderE2E);
+        } else if (uri.equals(Channel.Request.toString()))  {
+            processMessages(messages, senderE2E);
+        } else if (uri.equals(Channel.Contract.toString()))  {
+            processMessages(messages, senderE2E);
         }
-        System.err.println("Received message has no uri!");
-        }
+        System.err.println("Message has invalid format: ");
+    }
 
     /**
-     * The methode parses the byte[] message to a Message object and passes it to the SEssionManager class.
+ * The methode parses the byte[] message to a Message object and passes it to the SEssionManager class.
      *
      * @param messages    received message as byte[] data type..
      * @param senderE2E   The device which sent the received message.
@@ -157,7 +153,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
         byte[] encryptedMessage;
         try {
             for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
-              //  message = (IMessage) this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
+                message = (IMessage) this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
                 message = (IMessage) messageHandler.byteArrayToObject(it.next());
                 Optional<MessageBuilder> messageBuilder = Optional.ofNullable(sessionManager.sessionHandling(message, senderE2E).get());
                 if (!messageBuilder.isPresent()) {

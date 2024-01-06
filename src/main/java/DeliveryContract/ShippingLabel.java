@@ -1,6 +1,6 @@
 package DeliveryContract;
 
-import HedwigUI.UserInput;
+import HedwigUI.UserInputObject;
 import Location.Location;
 import Misc.Utilities;
 
@@ -55,7 +55,7 @@ public class ShippingLabel implements IDeliveryContract {
      * @param object    UserInputBuilder object sent from the user interface.
      */
 
-    public boolean create(UserInput object) {
+    public boolean create(UserInputObject object) {
         if (verifyUserData(object)) {
             new ShippingLabel(Utilities.createUUID(), object.getSender(), object.getOrigin(), new Location(object.getLatitudeOrigin(),
                     object.getLongitudeOrigin()), object.getRecipient(), object.getDestination(), new Location(object.getLatitudeDest(),
@@ -73,7 +73,7 @@ public class ShippingLabel implements IDeliveryContract {
      *
      * @param userInput    UserInputBuilder oject this one needs to be checked before the label gets created.
      */
-    public boolean verifyUserData(UserInput userInput) {
+    public boolean verifyUserData(UserInputObject userInput) {
         return Stream.of(userInput.getSender(), userInput.getOrigin(), userInput.getLatitudeOrigin(), userInput.getLongitudeOrigin(),
                 userInput.getRecipient(), userInput.getDestination(), userInput.getLatitudeDest(), userInput.getLongitudeDest(),
                 userInput.getPackageWeight())
@@ -136,7 +136,8 @@ public class ShippingLabel implements IDeliveryContract {
      */
     @Override
     public String toString() {
-        return String.format(this.packageUUID + this.sender + this.origin + this.locationOrigin + this.recipient +
-                this.destination + this.locationDest + this.packageWeight);
+        return String.format("PackageUUID: " + this.packageUUID + "; Sender: " + this.sender + "; Origin: " + this.origin +
+                "; Origin coordinates: " + this.locationOrigin + "; Recipient: " + this.recipient + "; Destination: " +
+                this.destination + "; Destination coordinates: " + this.locationDest + "; Package weight: " + this.packageWeight);
     }
 }

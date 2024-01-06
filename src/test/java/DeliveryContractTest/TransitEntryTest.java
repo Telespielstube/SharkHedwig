@@ -23,12 +23,6 @@ public class TransitEntryTest {
 
     @BeforeAll
     public static void setup() {
-        transitEntry = new TransitEntry(2, null, "Alice", "Bob", new Location(80.0,90.0), 45345345, null );
+        transitEntry = new TransitEntry(2, null, "Alice", "Bob", new Location(80.0,90.0), 45345345, null, null );
     }
-
-//    @Test
-//    public void testIfSerialNumberGetCountUpByOne() {
-//        System.out.println(transitEntry.getSerialNumber());
-//        assertEquals(3, transitEntry.getSerialNumber());
-//    }
 }

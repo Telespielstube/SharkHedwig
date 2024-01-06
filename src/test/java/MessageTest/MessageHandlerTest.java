@@ -19,12 +19,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MessageHandlerTest {
 
@@ -70,6 +71,27 @@ public class MessageHandlerTest {
         assertNotEquals(Arrays.toString(outgoingMessage), challenge.toString());
     }
 
+    @Test
+    public void testIfMessageGetsSigned() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        byte[] byteMessage = MessageHandler.objectToByteArray(challenge);
+        Method composeSignature = messageHandler.getClass().getDeclaredMethod("composeSignedMessage", byte[].class, SharkPKIComponent.class);
+        composeSignature.setAccessible(true);
+        byte[] signedMessage = (byte[]) composeSignature.invoke(messageHandler, byteMessage, sharkPKIComponent);
+        System.out.println(Arrays.toString(signedMessage));
+        assertNotNull(signedMessage);
+    }
+
+    @Test
+    public void verifySignedMessage() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        byte[] byteMessage = MessageHandler.objectToByteArray(challenge);
+        Method composeSignature = messageHandler.getClass().getDeclaredMethod("composeSignedMessage", byte[].class, SharkPKIComponent.class);
+        composeSignature.setAccessible(true);
+        byte[] signedMessage = (byte[]) composeSignature.invoke(messageHandler, byteMessage, sharkPKIComponent);
+        Method verifyMessage = messageHandler.getClass().getDeclaredMethod("verifySignedMessage", byte[].class, String.class, SharkPKIComponent.class);
+        verifyMessage.setAccessible(true);
+        byte[] verified = (byte[]) verifyMessage.invoke(messageHandler, signedMessage, francisID, sharkPKIComponent);
+        assertNotNull(verified);
+    }
 
     // There is something wrong decrypting a incoming message!!
 //    @Test
@@ -83,8 +105,8 @@ public class MessageHandlerTest {
 
     @Test
     public void testIfObjectGetsConvertedToByteArrayAndBackToObject() {
-        byte[] byteMessage = messageHandler.objectToByteArray(challenge);
-        Object object = messageHandler.byteArrayToObject(byteMessage);
+        byte[] byteMessage = MessageHandler.objectToByteArray(challenge);
+        Object object = MessageHandler.byteArrayToObject(byteMessage);
         assertEquals(object.getClass(), challenge.getClass());
     }
 }

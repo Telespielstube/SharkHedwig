@@ -85,7 +85,7 @@ public class MessageHandler implements IMessageHandler {
         return signedMessagePackage;
     }
 
-    public byte[] objectToByteArray(Object object) {
+    public static byte[] objectToByteArray(Object object) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             ObjectOutputStream oos = new ObjectOutputStream(outputStream);
@@ -96,7 +96,7 @@ public class MessageHandler implements IMessageHandler {
         return outputStream.toByteArray();
     }
 
-    public Object byteArrayToObject(byte[] message) {
+    public static Object byteArrayToObject(byte[] message) {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(message);
         ObjectInputStream input;
         try {

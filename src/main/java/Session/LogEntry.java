@@ -1,4 +1,4 @@
-package Misc;
+package Session;
 
 import java.io.Serializable;
 import Location.Location;
@@ -7,7 +7,7 @@ import java.util.UUID;
 public class LogEntry implements Serializable {
 
     private UUID packageUUID;
-    private long timestamp;
+    private String timestamp;
     private Location handover;
     private boolean concluded;
     private String transferor;
@@ -20,10 +20,10 @@ public class LogEntry implements Serializable {
      * @param packageUUID     Universally Unique Identifier for the package.
      * @param timestamp       current timestamp
      * @param transferor      Package holder.
-     * @param transferee
+     * @param transferee      Peer with no carriage.
      * @param concluded       set if the request session was successful.
      */
-    public LogEntry(UUID packageUUID, long timestamp, boolean concluded, String transferor, String transferee) {
+    public LogEntry(UUID packageUUID, String timestamp, boolean concluded, String transferor, String transferee) {
         this.packageUUID = packageUUID;
         this.timestamp = timestamp;
         this.concluded = concluded;
@@ -37,10 +37,10 @@ public class LogEntry implements Serializable {
      * @param timestamp       current timestamp.
      * @param handover        Location where the handover takes place.
      * @param transferor      Package holder.
-     * @param transferee
+     * @param transferee      Peer with no carriage.
 
      */
-    public LogEntry(UUID packageUUID, long timestamp, Location handover, boolean concluded, String transferor, String transferee) {
+    public LogEntry(UUID packageUUID, String timestamp, Location handover, boolean concluded, String transferor, String transferee) {
         this.packageUUID = packageUUID;
         this.timestamp = timestamp;
         this.concluded = concluded;

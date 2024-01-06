@@ -3,14 +3,14 @@ package SetupTest;
 import DeliveryContract.*;
 import Location.Location;
 import Session.SessionManager;
-import Setup.DeviceState;
+import Setup.ProtocolState;
 import org.junit.jupiter.api.Test;
 
-import static Setup.DeviceState.Transferee;
-import static Setup.DeviceState.Transferor;
+import static Setup.ProtocolState.Transferee;
+import static Setup.ProtocolState.Transferor;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DeviceStateTest {
+public class ProtocolStateTest {
 
     private final SessionManager sessionManager = new SessionManager();
     private ShippingLabel shippingLabel;
@@ -21,7 +21,7 @@ public class DeviceStateTest {
                 null, null, 0.0);
 
         assertFalse(shippingLabel.getIsCreated());
-        assertEquals(Transferee, DeviceState.Transferee.isActive());
+        assertEquals(Transferee, ProtocolState.Transferee.isActive());
     }
 
     @Test
@@ -35,34 +35,34 @@ public class DeviceStateTest {
 
     @Test
     public void testIfTheSwitchBetweenDeviceStatesInTheSessionManagerIsWorking() {
-        DeviceState state = Transferor;
+        ProtocolState state = Transferor;
         assertEquals(Transferor, state);
     }
 
 
     @Test
     public void checkIfCurrentStateIsTransferor() {
-        DeviceState state = DeviceState.Transferor.isActive();
+        ProtocolState state = ProtocolState.Transferor.isActive();
 
         assertEquals(Transferor, state);
     }
 
     @Test
     public void assertANotEqualResultIfTransferorAndTransfereeStatesAreSetToTrue() {
-        DeviceState state = Transferee.isActive();
+        ProtocolState state = Transferee.isActive();
 
         assertEquals(Transferee, state);
     }
 
     @Test
     public void returnEqualsIfTransferorStateIsInActiveAndTransfereeIsActive() {
-        DeviceState state = Transferor;
+        ProtocolState state = Transferor;
         assertNotEquals(Transferee, state);
     }
 
     @Test
     public void returnEqualsIfTransferorStateIsActiveAndTransfereeIsInactive() {
-        DeviceState state = Transferee;
+        ProtocolState state = Transferee;
         assertNotEquals(Transferor, state);
     }
 }

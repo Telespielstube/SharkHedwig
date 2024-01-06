@@ -17,7 +17,7 @@ import net.sharksystem.pki.SharkPKIComponent;
 
 public class Identification extends AbstractSession {
 
-    private SharkPKIComponent sharkPKIComponent;
+    private final SharkPKIComponent sharkPKIComponent;
     private Challenge challenge;
     private Response response;
     private AckMessage ackMessage;
@@ -87,7 +87,7 @@ public class Identification extends AbstractSession {
         } else {
             addMessageToList(messageObject.get());
         }
-        return Optional.ofNullable(messageObject);
+        return Optional.of(messageObject);
     }
 
     /**
@@ -117,7 +117,7 @@ public class Identification extends AbstractSession {
      * @return            Response object.
      */
     private Optional<Response> handleResponse(Response response) {
-        if ( compareTimestamp(response.getTimestamp()) && compareDecryptedNumber(response.getDecryptedNumber()) ) {
+        if ( compareTimestamp(response.getTimestamp(), timeOffset) && compareDecryptedNumber(response.getDecryptedNumber()) ) {
             try {
                 byte[] decryptedNumber = ASAPCryptoAlgorithms.decryptAsymmetric(response.getEncryptedNumber(), this.sharkPKIComponent.getASAPKeyStore());
                 return Optional.of(new Response(Utilities.createUUID(), decryptedNumber, MessageFlag.Response, Utilities.createTimestamp() ));
@@ -138,7 +138,7 @@ public class Identification extends AbstractSession {
      *                      or an empty Optional if its not.
      */
     public Optional<AckMessage> handleAckMessage(AckMessage ackMessage)  {
-        boolean isFirstAck = compareTimestamp(ackMessage.getTimestamp()) && ackMessage.getIsAck() && ackMessage.getMessageFlag().equals(MessageFlag.Ack);
+        boolean isFirstAck = compareTimestamp(ackMessage.getTimestamp(), timeOffset) && ackMessage.getIsAck() && ackMessage.getMessageFlag().equals(MessageFlag.Ack);
         boolean readyFlag = ackMessage.getMessageFlag().equals(MessageFlag.Ready);
 
         //Only send the Ready Message if the flag of the received message is not "Ready" Prevent infinite loop!!!
@@ -157,7 +157,7 @@ public class Identification extends AbstractSession {
         if (message.getMessageFlag().equals(MessageFlag.Challenge)) {
             try {
                 byte[] decryptedNumber = ASAPCryptoAlgorithms.decryptAsymmetric(message.getChallengeNumber(), this.sharkPKIComponent.getASAPKeyStore());
-                return Optional.ofNullable(new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), Utilities.encryptAsymmetric(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()), decryptedNumber));
+                return Optional.of(new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), Utilities.encryptAsymmetric(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()), decryptedNumber));
             } catch (ASAPSecurityException e) {
                 throw new RuntimeException(e);
             }
@@ -171,7 +171,7 @@ public class Identification extends AbstractSession {
      * @return
      */
     private Optional<AckMessage> handleResponseReply(Response responseReply) {
-        if ( compareTimestamp(responseReply.getTimestamp()) && compareDecryptedNumber(responseReply.getDecryptedNumber()) ) {
+        if ( compareTimestamp(responseReply.getTimestamp(), timeOffset) && compareDecryptedNumber(responseReply.getDecryptedNumber()) ) {
             return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
@@ -183,7 +183,7 @@ public class Identification extends AbstractSession {
      *
      * @return    The secure random number converted to byte[] ready for encryption.
      */
-    public byte[] generateRandomNumber() {
+    private byte[] generateRandomNumber() {
         SecureRandom secureRandom = new SecureRandom();
         byte bytes[] = new byte[1];
         secureRandom.nextBytes(bytes);

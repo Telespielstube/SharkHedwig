@@ -5,14 +5,15 @@ public enum Constant {
     AppFormat("hedwig"),
     PeerFolder("HedwigStorage"),
     PeerName("hedwig123"),
-    CaId("ceretificateAuthority"),
+    CaId("certificateAuthority"),
     Scheme("sn2://"),
 
     // Constants for the log files. */
     LogFolder("Log"),
     RequestLog("Request"),
-    RequestLogPath("HedwigStroage/Log/Request.txt"),
+    RequestLogPath("HedwigStorage/Log/Request.txt"),
     ContractLog("Contract"),
+    DeliveryContract("DeliveryContract"),
     ContractLogPath("HedwigStorage/Log/Contract.txt");
     private final String name;
 

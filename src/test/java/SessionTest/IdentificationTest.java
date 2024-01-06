@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.io.ObjectOutput;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -72,19 +74,22 @@ public class IdentificationTest {
     }
 
     @Test
-    public void testIfRandomNumberGetsEncryptedAndDecrypted() throws NoSuchAlgorithmException, ASAPSecurityException, NoSuchPaddingException {
-
-        byte[] random = identification.generateRandomNumber();
-
-        byte[] encrypted = Utilities.encryptAsymmetric(random, sharkPKIComponent.getASAPKeyStore().getPublicKey());
+    public void testIfRandomNumberGetsEncryptedAndDecrypted() throws NoSuchAlgorithmException, ASAPSecurityException, NoSuchPaddingException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method random = identification.getClass().getDeclaredMethod("generateRandomNumber");
+        random.setAccessible(true);
+        byte[] secNumber = (byte[]) random.invoke(identification);
+        byte[] encrypted = Utilities.encryptAsymmetric(secNumber, sharkPKIComponent.getASAPKeyStore().getPublicKey());
         byte[] decrypted = ASAPCryptoAlgorithms.decryptAsymmetric(encrypted, sharkPKIComponent.getASAPKeyStore());
-        assertEquals(new String(random, StandardCharsets.UTF_8), new String(decrypted, StandardCharsets.UTF_8));
-        assertArrayEquals(random, decrypted);
+        assertEquals(new String(secNumber, StandardCharsets.UTF_8), new String(decrypted, StandardCharsets.UTF_8));
+        assertArrayEquals(secNumber, decrypted);
     }
 
     @Test
-    public void createANewChallengeMessage() throws ASAPSecurityException {
-        Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.Challenge, Utilities.createTimestamp(), Utilities.encryptAsymmetric(identification.generateRandomNumber(), sharkPKIComponent.getPublicKey()));
+    public void createNewChallengeMessage() throws ASAPSecurityException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method secNumber = identification.getClass().getDeclaredMethod("generateRandomNumber");
+        secNumber.setAccessible(true);
+        byte[] randomSecNumber = (byte[]) secNumber.invoke(identification);
+        Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.Challenge, Utilities.createTimestamp(), Utilities.encryptAsymmetric(randomSecNumber, sharkPKIComponent.getPublicKey()));
         assertInstanceOf(Challenge.class, challenge);
     }
 
@@ -96,4 +101,11 @@ public class IdentificationTest {
         assertNotNull(object.get());
     }
 
+    @Test
+    public void createSecureRandomNumber() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method random = identification.getClass().getDeclaredMethod("generateRandomNumber");
+        random.setAccessible(true);
+        assertNotNull(random.invoke(identification));
+
+    }
 }

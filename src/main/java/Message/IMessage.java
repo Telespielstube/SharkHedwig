@@ -1,5 +1,7 @@
 package Message;
 
+import Session.Sessions.AbstractSession;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -37,6 +39,10 @@ public interface IMessage extends Serializable {
      */
     long getTimestamp();
 
-
+    /**
+     * Sets the timestamp for the message.
+     *
+     * @param currentTime    Current time in milliseconds.
+     */
     void setTimestamp(long currentTime);
 }

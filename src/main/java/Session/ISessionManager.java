@@ -2,8 +2,6 @@ package Session;
 
 import Message.IMessage;
 import Message.MessageBuilder;
-import Setup.DeviceState;
-import net.sharksystem.pki.SharkPKIComponent;
 
 import java.util.Optional;
 

@@ -59,5 +59,9 @@ public class Location {
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
+
+    public String toString() {
+        return ("Latitude: " + this.latitude + "; Longitude: " + this.longitude);
+    }
 }
 

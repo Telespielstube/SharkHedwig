@@ -36,7 +36,7 @@ public class OfferReply extends AbstractRequest {
     }
 
     public Location getPackageDestination() {
-        return this.packageDestination = packageDestination;
+        return this.packageDestination;
     }
 
     public void setPackageDestination(Location packageDestination) {
