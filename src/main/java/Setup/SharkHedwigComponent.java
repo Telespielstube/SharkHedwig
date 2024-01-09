@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import Session.Logger;
+import Misc.Logger;
 import Message.*;
 import Session.*;
 
@@ -106,7 +106,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
      * Setting up all things logging. The folder and the files to differentiate between request session and contract session.
      */
     public void setupLogger() {
-        String[] directories = { Constant.RequestLog.getAppConstant(), Constant.ContractLog.getAppConstant(), Constant.DeliveryContract.getAppConstant() };
+        String[] directories = { Constant.RequestLog.getAppConstant(), Constant.DeliveryContract.getAppConstant() };
         try {
 
             for (String directory : directories) {

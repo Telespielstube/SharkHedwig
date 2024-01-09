@@ -9,6 +9,7 @@ public class ContractDocument extends AbstractContract {
     private final DeliveryContract deliveryContract;
 
     public ContractDocument(UUID uuid, MessageFlag messageFlag, long timestamp, DeliveryContract deliveryContract) {
+        super(uuid, messageFlag, timestamp);
         this.deliveryContract = deliveryContract;
     }
 

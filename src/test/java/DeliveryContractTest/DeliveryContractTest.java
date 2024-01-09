@@ -94,7 +94,7 @@ public class DeliveryContractTest {
         transitRecord.addEntry(new TransitEntry(2, null, "Alice", "Bobby", new Location(80.0,90.0), 45345345, null, null ));
         System.out.println(transitRecord.toString());
         assertNotNull(transitRecord);
-        assertEquals(1, transitRecord.getTransitRecordSize());
+        assertEquals(4, transitRecord.getTransitRecordSize());
 
     }
 

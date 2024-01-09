@@ -1,11 +1,13 @@
 package Location;
 
+import java.io.Serializable;
+
 import static java.lang.Math.sqrt;
 
 /**
  * Location object to determine the current location of a mobile device or geo location.
  */
-public class Location {
+public class Location implements Serializable {
 
     private String name = null;
     private Double latitude = 0.0;

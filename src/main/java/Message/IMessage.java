@@ -1,7 +1,5 @@
 package Message;
 
-import Session.Sessions.AbstractSession;
-
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -16,7 +14,7 @@ public interface IMessage extends Serializable {
      *
      * @return    A 128-bit randomly created UUID.
      */
-    UUID getUuid();
+    UUID getUUID();
 
     /**
      * Returns the message flag.

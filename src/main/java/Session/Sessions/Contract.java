@@ -3,14 +3,14 @@ package Session.Sessions;
 import DeliveryContract.*;
 import HedwigUI.UserInputObject;
 import Location.Location;
-import Location.IGeoSpatial;
+import Location.GeoSpatial;
 import Message.Contract.*;
 import Message.IMessage;
 import Message.IMessageHandler;
 import Message.MessageFlag;
 import Message.MessageHandler;
-import Session.LogEntry;
-import Session.Logger;
+import Misc.LogEntry;
+import Misc.Logger;
 import Misc.Utilities;
 import Setup.Constant;
 import net.sharksystem.asap.ASAPSecurityException;
@@ -28,7 +28,7 @@ public class Contract extends AbstractSession {
     private IDeliveryContract shippingLabel;
     private IDeliveryContract contractRecord;
     private UserInputObject userInputBuilder;
-    private IGeoSpatial geoSpatial;
+    private GeoSpatial geoSpatial;
     private Location location;
     private Confirm confirm;
     private PickUp pickUp;
@@ -40,7 +40,7 @@ public class Contract extends AbstractSession {
         this.messageHandler = messageHandler;
         this.sharkPKIComponent = sharkPKIComponent;
         this.messageList = Collections.synchronizedSortedMap(new TreeMap<>());
-
+        this.geoSpatial = new GeoSpatial();
     }
 
     @Override
@@ -58,10 +58,8 @@ public class Contract extends AbstractSession {
             case Ack:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 if (messageObject.isPresent()) {
-                    LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), Utilities.createReadableTimestamp(),
-                            new Location(pickupLocation.getLatitude(), pickupLocation.getLongitude()), true,
-                            Constant.PeerName.getAppConstant(), sender);
-                    Logger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
+                    Logger.writeLog(this.deliveryContract.toString(), Constant.DeliveryContractLogPath.getAppConstant() +
+                            this.deliveryContract.getShippingLabel().getUUID());
                 }
                 break;
             default:
@@ -86,15 +84,12 @@ public class Contract extends AbstractSession {
                 break;
             case PickUp:
                 messageObject = Optional.ofNullable(handlePickUp((PickUp) message, sender).orElse(null));
-
                 break;
             case Ack:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 if (messageObject.isPresent()) {
-                    LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), Utilities.createReadableTimestamp(),
-                            geoSpatial.getCurrentLocation(), true,
-                            Constant.PeerName.getAppConstant(), sender);
-                    Logger.writeLog(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
+                    Logger.writeLog(this.deliveryContract.toString(), Constant.DeliveryContractLogPath.getAppConstant() +
+                            this.deliveryContract.getShippingLabel().getUUID());
                 }
                 break;
             default:
@@ -180,7 +175,7 @@ public class Contract extends AbstractSession {
      *
      * @param message    The DeliveryContract object.
      */
-    private DeliveryContract inMemoDeliveryContract(DeliveryContract message) {
+    private void inMemoDeliveryContract(DeliveryContract message) {
         ShippingLabel label = message.getShippingLabel();
         this.shippingLabel = new ShippingLabel(label.getUUID(), label.getSender(), label.getOrigin(), label.getPackageOrigin(),
                 label.getRecipient(), label.getDestination(), label.getPackageDestination(), label.getPackageWeight());
@@ -217,7 +212,7 @@ public class Contract extends AbstractSession {
      * @return              An otional AckMessage object if timestamp and ack flag are ok
      *                      or an empty Optional if its not.
      */
-    public Optional<AckMessage> handleAckMessage(AckMessage ackMessage)  {
+    private Optional<AckMessage> handleAckMessage(AckMessage ackMessage)  {
         if (compareTimestamp(ackMessage.getTimestamp(), timeOffset) && ackMessage.getIsAck()) {
             return Optional.of(ackMessage);
         }

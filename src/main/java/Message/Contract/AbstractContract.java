@@ -11,11 +11,17 @@ public abstract class AbstractContract implements IMessage {
     protected MessageFlag messageFlag;
     protected long timestamp;
 
-    public UUID getUuid() {
+    public AbstractContract(UUID uuid, MessageFlag messageFlag, long timestamp) {
+        this.uuid = uuid;
+        this.messageFlag = messageFlag;
+        this.timestamp = timestamp;
+    }
+
+    public UUID getUUID() {
         return this.uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUUID(UUID uuid) {
         this.uuid = uuid;
     }
 

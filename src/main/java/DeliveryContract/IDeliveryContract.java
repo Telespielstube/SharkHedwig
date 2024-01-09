@@ -1,6 +1,8 @@
 package DeliveryContract;
 
-public interface IDeliveryContract {
+import java.io.Serializable;
+
+public interface IDeliveryContract extends Serializable {
 
   //  boolean create(Object object);
     Object get();

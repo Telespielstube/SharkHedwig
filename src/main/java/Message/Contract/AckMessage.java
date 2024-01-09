@@ -8,8 +8,8 @@ public class AckMessage extends AbstractContract {
 
     private boolean isAck = false;
 
-    public AckMessage() {}
     public AckMessage(UUID uuid, MessageFlag messageFlag, long timestamp, boolean isAck) {
+        super(uuid, messageFlag, timestamp);
         this.isAck = isAck;
     }
 

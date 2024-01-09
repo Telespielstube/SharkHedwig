@@ -6,7 +6,9 @@ public class GeoSpatial implements IGeoSpatial {
 
     private Location pickUp;
 
-    public GeoSpatial() {}
+    public GeoSpatial() {
+        this.pickUp = null;
+    }
 
     /**
      * For now this is the hard coded location for the HTW-Berlin Building C.
@@ -17,8 +19,8 @@ public class GeoSpatial implements IGeoSpatial {
         return new Location();
     }
 
-    public void setPickUpLocation(Location pickUp) {
-        this.pickUp = pickUp;
+    public void setPickUpLocation(Location pickupLocation) {
+        this.pickUp = pickupLocation;
     }
 
     /**

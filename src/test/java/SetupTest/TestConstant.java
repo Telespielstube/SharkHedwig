@@ -1,5 +1,7 @@
 package SetupTest;
 
+import java.nio.file.Path;
+
 public enum TestConstant {
     AppFormat("hedwigTest"),
     PeerFolder("./src/test/resources/TestStorage"),
@@ -8,9 +10,7 @@ public enum TestConstant {
     Scheme("sn2://"),
     LogFolder("LogTest"),
     RequestLog("RequestTest"),
-    RequestLogPath("./src/test/resources/TestStorage/LogTest/RequestTest"),
-    ContractLog("ContractTest"),
-    ContractLogPath("./src/test/resources/TestStorage/LogTest/ContractTest"),
+    DeliveryContractLogPath("DeliveryContractTest"),
     ErrorLog("ErrorTest");
     private final String name;
 

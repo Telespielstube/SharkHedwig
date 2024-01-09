@@ -12,11 +12,11 @@ public abstract class AbstractIdentification implements IMessage {
     protected MessageFlag messageFlag;;
     protected long timestamp;
 
-    public UUID getUuid() {
+    public UUID getUUID() {
         return this.uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUUID(UUID uuid) {
         this.uuid = uuid;
     }
 

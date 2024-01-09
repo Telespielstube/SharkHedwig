@@ -1,9 +1,8 @@
-package Session;
+package Misc;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 
 /**
  * Saves communication sessions to disk to make them accessable for the future.
@@ -32,7 +31,7 @@ public class Logger {
     public static boolean writeLog(String entry, String file) {
         Path path = Paths.get(file);
         try {
-            Files.write(path, entry.getBytes());
+            Files.write(path, entry.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

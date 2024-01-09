@@ -7,9 +7,9 @@ import java.util.UUID;
 public class PickUp extends AbstractContract {
 
     private TransitRecord entryList;
-    public PickUp() {}
 
     public PickUp(UUID uuid, MessageFlag messageFlag, long timestamp, TransitRecord entryList) {
+        super(uuid, messageFlag, timestamp);
         this.entryList = entryList;
     }
 

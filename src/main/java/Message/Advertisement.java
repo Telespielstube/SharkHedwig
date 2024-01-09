@@ -20,8 +20,7 @@ public class Advertisement implements IMessage, Serializable {
         this.adTag = adTag;
     }
 
-    @Override
-    public UUID getUuid() {
+    public UUID getUUID() {
         return this.uuid;
     }
 

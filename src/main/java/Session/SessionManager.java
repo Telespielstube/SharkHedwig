@@ -3,6 +3,7 @@ package Session;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.IDeliveryContract;
 import DeliveryContract.ShippingLabel;
+import Misc.LogEntry;
 import Misc.Utilities;
 import Session.Sessions.*;
 import Setup.Channel;

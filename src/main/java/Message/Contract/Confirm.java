@@ -11,6 +11,7 @@ public class Confirm extends AbstractContract {
     private boolean isConfirmed = false;
 
     public Confirm(UUID uuid, MessageFlag messageFlag, long timestamp, DeliveryContract deliveryContract, boolean isConfirmed) {
+        super(uuid, messageFlag, timestamp);
         this.deliveryContract = deliveryContract;
         this.isConfirmed = isConfirmed;
     }

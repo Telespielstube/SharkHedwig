@@ -5,8 +5,8 @@ import DeliveryContract.ShippingLabel;
 import Message.IMessage;
 import Message.MessageFlag;
 import Message.Request.*;
-import Session.LogEntry;
-import Session.Logger;
+import Misc.LogEntry;
+import Misc.Logger;
 import Misc.Utilities;
 import Setup.Constant;
 
@@ -21,6 +21,7 @@ public class Request extends AbstractSession {
     private Confirm confirm;
     private DeliveryContract deliveryContract;
     private AckMessage ackMessage;
+    private LogEntry logEntry;
 
     public Request() {
         this.messageList = Collections.synchronizedSortedMap(new TreeMap<>());
@@ -29,7 +30,6 @@ public class Request extends AbstractSession {
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
         Optional<AbstractRequest> messageObject = Optional.empty();
-        LogEntry logEntry;
         switch(message.getMessageFlag()) {
             case Offer:
                 messageObject = Optional.of(handleOffer((Offer) message).get());
@@ -38,11 +38,12 @@ public class Request extends AbstractSession {
                 messageObject = Optional.ofNullable(handleConfirm((Confirm) message).orElse(null));
                 break;
             case Ready:
-                //If the isAck flag is set to 'true' in the Ready message. The transferor sets the concluded flag from 'false' to 'true' and saves the session
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 if (messageObject.isPresent()) {
-                    logEntry = new LogEntry(messageObject.get().getUuid(), Utilities.createReadableTimestamp(), true, Constant.PeerName.getAppConstant(), sender);
-                    Logger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
+                    this.logEntry = new LogEntry(messageObject.get().getUUID(), Utilities.createReadableTimestamp(),
+                            this.deliveryContract.getShippingLabel().getPackageDestination(),true, Constant.PeerName.getAppConstant(), sender);
+                    Logger.writeLog(logEntry.toString(), Constant.RequestLogPath.getAppConstant() +
+                            messageObject.get().getUUID());
                 }
                 break;
             default:
@@ -53,15 +54,13 @@ public class Request extends AbstractSession {
             clearMessageList();
         } else {
             addMessageToList(messageObject.get());
-
-            Logger.writeEntry(null, Constant.RequestLogPath.getAppConstant());
         }
         return Optional.of(messageObject);
     }
 
     @Override
     public Optional<Object> transferee(IMessage message, String sender) {
-        Optional<AbstractRequest> messageObject = null;
+        Optional<AbstractRequest> messageObject = Optional.empty();
 
         switch(message.getMessageFlag()) {
             case OfferReply:
@@ -72,9 +71,12 @@ public class Request extends AbstractSession {
                 break;
             case Ack:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
-                LogEntry logEntry = new LogEntry(messageObject.get().getUuid(), Utilities.createReadableTimestamp(),
-                        true, Constant.PeerName.getAppConstant(), sender);
-                Logger.writeEntry(logEntry.toString(), Constant.RequestLogPath.getAppConstant());
+                if (messageObject.isPresent()) {
+                    this.logEntry = new LogEntry(messageObject.get().getUUID(), Utilities.createReadableTimestamp(),
+                            this.deliveryContract.getShippingLabel().getPackageDestination(), true, Constant.PeerName.getAppConstant(), sender);
+                    Logger.writeLog(logEntry.toString(), Constant.RequestLogPath.getAppConstant() +
+                            messageObject.get().getUUID());
+                }
                 break;
             default:
                 clearMessageList();

@@ -11,10 +11,10 @@ public enum Constant {
     // Constants for the log files. */
     LogFolder("Log"),
     RequestLog("Request"),
-    RequestLogPath("HedwigStorage/Log/Request.txt"),
+    RequestLogPath("HedwigStorage/Log/Request/"),
     ContractLog("Contract"),
     DeliveryContract("DeliveryContract"),
-    ContractLogPath("HedwigStorage/Log/Contract.txt");
+    DeliveryContractLogPath("HedwigStorage/Log/DeliveryContract/");
     private final String name;
 
     Constant(String name) {

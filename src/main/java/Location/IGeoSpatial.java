@@ -34,7 +34,7 @@ public interface IGeoSpatial {
     /**
      * Sets the location for handover.
      *
-     * @param handoverLocation    Location object.
+     * @param pickupLocation    Location object.
      */
-    void setPickUpLocation(Location handoverLocation);
+    void setPickUpLocation(Location pickupLocation);
 }
