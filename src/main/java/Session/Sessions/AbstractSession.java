@@ -1,5 +1,6 @@
 package Session.Sessions;
 
+import Message.Contract.Complete;
 import Message.IMessage;
 import Message.Identification.AckMessage;
 import Message.MessageFlag;
@@ -31,7 +32,8 @@ public abstract class AbstractSession implements ISession {
     }
 
     public boolean setSessionComplete(Object message) {
-        if (!this.messageList.isEmpty() && message.equals(getLastValueFromList() instanceof AckMessage)) {
+        if (!this.messageList.isEmpty() && message.equals(getLastValueFromList() instanceof AckMessage ||
+                !this.messageList.isEmpty() && message.equals(getLastValueFromList() instanceof Complete))) {
             this.sessionComplete = true;
             return true;
         }

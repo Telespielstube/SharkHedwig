@@ -31,8 +31,6 @@ public class SessionManager implements ISessionManager {
     private DeliveryContract deliveryContract;
     private Optional<Object> messageObject;
 
-    public SessionManager() {}
-
     public SessionManager(MessageHandler messageHandler, SessionState sessionState, ProtocolState protocolState, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.protocolState = protocolState;
         this.sessionState = sessionState;
@@ -80,9 +78,7 @@ public class SessionManager implements ISessionManager {
                 } else {
                     processIdentification(message);
                 }
-                if (this.messageObject.isPresent()) {
-                    messageBuilder = Optional.of(new MessageBuilder(this.messageObject.get(), Channel.Identification.getChannelType(), sender)).get();
-                }
+                this.messageObject.ifPresent(object -> messageBuilder = Optional.of(new MessageBuilder(object, Channel.Identification.getChannelType(), sender)).get());
                 break;
 
             case Request:
@@ -91,9 +87,7 @@ public class SessionManager implements ISessionManager {
                 } else {
                     processRequest(message);
                 }
-                if (this.messageObject.isPresent()) {
-                    messageBuilder = new MessageBuilder(this.messageObject.get(), Channel.Request.getChannelType(), sender);
-                }
+                this.messageObject.ifPresent(object -> messageBuilder = new MessageBuilder(object, Channel.Request.getChannelType(), sender));
                 break;
 
             case Contract:
@@ -102,9 +96,7 @@ public class SessionManager implements ISessionManager {
                 } else {
                     processContract(message);
                 }
-                if (this.messageObject.isPresent()) {
-                    messageBuilder = new MessageBuilder(this.messageObject.get(), Channel.Contract.getChannelType(), sender);
-                }
+                this.messageObject.ifPresent(object -> messageBuilder = new MessageBuilder(object, Channel.Contract.getChannelType(), sender));
                 break;
 
             default:

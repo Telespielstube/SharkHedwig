@@ -66,8 +66,8 @@ public class Contract extends AbstractSession {
                 }
                 break;
             case Complete:
-                messageObject = Optional.ofNullable(handleFinishMessage((AckMessage) message).orElse(null));
-
+                messageObject = Optional.ofNullable(handleCompleteMessage((Complete) message).orElse(null));
+                break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
                 clearMessageList();
@@ -210,10 +210,10 @@ public class Contract extends AbstractSession {
     }
 
     /**
-     * An Acknowledgment maesage to signal that the PickUpMessage was received.
+     * An Acknowledgment message to signal that the PickUpMessage was received.
      *
      * @param nessage    The received AckMessage object.
-     * @return              An otional AckMessage object if timestamp and ack flag are ok
+     * @return              An optional AckMessage object if timestamp and ack flag are ok
      *                      or an empty Optional if its not.
      */
     private Optional<AckMessage> handleAckMessage(AckMessage nessage)  {
@@ -230,9 +230,11 @@ public class Contract extends AbstractSession {
      *
      * @return           Optional object if message is validated correctly, empty if not.
      */
-    private Optional<Object> handleFinishMessage(Complete message) {
+    private Optional<Complete> handleCompleteMessage(Complete message) {
         timeOffset = 30000;
         if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getComplete()) {
+            // Send a message to the owner of the drone that a package is handed over to another drone.
+            //notificationService.newMessage(DeliveryContract deliveryContract);
             return Optional.of(message);
         } else {
             // Send a message to the drone owner that a package is lost
