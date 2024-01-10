@@ -1,9 +1,7 @@
 package Session;
 
 import DeliveryContract.DeliveryContract;
-import DeliveryContract.IDeliveryContract;
 import DeliveryContract.ShippingLabel;
-import Misc.LogEntry;
 import Misc.Utilities;
 import Session.Sessions.*;
 import Setup.Channel;
@@ -22,21 +20,20 @@ public class SessionManager implements ISessionManager {
     private AbstractSession identification;
     private AbstractSession request;
     private AbstractSession contract;
-    private String sender;
-    private Advertisement advertisement;
-    private LogEntry logEntry;
     private MessageBuilder messageBuilder;
-    private final IDeliveryContract shippingLabel = new ShippingLabel();
-    private boolean noSession = false; // attribute because NoSession has no Session Object.
-    private DeliveryContract deliveryContract;
+    private DeliveryContract shippingLabel;
+    private boolean noSession = false; // attribute because NoSession has no Session Object
     private Optional<Object> messageObject;
+    private String sender;
+    private DeliveryContract deliveryContract;
 
-    public SessionManager(MessageHandler messageHandler, SessionState sessionState, ProtocolState protocolState, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public SessionManager(SessionState sessionState, ProtocolState protocolState, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.protocolState = protocolState;
         this.sessionState = sessionState;
         this.identification = new Identification(sharkPKIComponent);
+        this.shippingLabel = shippingLabel;
         this.request = new Request();
-        this.contract = new Contract(messageHandler, sharkPKIComponent);
+        this.contract = new Contract(sharkPKIComponent);
         this.messageObject = Optional.empty();
     }
 
@@ -59,6 +56,7 @@ public class SessionManager implements ISessionManager {
 
     @Override
     public Optional<MessageBuilder> sessionHandling(IMessage message, String sender) {
+        this.sender = sender;
         checkDeviceState();
         switch (this.sessionState) {
             case NoSession:
@@ -132,9 +130,9 @@ public class SessionManager implements ISessionManager {
      */
     private void processRequest(IMessage message) {
         if (this.protocolState.equals(ProtocolState.Transferor.isActive())) {
-            this.messageObject = Optional.ofNullable(this.request.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
+            this.messageObject = Optional.ofNullable(this.request.transferor(message, this.sender).orElse(this.sessionState.resetSessionState()));
         } else {
-            this.messageObject = Optional.ofNullable(this.request.transferee(message, sender).orElse(this.sessionState.resetSessionState()));
+            this.messageObject = Optional.ofNullable(this.request.transferee(message, this.sender).orElse(this.sessionState.resetSessionState()));
         }
         if (this.messageObject.isPresent() && this.request.setSessionComplete(this.messageObject)) {
             this.request.clearMessageList();
@@ -150,9 +148,9 @@ public class SessionManager implements ISessionManager {
      */
     private void processContract(IMessage message) {
         if (protocolState.equals(ProtocolState.Transferor.isActive())) {
-            this.messageObject = Optional.ofNullable(this.contract.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
+            this.messageObject = Optional.ofNullable(this.contract.transferor(message, this.sender).orElse(this.sessionState.resetSessionState()));
         } else {
-            this.messageObject = Optional.ofNullable(this.contract.transferee(message, sender).orElse(this.sessionState.resetSessionState()));
+            this.messageObject = Optional.ofNullable(this.contract.transferee(message, this.sender).orElse(this.sessionState.resetSessionState()));
         }
         if (this.messageObject.isPresent() && this.contract.setSessionComplete(this.messageObject)) {
             changeDeviceState();
@@ -178,7 +176,7 @@ public class SessionManager implements ISessionManager {
      * Method to reset every list and current state, but not the ShippingLabel state!!!
      */
     public void resetAll() {
-        this.noSession = false;
+        this.noSession = true;
         this.identification.setSessionComplete(false);
         this.request.setSessionComplete(false);
         this.contract.setSessionComplete(false);

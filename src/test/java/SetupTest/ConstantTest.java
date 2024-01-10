@@ -1,6 +1,6 @@
 package SetupTest;
 
-import Setup.Constant;
+import Setup.AppConstant;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,16 +16,16 @@ public class ConstantTest {
     }
     @Test
     public void testIfHedwigStringGetsReturnedFromAppConstantsEnumClass() {
-        assertEquals("hedwig" , Constant.AppFormat.getAppConstant());
+        assertEquals("hedwig" , AppConstant.AppFormat.toString());
     }
 
     @Test
     public void testIfAssertNotEqualsTestIsPassed() {
-        assertNotEquals("hedwig", Constant.PeerFolder.getAppConstant());
+        assertNotEquals("hedwig", AppConstant.PeerFolder.toString());
     }
 
     @Test
     public void testIfAssertNotEqualsTestIsPassedWhenGetterMethodeIsMissing() {
-        assertNotEquals("hedwig", Constant.CaId);
+        assertNotEquals("hedwig", AppConstant.CaId);
     }
 }

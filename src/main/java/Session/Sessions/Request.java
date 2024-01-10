@@ -8,7 +8,7 @@ import Message.Request.*;
 import Misc.LogEntry;
 import Misc.Logger;
 import Misc.Utilities;
-import Setup.Constant;
+import Setup.AppConstant;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -41,8 +41,8 @@ public class Request extends AbstractSession {
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 if (messageObject.isPresent()) {
                     this.logEntry = new LogEntry(messageObject.get().getUUID(), Utilities.createReadableTimestamp(),
-                            this.deliveryContract.getShippingLabel().getPackageDestination(),true, Constant.PeerName.getAppConstant(), sender);
-                    Logger.writeLog(logEntry.toString(), Constant.RequestLogPath.getAppConstant() +
+                            this.deliveryContract.getShippingLabel().getPackageDestination(),true, AppConstant.PeerName.toString(), sender);
+                    Logger.writeLog(logEntry.toString(), AppConstant.RequestLogPath.toString() +
                             messageObject.get().getUUID());
                 }
                 break;
@@ -73,8 +73,8 @@ public class Request extends AbstractSession {
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 if (messageObject.isPresent()) {
                     this.logEntry = new LogEntry(messageObject.get().getUUID(), Utilities.createReadableTimestamp(),
-                            this.deliveryContract.getShippingLabel().getPackageDestination(), true, Constant.PeerName.getAppConstant(), sender);
-                    Logger.writeLog(logEntry.toString(), Constant.RequestLogPath.getAppConstant() +
+                            this.deliveryContract.getShippingLabel().getPackageDestination(), true, AppConstant.PeerName.toString(), sender);
+                    Logger.writeLog(logEntry.toString(), AppConstant.RequestLogPath.toString() +
                             messageObject.get().getUUID());
                 }
                 break;

@@ -11,12 +11,10 @@ package Session;
 public enum SessionState {
 
     NoSession {
-        @Override
         public SessionState resetSessionState() {
             return NoSession;
         }
 
-        @Override
         public SessionState nextState() {
             return Identification;
         }
