@@ -1,18 +1,14 @@
 package Session.Sessions;
 
 import DeliveryContract.*;
-import HedwigUI.UserInputObject;
-import Location.Location;
-import Location.GeoSpatial;
+import Location.*;
 import Message.Contract.*;
 import Message.IMessage;
-import Message.IMessageHandler;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import Misc.Logger;
 import Misc.Utilities;
 import Setup.Constant;
-import Misc.INotificationService;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;
@@ -22,25 +18,14 @@ import java.util.*;
 public class Contract extends AbstractSession {
 
     private final SharkPKIComponent sharkPKIComponent;
-    private final IMessageHandler messageHandler;
-    private INotificationService notificationService;
-    private ContractDocument contractDocument;
     private DeliveryContract deliveryContract;
     private IDeliveryContract shippingLabel;
-    private IDeliveryContract contractRecord;
-    private UserInputObject userInputBuilder;
-    private GeoSpatial geoSpatial;
-    private Location location;
-    private Confirm confirm;
-    private PickUp pickUp;
-    private Location pickupLocation;
-    private AckMessage ackMessage;
+    private IGeoSpatial geoSpatial;
     private TransitRecord transitRecord;
-    private byte[] signedField;;
+    private byte[] signedField;
 
 
-    public Contract(IMessageHandler messageHandler, SharkPKIComponent sharkPKIComponent) {
-        this.messageHandler = messageHandler;
+    public Contract(SharkPKIComponent sharkPKIComponent) {
         this.sharkPKIComponent = sharkPKIComponent;
         this.messageList = Collections.synchronizedSortedMap(new TreeMap<>());
         this.geoSpatial = new GeoSpatial();

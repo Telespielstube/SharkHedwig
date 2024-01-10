@@ -18,9 +18,6 @@ import net.sharksystem.pki.SharkPKIComponent;
 public class Identification extends AbstractSession {
 
     private final SharkPKIComponent sharkPKIComponent;
-    private Challenge challenge;
-    private Response response;
-    private AckMessage ackMessage;
     private byte[] secureNumber;
 
     /**
@@ -37,7 +34,7 @@ public class Identification extends AbstractSession {
 
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
-        Optional<AbstractIdentification> messageObject = null;
+        Optional<AbstractIdentification> messageObject = Optional.empty();
 
         switch(message.getMessageFlag()) {
             case Advertisement:
@@ -98,10 +95,11 @@ public class Identification extends AbstractSession {
      * @return           if message was valid a Challenge message, if not an empty Optional.
      */
     private Optional<Challenge> handleAdvertisement(Advertisement message) {
+        this.secureNumber = generateRandomNumber();
         if (message.getMessageFlag().equals(MessageFlag.Advertisement) && message.getAdTag()) {
             try {
                 return Optional.of(new Challenge(Utilities.createUUID(), MessageFlag.Challenge, Utilities.createTimestamp(),
-                        Utilities.encryptAsymmetric(generateRandomNumber(), this.sharkPKIComponent.getPublicKey())));
+                        Utilities.encryptAsymmetric(this.secureNumber, this.sharkPKIComponent.getPublicKey())));
             } catch (ASAPSecurityException e) {
                 throw new RuntimeException(e);
             }
@@ -185,7 +183,7 @@ public class Identification extends AbstractSession {
      */
     private byte[] generateRandomNumber() {
         SecureRandom secureRandom = new SecureRandom();
-        byte bytes[] = new byte[1];
+        byte[] bytes = new byte[0];
         secureRandom.nextBytes(bytes);
 
         return bytes;
