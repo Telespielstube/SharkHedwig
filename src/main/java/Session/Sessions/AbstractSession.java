@@ -13,7 +13,7 @@ public abstract class AbstractSession implements ISession {
 
     protected SortedMap<Long, Object> messageList;
     private boolean sessionComplete = false;
-    protected int timeOffset;
+    protected int timeOffset = 3000;
 
     public abstract Optional<Object> transferor(IMessage message, String sender);
 

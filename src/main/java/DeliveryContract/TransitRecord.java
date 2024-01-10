@@ -1,6 +1,5 @@
 package DeliveryContract;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +7,7 @@ import java.util.List;
 /**
  * Class to add a new entry to the list of all previous handovers of this package.
  */
-public class TransitRecord implements IDeliveryContract, Serializable {
+public class TransitRecord implements IDeliveryContract {
 
     private TransitEntry transitEntry;
     private List<TransitEntry> entryList = null;

@@ -11,7 +11,8 @@ public enum MessageFlag {
     ContractDocument(8),
     PickUp(9),
     Ack(10),
-    Ready(11);
+    Ready(11),
+    Complete(12);
 
     private final int flag;
 

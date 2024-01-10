@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class Confirm extends AbstractContract {
 
-    private DeliveryContract deliveryContract;
+    private final DeliveryContract deliveryContract;
     private boolean isConfirmed = false;
 
     public Confirm(UUID uuid, MessageFlag messageFlag, long timestamp, DeliveryContract deliveryContract, boolean isConfirmed) {

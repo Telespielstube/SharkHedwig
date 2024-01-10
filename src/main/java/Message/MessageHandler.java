@@ -22,6 +22,7 @@ public class MessageHandler implements IMessageHandler {
             verifiedMessage = verifySignedMessage(decryptedMessage, senderE2E, sharkPKIComponent);
             object = byteArrayToObject(verifiedMessage);
         } catch (ASAPException | IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
         return object;
@@ -44,6 +45,7 @@ public class MessageHandler implements IMessageHandler {
                 return byteMessage;
             }
         } catch (ASAPException | IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
         return new byte[0];
@@ -57,6 +59,7 @@ public class MessageHandler implements IMessageHandler {
             signedMessage = composeSignedMessage(byteMessage, sharkPKIComponent);
             encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(signedMessage, recipient, sharkPKIComponent.getASAPKeyStore());
         } catch (ASAPException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
         return encryptedMessage;
@@ -80,6 +83,7 @@ public class MessageHandler implements IMessageHandler {
             signedMessagePackage = outputStream.toByteArray();
             outputStream.flush();
         } catch (ASAPSecurityException | IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
         return signedMessagePackage;
@@ -91,6 +95,7 @@ public class MessageHandler implements IMessageHandler {
             ObjectOutputStream oos = new ObjectOutputStream(outputStream);
             oos.writeObject(object);
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
         return outputStream.toByteArray();
@@ -103,6 +108,7 @@ public class MessageHandler implements IMessageHandler {
             input = new ObjectInputStream(inputStream);
             return input.readObject();
         } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }

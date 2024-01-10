@@ -12,9 +12,9 @@ public enum Constant {
     LogFolder("Log"),
     RequestLog("Request"),
     RequestLogPath("HedwigStorage/Log/Request/"),
-    ContractLog("Contract"),
     DeliveryContract("DeliveryContract"),
     DeliveryContractLogPath("HedwigStorage/Log/DeliveryContract/");
+
     private final String name;
 
     Constant(String name) {

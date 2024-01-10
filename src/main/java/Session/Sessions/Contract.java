@@ -9,10 +9,10 @@ import Message.IMessage;
 import Message.IMessageHandler;
 import Message.MessageFlag;
 import Message.MessageHandler;
-import Misc.LogEntry;
 import Misc.Logger;
 import Misc.Utilities;
 import Setup.Constant;
+import Misc.INotificationService;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;
@@ -23,6 +23,7 @@ public class Contract extends AbstractSession {
 
     private final SharkPKIComponent sharkPKIComponent;
     private final IMessageHandler messageHandler;
+    private INotificationService notificationService;
     private ContractDocument contractDocument;
     private DeliveryContract deliveryContract;
     private IDeliveryContract shippingLabel;
@@ -35,6 +36,8 @@ public class Contract extends AbstractSession {
     private Location pickupLocation;
     private AckMessage ackMessage;
     private TransitRecord transitRecord;
+    private byte[] signedField;;
+
 
     public Contract(IMessageHandler messageHandler, SharkPKIComponent sharkPKIComponent) {
         this.messageHandler = messageHandler;
@@ -62,6 +65,9 @@ public class Contract extends AbstractSession {
                             this.deliveryContract.getShippingLabel().getUUID());
                 }
                 break;
+            case Complete:
+                messageObject = Optional.ofNullable(handleFinishMessage((AckMessage) message).orElse(null));
+
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
                 clearMessageList();
@@ -84,13 +90,13 @@ public class Contract extends AbstractSession {
                 break;
             case PickUp:
                 messageObject = Optional.ofNullable(handlePickUp((PickUp) message, sender).orElse(null));
-                break;
-            case Ack:
-                messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 if (messageObject.isPresent()) {
                     Logger.writeLog(this.deliveryContract.toString(), Constant.DeliveryContractLogPath.getAppConstant() +
                             this.deliveryContract.getShippingLabel().getUUID());
                 }
+                break;
+            case Ready:
+                messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
@@ -111,7 +117,7 @@ public class Contract extends AbstractSession {
      *
      * @return    new ContractDocument message object.
      */
-    public ContractDocument createDeliveryContract(String sender) {
+    private ContractDocument createDeliveryContract(String sender) {
         ShippingLabel label = this.deliveryContract.getShippingLabel();
         this.transitRecord = new TransitRecord();
         this.transitRecord.addEntry(new TransitEntry(this.transitRecord.countUp(), label.getUUID(), Constant.PeerName.getAppConstant(),
@@ -131,11 +137,10 @@ public class Contract extends AbstractSession {
         if (compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
             byte[] signedTransfereeField = message.getDeliveryContract().getTransitRecord().getLastElement().getSignatureTransferee();
             byte[] byteTransitEntry = MessageHandler.objectToByteArray(this.transitRecord.getLastElement());
-            byte[] signedTransferor;
             try {
                 if (ASAPCryptoAlgorithms.verify(signedTransfereeField, byteTransitEntry, sender, this.sharkPKIComponent.getASAPKeyStore())) {
-                    signedTransferor = ASAPCryptoAlgorithms.sign(MessageHandler.objectToByteArray(this.transitRecord.getLastElement()), this.sharkPKIComponent);
-                    this.transitRecord.getLastElement().setSignatureTransferor(signedTransferor);
+                    this.signedField = ASAPCryptoAlgorithms.sign(byteTransitEntry, this.sharkPKIComponent);
+                    this.transitRecord.getLastElement().setSignatureTransferor(this.signedField);
                 }
             } catch (ASAPSecurityException e) {
                 e.printStackTrace();
@@ -153,13 +158,12 @@ public class Contract extends AbstractSession {
      * @return           An optional if the message passed the timestamp and flag checks or empty if not.
      */
     private Optional<Confirm> handleContract(ContractDocument message) {
-        byte[] signedTransitEntry;
         if (message.getDeliveryContract() != null) {
             this.transitRecord = message.getDeliveryContract().getTransitRecord();
             this.geoSpatial.setPickUpLocation(this.transitRecord.getLastElement().getPickUpLocation());
             try {
-                signedTransitEntry = ASAPCryptoAlgorithms.sign(MessageHandler.objectToByteArray(this.transitRecord.getLastElement()), sharkPKIComponent);
-                this.transitRecord.getLastElement().setSignatureTransferee(signedTransitEntry);
+                this.signedField = ASAPCryptoAlgorithms.sign(MessageHandler.objectToByteArray(this.transitRecord.getLastElement()), sharkPKIComponent);
+                this.transitRecord.getLastElement().setSignatureTransferee(this.signedField);
             } catch (ASAPSecurityException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
@@ -171,7 +175,7 @@ public class Contract extends AbstractSession {
     }
 
     /**
-     * The transferee needs to store the DeliveryContract in memory until the transferor signed the trasnit record entry too.
+     * The transferee needs to store the DeliveryContract in memory until the transferor signed the transit record entry too.
      *
      * @param message    The DeliveryContract object.
      */
@@ -208,13 +212,31 @@ public class Contract extends AbstractSession {
     /**
      * An Acknowledgment maesage to signal that the PickUpMessage was received.
      *
-     * @param ackMessage    The received AckMessage object.
+     * @param nessage    The received AckMessage object.
      * @return              An otional AckMessage object if timestamp and ack flag are ok
      *                      or an empty Optional if its not.
      */
-    private Optional<AckMessage> handleAckMessage(AckMessage ackMessage)  {
-        if (compareTimestamp(ackMessage.getTimestamp(), timeOffset) && ackMessage.getIsAck()) {
-            return Optional.of(ackMessage);
+    private Optional<AckMessage> handleAckMessage(AckMessage nessage)  {
+        if (compareTimestamp(nessage.getTimestamp(), timeOffset) && nessage.getIsAck()) {
+            return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.Ready, Utilities.createTimestamp(), true));
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * The Complete message is sent by the transferee and marks the completion of the transaction.
+     *
+     * @param message    Complete message object.
+     *
+     * @return           Optional object if message is validated correctly, empty if not.
+     */
+    private Optional<Object> handleFinishMessage(Complete message) {
+        timeOffset = 30000;
+        if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getComplete()) {
+            return Optional.of(message);
+        } else {
+            // Send a message to the drone owner that a package is lost
+            //notificationService.newMessage(DeliveryContract deliveryContract);
         }
         return Optional.empty();
     }

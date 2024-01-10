@@ -22,7 +22,7 @@ public class ShippingLabel implements IDeliveryContract {
     private Double packageWeight = null;
     private String destination = null;
     private Location locationOrigin = null;
-    private Location locationDest = null;
+    private Location locationDestination = null;
     private boolean isCreated = false;
 
     /**
@@ -33,17 +33,17 @@ public class ShippingLabel implements IDeliveryContract {
      * @param locationOrigin    Geolocation of the origin location.
      * @param recipient         Recipeint of the package.
      * @param destination       Human readable name of the reception location.
-     * @param locationDest      Geolocation of the reception location.
+     * @param locationDestination      Geolocation of the reception location.
      * @param packageWeight     Weight of the package.
      */
-    public ShippingLabel(UUID packageUUID, String sender, String origin, Location locationOrigin, String recipient, String destination, Location locationDest, double packageWeight) {
+    public ShippingLabel(UUID packageUUID, String sender, String origin, Location locationOrigin, String recipient, String destination, Location locationDestination, double packageWeight) {
         this.packageUUID = packageUUID;
         this.sender = sender;
         this.origin = origin;
         this.locationOrigin = locationOrigin;
         this.recipient = recipient;
         this.destination = destination;
-        this.locationDest = locationDest;
+        this.locationDestination = locationDestination;
         this.packageWeight = packageWeight;
     }
 
@@ -122,7 +122,7 @@ public class ShippingLabel implements IDeliveryContract {
     }
 
     public Location getPackageDestination() {
-        return this.locationDest;
+        return this.locationDestination;
     }
 
     public Double getPackageWeight() {
@@ -138,6 +138,6 @@ public class ShippingLabel implements IDeliveryContract {
     public String toString() {
         return String.format("PackageUUID: " + this.packageUUID + "; Sender: " + this.sender + "; Origin: " + this.origin +
                 "; Origin coordinates: " + this.locationOrigin + "; Recipient: " + this.recipient + "; Destination: " +
-                this.destination + "; Destination coordinates: " + this.locationDest + "; Package weight: " + this.packageWeight);
+                this.destination + "; Destination coordinates: " + this.locationDestination + "; Package weight: " + this.packageWeight);
     }
 }
