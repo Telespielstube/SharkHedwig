@@ -16,28 +16,28 @@ package Setup;
 public enum Channel {
     Advertisement {
         @Override
-        public String getChannelType() {
-            return AppConstant.Scheme + Advertisement.toString();
+        public String getChannel() {
+            return AppConstant.Scheme.toString() + Advertisement;
         }
     },
     Identification{
         @Override
-        public String getChannelType() {
-            return AppConstant.Scheme + Identification.toString();
+        public String getChannel() {
+            return AppConstant.Scheme.toString() + Identification;
         }
     },
     Request {
         @Override
-        public String getChannelType() {
-            return AppConstant.Scheme + Request.toString();
+        public String getChannel() {
+            return AppConstant.Scheme.toString() + Request;
         }
     },
     Contract {
         @Override
-        public String getChannelType() {
-            return AppConstant.Scheme + Contract.toString();
+        public String getChannel() {
+            return AppConstant.Scheme.toString() + Contract;
         }
     };
 
-    public abstract String getChannelType();
+    public abstract String getChannel();
 }

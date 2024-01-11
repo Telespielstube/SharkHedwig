@@ -15,7 +15,7 @@ public enum AppConstant {
     DeliveryContract("DeliveryContract"),
     DeliveryContractLogPath("HedwigStorage/Log/DeliveryContract/");
 
-    private final String name;
-    AppConstant(String name) {this.name = name;}
+    AppConstant(String name) {}
+
 }
 

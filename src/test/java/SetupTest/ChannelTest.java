@@ -11,12 +11,12 @@ public class ChannelTest {
 
     @Test
     public void testIfCorrectChannelIsResturned() {
-        assertTrue(Channel.Advertisement.getChannelType() instanceof String);
-        assertEquals("sn2://Advertisement", Channel.Advertisement.getChannelType());
+        assertTrue(Channel.Advertisement.getChannel() instanceof String);
+        assertEquals("sn2://Advertisement", Channel.Advertisement.getChannel());
     }
 
     @Test
     public void testIfChannelIsNotOfTypeChannel() {
-        assertNotEquals(Channel.Identification.getChannelType(), Channel.Identification);
+        assertNotEquals(Channel.Identification.getChannel(), Channel.Identification);
     }
 }
