@@ -8,7 +8,7 @@ import Message.MessageFlag;
 import Message.MessageHandler;
 import Misc.Logger;
 import Misc.Utilities;
-import Setup.Constant;
+import Setup.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;
@@ -46,7 +46,7 @@ public class Contract extends AbstractSession {
             case Ack:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 if (messageObject.isPresent()) {
-                    Logger.writeLog(this.deliveryContract.toString(), Constant.DeliveryContractLogPath.getAppConstant() +
+                    Logger.writeLog(this.deliveryContract.toString(), AppConstant.DeliveryContractLogPath.toString() +
                             this.deliveryContract.getShippingLabel().getUUID());
                 }
                 break;
@@ -76,7 +76,7 @@ public class Contract extends AbstractSession {
             case PickUp:
                 messageObject = Optional.ofNullable(handlePickUp((PickUp) message, sender).orElse(null));
                 if (messageObject.isPresent()) {
-                    Logger.writeLog(this.deliveryContract.toString(), Constant.DeliveryContractLogPath.getAppConstant() +
+                    Logger.writeLog(this.deliveryContract.toString(), AppConstant.DeliveryContractLogPath.toString() +
                             this.deliveryContract.getShippingLabel().getUUID());
                 }
                 break;
@@ -105,7 +105,7 @@ public class Contract extends AbstractSession {
     private ContractDocument createDeliveryContract(String sender) {
         ShippingLabel label = this.deliveryContract.getShippingLabel();
         this.transitRecord = new TransitRecord();
-        this.transitRecord.addEntry(new TransitEntry(this.transitRecord.countUp(), label.getUUID(), Constant.PeerName.getAppConstant(),
+        this.transitRecord.addEntry(new TransitEntry(this.transitRecord.countUp(), label.getUUID(), AppConstant.PeerName.toString(),
                 sender, this.geoSpatial.getCurrentLocation(), Utilities.createTimestamp(), null, null));
         this.deliveryContract.setContractSent(true);
         return new ContractDocument(Utilities.createUUID(), MessageFlag.ContractDocument,

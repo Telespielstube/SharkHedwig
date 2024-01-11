@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ProtocolStateTest {
 
-    private final SessionManager sessionManager = new SessionManager();
     private ShippingLabel shippingLabel;
 
     @Test

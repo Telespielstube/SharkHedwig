@@ -2,7 +2,6 @@ package SetupTest;
 
 import Session.Sessions.Identification;
 import Setup.Channel;
-import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeer;
@@ -11,14 +10,11 @@ import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.NoSuchPaddingException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -71,7 +67,7 @@ public class SharkComponentTest {
     @Test
     public void testIfChannelAdvertisementEqualsReceivedURI() {
         String uri = "sn2://Advertisement";
-        assertEquals(uri, Channel.Advertisement.getChannelType());
+        assertEquals(uri, Channel.Advertisement.getChannel());
     }
 
     @Test

@@ -29,8 +29,8 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
     private ASAPMessages messages;
 
     public SharkHedwigComponent(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
-        ErrorLogger.redirectErrorStream(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant(), "errorLog.txt");
-        this.sharkPeerFS = new SharkPeerFS(Constant.PeerName.getAppConstant(), Constant.PeerFolder.getAppConstant() + "/" + Constant.PeerName.getAppConstant() );
+        ErrorLogger.redirectErrorStream(AppConstant.PeerFolder.toString(), AppConstant.LogFolder.toString(), "errorLog.txt");
+        this.sharkPeerFS = new SharkPeerFS(AppConstant.PeerName.toString(), AppConstant.PeerFolder.toString() + "/" + AppConstant.PeerName.toString() );
         this.sharkPKIComponent = pkiComponent;
         this.messageHandler = new MessageHandler();
 
@@ -70,11 +70,11 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
     @Override
     public void onStart(ASAPPeer asapPeer) throws SharkException {
         this.peer = asapPeer;
-        this.peer.addASAPMessageReceivedListener(Constant.AppFormat.getAppConstant(), this);
+        this.peer.addASAPMessageReceivedListener(AppConstant.AppFormat.toString(), this);
         try {
-            this.peer.setASAPRoutingAllowed(Constant.AppFormat.getAppConstant(), true);
+            this.peer.setASAPRoutingAllowed(AppConstant.AppFormat.toString(), true);
             this.setupChannel();
-            this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).getOwner();
+            this.peer.getASAPStorage(AppConstant.AppFormat.toString()).getOwner();
             this.setupLogger();
         } catch (IOException e) {
             System.err.println("Caught an IOException while setting up component: " + e.getMessage());
@@ -94,7 +94,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
     public void setupChannel()  {
         for (Channel type : Channel.values()) {
             try {
-                this.peer.getASAPStorage(Constant.AppFormat.getAppConstant()).createChannel(type.getChannelType());
+                this.peer.getASAPStorage(AppConstant.AppFormat.toString()).createChannel(type.getChannel());
             } catch (IOException | ASAPException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
@@ -106,11 +106,11 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
      * Setting up all things logging. The folder and the files to differentiate between request session and contract session.
      */
     public void setupLogger() {
-        String[] directories = { Constant.RequestLog.getAppConstant(), Constant.DeliveryContract.getAppConstant() };
+        String[] directories = { AppConstant.RequestLog.toString(), AppConstant.DeliveryContract.toString() };
         try {
 
             for (String directory : directories) {
-                Logger.createLogDirectory(Constant.PeerFolder.getAppConstant(), Constant.LogFolder.getAppConstant(), directory);
+                Logger.createLogDirectory(AppConstant.PeerFolder.toString(), AppConstant.LogFolder.toString(), directory);
             }
         } catch (IOException e) {
             throw new RuntimeException("Could not create logger files for request and contract sessions: " + e);
@@ -128,9 +128,9 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
      */
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) throws IOException {
         CharSequence uri = messages.getURI();
-        if ( uri.equals(Channel.Advertisement.getChannelType()) ) {
+        if ( uri.equals(Channel.Advertisement.getChannel()) ) {
             processMessages(messages, senderE2E);
-        } else if ( (uri.equals(Channel.Identification.getChannelType()))) {
+        } else if ( (uri.equals(Channel.Identification.getChannel()))) {
             processMessages(messages, senderE2E);
         } else if (uri.equals(Channel.Request.toString()))  {
             processMessages(messages, senderE2E);
@@ -161,7 +161,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
                 }
                 encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.get().getMessage(), messageBuilder.get().getUri(), messageBuilder.get().getSender(), sharkPKIComponent);
                 try {
-                    this.peer.sendASAPMessage(Constant.AppFormat.getAppConstant(), Constant.Scheme.getAppConstant() + messageBuilder.get().getUri(), encryptedMessage);
+                    this.peer.sendASAPMessage(AppConstant.AppFormat.toString(), AppConstant.Scheme.toString() + messageBuilder.get().getUri(), encryptedMessage);
                 } catch (ASAPException e) {
                     e.printStackTrace();
                     throw new RuntimeException(e);

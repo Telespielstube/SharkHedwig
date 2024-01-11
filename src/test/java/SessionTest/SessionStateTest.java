@@ -25,16 +25,16 @@ public class SessionStateTest {
 
     @Test
     public void testIfResetNoSessionIsNoSession() {
-        assertEquals(SessionState.NoSession, SessionState.NoSession.resetSessionState());
+        assertEquals(SessionState.NoSession, SessionState.NoSession.resetState());
     }
 
     @Test
     public void testIResetContractSessionIsNoSession() {
-        assertEquals(SessionState.NoSession, SessionState.Contract.resetSessionState());
+        assertEquals(SessionState.NoSession, SessionState.Contract.resetState());
     }
 
     @Test
     public void testIResetContractSessionIsNotIdentificationSession() {
-        assertNotEquals(SessionState.Identification, SessionState.Contract.resetSessionState());
+        assertNotEquals(SessionState.Identification, SessionState.Contract.resetState());
     }
 }

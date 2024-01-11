@@ -36,7 +36,7 @@ public class SessionManager implements ISessionManager {
         this.sessionState = sessionState;
         this.identification = new Identification(sharkPKIComponent);
         this.request = new Request();
-        this.contract = new Contract(messageHandler, sharkPKIComponent);
+        this.contract = new Contract(sharkPKIComponent);
         this.messageObject = Optional.empty();
     }
 
@@ -63,13 +63,13 @@ public class SessionManager implements ISessionManager {
         switch (this.sessionState) {
             case NoSession:
                 if (this.protocolState.equals(ProtocolState.Transferor.isActive())) {
-                    this.messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
+                    this.messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetState()));
                 }
                 // Only the NoSession and Transferee state creates an Advertisement message.
                 this.messageObject = Optional.of((createAdvertisement()));
                 this.noSession = true;
                 this.sessionState = SessionState.NoSession.nextState();
-                messageBuilder = Optional.of(new MessageBuilder(this.messageObject.get(), Channel.Advertisement.getChannelType(), sender)).get();
+                messageBuilder = Optional.of(new MessageBuilder(this.messageObject.get(), Channel.Advertisement.getChannel(), sender)).get();
                 break;
 
             case Identification:
@@ -78,7 +78,7 @@ public class SessionManager implements ISessionManager {
                 } else {
                     processIdentification(message);
                 }
-                this.messageObject.ifPresent(object -> messageBuilder = Optional.of(new MessageBuilder(object, Channel.Identification.getChannelType(), sender)).get());
+                this.messageObject.ifPresent(object -> messageBuilder = Optional.of(new MessageBuilder(object, Channel.Identification.getChannel(), sender)).get());
                 break;
 
             case Request:
@@ -87,7 +87,7 @@ public class SessionManager implements ISessionManager {
                 } else {
                     processRequest(message);
                 }
-                this.messageObject.ifPresent(object -> messageBuilder = new MessageBuilder(object, Channel.Request.getChannelType(), sender));
+                this.messageObject.ifPresent(object -> messageBuilder = new MessageBuilder(object, Channel.Request.getChannel(), sender));
                 break;
 
             case Contract:
@@ -96,7 +96,7 @@ public class SessionManager implements ISessionManager {
                 } else {
                     processContract(message);
                 }
-                this.messageObject.ifPresent(object -> messageBuilder = new MessageBuilder(object, Channel.Contract.getChannelType(), sender));
+                this.messageObject.ifPresent(object -> messageBuilder = new MessageBuilder(object, Channel.Contract.getChannel(), sender));
                 break;
 
             default:
@@ -114,9 +114,9 @@ public class SessionManager implements ISessionManager {
      */
     private void processIdentification(IMessage message) {
         if (this.protocolState.equals(ProtocolState.Transferor.isActive())) {
-            this.messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
+            this.messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetState()));
         } else {
-            this.messageObject = Optional.ofNullable(this.identification.transferee(message, sender).orElse(this.sessionState.resetSessionState()));
+            this.messageObject = Optional.ofNullable(this.identification.transferee(message, sender).orElse(this.sessionState.resetState()));
         }
         if (this.messageObject.isPresent() && this.identification.setSessionComplete(this.messageObject)) {
             this.identification.clearMessageList();
@@ -132,9 +132,9 @@ public class SessionManager implements ISessionManager {
      */
     private void processRequest(IMessage message) {
         if (this.protocolState.equals(ProtocolState.Transferor.isActive())) {
-            this.messageObject = Optional.ofNullable(this.request.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
+            this.messageObject = Optional.ofNullable(this.request.transferor(message, sender).orElse(this.sessionState.resetState()));
         } else {
-            this.messageObject = Optional.ofNullable(this.request.transferee(message, sender).orElse(this.sessionState.resetSessionState()));
+            this.messageObject = Optional.ofNullable(this.request.transferee(message, sender).orElse(this.sessionState.resetState()));
         }
         if (this.messageObject.isPresent() && this.request.setSessionComplete(this.messageObject)) {
             this.request.clearMessageList();
@@ -150,9 +150,9 @@ public class SessionManager implements ISessionManager {
      */
     private void processContract(IMessage message) {
         if (protocolState.equals(ProtocolState.Transferor.isActive())) {
-            this.messageObject = Optional.ofNullable(this.contract.transferor(message, sender).orElse(this.sessionState.resetSessionState()));
+            this.messageObject = Optional.ofNullable(this.contract.transferor(message, sender).orElse(this.sessionState.resetState()));
         } else {
-            this.messageObject = Optional.ofNullable(this.contract.transferee(message, sender).orElse(this.sessionState.resetSessionState()));
+            this.messageObject = Optional.ofNullable(this.contract.transferee(message, sender).orElse(this.sessionState.resetState()));
         }
         if (this.messageObject.isPresent() && this.contract.setSessionComplete(this.messageObject)) {
             changeDeviceState();
@@ -185,7 +185,7 @@ public class SessionManager implements ISessionManager {
         this.identification.clearMessageList();
         this.request.clearMessageList();
         this.contract.clearMessageList();
-        this.sessionState.resetSessionState();
+        this.sessionState.resetState();
         this.deliveryContract.setContractSent(false);
     }
 }

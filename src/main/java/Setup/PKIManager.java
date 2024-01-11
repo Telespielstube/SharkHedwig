@@ -12,10 +12,10 @@ public class PKIManager {
     }
 
     public CharSequence getCertificateAuthority() {
-        return Constant.CaId.getAppConstant();
+        return AppConstant.CaId.toString();
     }
 
     public ASAPCertificate getCertificateOf(CharSequence subject) throws ASAPSecurityException {
-        return sharkPKIComponent.getCertificateByIssuerAndSubject(Constant.CaId.getAppConstant(), subject);
+        return sharkPKIComponent.getCertificateByIssuerAndSubject(AppConstant.CaId.toString(), subject);
     }
 }

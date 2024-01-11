@@ -115,7 +115,7 @@ public class SessionManagerTest {
         byte[] encryptedNumber = Utilities.encryptAsymmetric("3345".getBytes(), asapKeyStore.getPublicKey());
         Challenge challenge = new Challenge(UUID.randomUUID(), MessageFlag.Challenge, System.currentTimeMillis(), encryptedNumber );
         MessageBuilder messageBuilder = sessionManager.sessionHandling(challenge, "Marta").get();
-        assertEquals(Channel.Advertisement.getChannelType(), messageBuilder.getUri());
+        assertEquals(Channel.Advertisement.getChannel(), messageBuilder.getUri());
     }
 
     @Test

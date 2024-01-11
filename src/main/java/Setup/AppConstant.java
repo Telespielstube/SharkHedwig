@@ -1,6 +1,6 @@
 package Setup;
 
-public enum Constant {
+public enum AppConstant {
     // Component related constants
     AppFormat("hedwig"),
     PeerFolder("HedwigStorage"),
@@ -17,11 +17,7 @@ public enum Constant {
 
     private final String name;
 
-    Constant(String name) {
+    AppConstant(String name) {
         this.name = name;
-    }
-
-    public String getAppConstant() {
-        return this.name;
     }
 }
