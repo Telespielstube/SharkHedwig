@@ -31,7 +31,7 @@ public class SessionManager implements ISessionManager {
     private DeliveryContract deliveryContract;
     private Optional<Object> messageObject;
 
-    public SessionManager(MessageHandler messageHandler, SessionState sessionState, ProtocolState protocolState, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public SessionManager(SessionState sessionState, ProtocolState protocolState, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.protocolState = protocolState;
         this.sessionState = sessionState;
         this.identification = new Identification(sharkPKIComponent);

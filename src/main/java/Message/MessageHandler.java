@@ -1,5 +1,6 @@
 package Message;
 
+import Setup.AppConstant;
 import net.sharksystem.asap.*;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms.EncryptedMessagePackage;
@@ -9,20 +10,34 @@ import java.io.*;
 
 public class MessageHandler implements IMessageHandler {
 
+    private EncryptedMessagePackage encryptedMessagePackage;
+
     public MessageHandler() {}
 
+    public boolean checkRecipient(byte[] message) {
+        try {
+            this.encryptedMessagePackage = ASAPCryptoAlgorithms.parseEncryptedMessagePackage(message);
+            if (!this.encryptedMessagePackage.getReceiver().equals(AppConstant.PeerName.toString())) {
+                return false;
+            }
+        } catch (IOException | ASAPException e) {
+            System.err.println("Caught an ASAP or IOException: " + e);
+            throw new RuntimeException(e);
+        }
+        return true;
+    }
+
     public Object parseMessage(byte[] message, String senderE2E, SharkPKIComponent sharkPKIComponent) {
-        EncryptedMessagePackage encryptedMessagePackage;
-        Object object = null;
+        Object object;
         byte[] verifiedMessage;
         byte[] decryptedMessage;
         try {
-            encryptedMessagePackage = ASAPCryptoAlgorithms.parseEncryptedMessagePackage(message);
+            this.encryptedMessagePackage = ASAPCryptoAlgorithms.parseEncryptedMessagePackage(message);
             decryptedMessage = ASAPCryptoAlgorithms.decryptPackage(encryptedMessagePackage, sharkPKIComponent.getASAPKeyStore());
             verifiedMessage = verifySignedMessage(decryptedMessage, senderE2E, sharkPKIComponent);
             object = byteArrayToObject(verifiedMessage);
         } catch (ASAPException | IOException e) {
-            e.printStackTrace();
+            System.err.println("Caught an ASAP or IOException: " + e);
             throw new RuntimeException(e);
         }
         return object;
@@ -45,7 +60,7 @@ public class MessageHandler implements IMessageHandler {
                 return byteMessage;
             }
         } catch (ASAPException | IOException e) {
-            e.printStackTrace();
+            System.err.println("Caught an ASAP or IOException: " + e);
             throw new RuntimeException(e);
         }
         return new byte[0];
@@ -53,13 +68,13 @@ public class MessageHandler implements IMessageHandler {
 
     public byte[] buildOutgoingMessage(Object object, String uri, String recipient, SharkPKIComponent sharkPKIComponent) {
         byte[] byteMessage = objectToByteArray(object);
-        byte[] encryptedMessage = new byte[0];
+        byte[] encryptedMessage;
         byte[] signedMessage;
         try {
             signedMessage = composeSignedMessage(byteMessage, sharkPKIComponent);
             encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(signedMessage, recipient, sharkPKIComponent.getASAPKeyStore());
         } catch (ASAPException e) {
-            e.printStackTrace();
+            System.err.println("Caught an ASAPException: " + e);
             throw new RuntimeException(e);
         }
         return encryptedMessage;
@@ -83,7 +98,7 @@ public class MessageHandler implements IMessageHandler {
             signedMessagePackage = outputStream.toByteArray();
             outputStream.flush();
         } catch (ASAPSecurityException | IOException e) {
-            e.printStackTrace();
+            System.err.println("Caught an ASAPSecurityException: " + e);
             throw new RuntimeException(e);
         }
         return signedMessagePackage;
@@ -95,7 +110,7 @@ public class MessageHandler implements IMessageHandler {
             ObjectOutputStream oos = new ObjectOutputStream(outputStream);
             oos.writeObject(object);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Caught an IOException: " + e);
             throw new RuntimeException(e);
         }
         return outputStream.toByteArray();
@@ -108,7 +123,7 @@ public class MessageHandler implements IMessageHandler {
             input = new ObjectInputStream(inputStream);
             return input.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            System.err.println("Caught an Exception: " + e);
             throw new RuntimeException(e);
         }
     }

@@ -49,7 +49,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
         } catch (SharkException e) {
             System.err.println("Caught an IOException: " + e.getMessage());
         }
-        ComponentFactory componentFactory = null;
+        ComponentFactory componentFactory;
         try {
             componentFactory = new ComponentFactory((SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class));
             sharkPeerFS.addComponent(componentFactory, ISharkHedwigComponent.class);
@@ -57,6 +57,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
             this.sharkPKIComponent = (SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class);
             this.sharkPeerFS.start();
         } catch (SharkException e) {
+            System.err.println("Caught an Exception: " + e);
             throw new RuntimeException(e);
         }
     }
@@ -81,9 +82,9 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
         }
         new PKIManager(sharkPKIComponent);
         try {
-            this.sessionManager = new SessionManager(this.messageHandler, SessionState.NoSession, ProtocolState.Transferee , this.peer, this.sharkPKIComponent);
+            this.sessionManager = new SessionManager(SessionState.NoSession, ProtocolState.Transferee , this.peer, this.sharkPKIComponent);
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            System.err.println("Caught an Exception: " + e);
             throw new RuntimeException(e);
         }
     }
@@ -96,7 +97,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
             try {
                 this.peer.getASAPStorage(AppConstant.AppFormat.toString()).createChannel(type.getChannel());
             } catch (IOException | ASAPException e) {
-                e.printStackTrace();
+                System.err.println("Caught an Exception: " + e);
                 throw new RuntimeException(e);
             }
         }
@@ -149,12 +150,15 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
      * @throws IOException
      */
     public void processMessages(ASAPMessages messages, String senderE2E) {
-        IMessage message = null;
+        IMessage message;
         byte[] encryptedMessage;
         try {
             for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
+                if (!messageHandler.checkRecipient(it.next())) {
+                    continue;
+                }
                 message = (IMessage) this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
-                message = (IMessage) messageHandler.byteArrayToObject(it.next());
+                message = (IMessage) MessageHandler.byteArrayToObject(it.next());
                 Optional<MessageBuilder> messageBuilder = Optional.ofNullable(sessionManager.sessionHandling(message, senderE2E).get());
                 if (!messageBuilder.isPresent()) {
                     continue;
@@ -168,7 +172,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Caught an Exception: " + e);
             throw new RuntimeException(e);
         }
     }
