@@ -65,7 +65,7 @@ public class SessionManager implements ISessionManager {
                 if (this.protocolState.equals(ProtocolState.Transferor.isActive())) {
                     this.messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetState()));
                 }
-                // Only the NoSession and Transferee state creates an Advertisement message.
+                // Only the NoSession combined with Transferee state creates an Advertisement message.
                 this.messageObject = Optional.of((createAdvertisement()));
                 this.noSession = true;
                 this.sessionState = SessionState.NoSession.nextState();
@@ -78,7 +78,10 @@ public class SessionManager implements ISessionManager {
                 } else {
                     processIdentification(message);
                 }
-                this.messageObject.ifPresent(object -> messageBuilder = Optional.of(new MessageBuilder(object, Channel.Identification.getChannel(), sender)).get());
+                if (this.messageObject.isPresent()) {
+                    messageBuilder = Optional.of(new MessageBuilder(this.messageObject, Channel.Identification.getChannel(), sender)).get();
+                }
+
                 break;
 
             case Request:

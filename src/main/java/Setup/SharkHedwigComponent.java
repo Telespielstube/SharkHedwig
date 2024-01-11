@@ -151,6 +151,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
      */
     public void processMessages(ASAPMessages messages, String senderE2E) {
         IMessage message;
+        IMessage messageObject;
         byte[] encryptedMessage;
         try {
             for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
@@ -158,16 +159,18 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
                     continue;
                 }
                 message = (IMessage) this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
-                message = (IMessage) MessageHandler.byteArrayToObject(it.next());
-                Optional<MessageBuilder> messageBuilder = Optional.ofNullable(sessionManager.sessionHandling(message, senderE2E).get());
+                messageObject = (IMessage) MessageHandler.byteArrayToObject(it.next());
+                Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(messageObject, senderE2E);
                 if (!messageBuilder.isPresent()) {
                     continue;
                 }
-                encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.get().getMessage(), messageBuilder.get().getUri(), messageBuilder.get().getSender(), sharkPKIComponent);
+                encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.get().getMessage(),
+                        messageBuilder.get().getUri(), messageBuilder.get().getSender(), sharkPKIComponent);
                 try {
-                    this.peer.sendASAPMessage(AppConstant.AppFormat.toString(), AppConstant.Scheme.toString() + messageBuilder.get().getUri(), encryptedMessage);
+                    this.peer.sendASAPMessage(AppConstant.AppFormat.toString(), AppConstant.Scheme +
+                            messageBuilder.get().getUri(), encryptedMessage);
                 } catch (ASAPException e) {
-                    e.printStackTrace();
+                    System.err.println("Caught an Exception: " + e);
                     throw new RuntimeException(e);
                 }
             }

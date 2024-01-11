@@ -158,7 +158,12 @@ public class SessionManagerTest {
         byte[] number = "4634563456".getBytes();
         byte[] encrypted = Utilities.encryptAsymmetric(number, asapKeyStore.getPublicKey());
         Response response = new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), encrypted, number);
-        Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(response, "Marta");
-        assertNotEquals("Message flag was incorrect:Response", Optional.empty().toString());
+        Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(response, francisID);
+        if (messageBuilder.isPresent()) {
+            assertNotNull(messageBuilder.get());
+        }
+        //assertNotEquals("Message flag was incorrect: Response", Optional.empty().toString());
     }
+
+
 }
