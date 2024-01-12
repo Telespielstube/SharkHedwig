@@ -9,14 +9,17 @@ import java.util.Observable;
 
 public class DeliveryContract extends Observable implements IDeliveryContract, Serializable {
 
-    private final TransitRecord transitRecord;
-    private final ShippingLabel shippingLabel;
+    private TransitRecord transitRecord;
+    private ShippingLabel shippingLabel;
     private boolean isCreated = false;
+    private boolean isSent = false;
+
+    public DeliveryContract() {}
 
     public DeliveryContract(String sender, IGeoSpatial geoSpatial) {
         this.shippingLabel = getShippingLabel();
         this.transitRecord = new TransitRecord();
-        this.transitRecord.addEntry(new TransitEntry(this.transitRecord.countUp(), this.shippingLabel.getUUID(), AppConstant.PeerName.toString(),
+        this.transitRecord.addEntry(new TransitEntry(this.transitRecord.countUp(), this.shippingLabel.getUUID(), AppConstant.PEER_NAME.toString(),
                 sender, geoSpatial.getCurrentLocation(), Utilities.createTimestamp(), null, null));
         setChanged();
         notifyObservers(this.isCreated);
@@ -42,19 +45,23 @@ public class DeliveryContract extends Observable implements IDeliveryContract, S
         return this.isCreated;
     }
 
+    public boolean getIsSent() {
+        return this.isSent;
+    }
 
-
+    public void setIsSent(boolean isSent) {
+        this.isSent = isSent;
+    }
 
     /**
      * After the hand over is complete the former transferor has to reset all DeliveryContract states to the initial states.
      */
-//    public void resetContractState() {
-//        this.isCreated = false;
-//        this.setContractSent(false);
-////        this.shippingLabel.setIsCreated(false);
-////        this.transitRecord.setIsCreated(false);
-//    }
-//
+    public void resetContractState() {
+        this.isCreated = false;
+        this.isSent = false;
+        this.shippingLabel.setIsCreated(false);
+    }
+
 
     /**
      * Gets the ShippingLabel object.
@@ -78,9 +85,8 @@ public class DeliveryContract extends Observable implements IDeliveryContract, S
      * Formats the DeliveryContract object
      * @return
      */
-    @Override
-    public String toString() {
-        return "DeliveryContract\n-----------------\n\n" + "Shipping label\n--------------\n" + getShippingLabel().toString() +
-                "\n\n" + "Transit record\n--------------\n" + getTransitRecord().toString() + "\n";
+    public String getString() {
+        return "DeliveryContract\n-----------------\n\n" + "Shipping label\n--------------\n" + getShippingLabel().getString() +
+                "\n\n" + "Transit record\n--------------\n" + getTransitRecord().getString() + "\n";
     }
 }

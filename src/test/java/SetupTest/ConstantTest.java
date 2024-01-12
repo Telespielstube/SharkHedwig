@@ -16,16 +16,16 @@ public class ConstantTest {
     }
     @Test
     public void testIfHedwigStringGetsReturnedFromAppConstantsEnumClass() {
-        assertEquals("hedwig" , AppConstant.AppFormat.toString());
+        assertEquals("hedwig" , AppConstant.APP_FORMAT.toString());
     }
 
     @Test
     public void testIfAssertNotEqualsTestIsPassed() {
-        assertNotEquals("hedwig", AppConstant.PeerFolder.toString());
+        assertNotEquals("hedwig", AppConstant.PEER_FOLDER.toString());
     }
 
     @Test
     public void testIfAssertNotEqualsTestIsPassedWhenGetterMethodeIsMissing() {
-        assertNotEquals("hedwig", AppConstant.CaId);
+        assertNotEquals("hedwig", AppConstant.CA_ID);
     }
 }

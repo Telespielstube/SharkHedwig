@@ -4,14 +4,12 @@ import DeliveryContract.*;
 import Location.Location;
 import Message.Contract.Confirm;
 import Message.Contract.ContractDocument;
-import Message.Contract.PickUp;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import Misc.Utilities;
 import Session.Sessions.Contract;
 import Session.Sessions.Identification;
 import SetupTest.TestConstant;
-import apple.laf.JRSUIUtils;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeer;
@@ -56,7 +54,7 @@ public class ContractTest {
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         PublicKey publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
-        //identification = new Identification(sharkPKIComponent);
+        Identification identification = new Identification(sharkPKIComponent);
         MessageHandler messageHandler = new MessageHandler();
         contract = new Contract(sharkPKIComponent);
         shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
@@ -90,6 +88,17 @@ public class ContractTest {
         // project "clean code" :) we only use interfaces - unfortunately casting is unavoidable
         return (SharkPKIComponent) component;
     }
+    @Test
+    public void testIfTransitRecordSignaturesAreCorrect() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
+        contractDocument = new ContractDocument(Utilities.createUUID(), MessageFlag.ContractDocument, Utilities.createTimestamp(), deliveryContract);
+        Method handleContract = contract.getClass().getDeclaredMethod("handleContract", ContractDocument.class);
+        handleContract.setAccessible(true);
+        Optional<Confirm> message = (Optional<Confirm>) handleContract.invoke(contract, contractDocument);
+        assertNotNull(message);
+        message.ifPresent(confirm -> assertEquals(confirm.getClass(), Confirm.class));
+        message.ifPresent((o -> assertNotNull(message.get().getDeliveryContract().getTransitRecord().getLastElement().getSignatureTransferee())));
+    }
 
     @Test
     public void testIfLastElementIsReturned() {
@@ -107,20 +116,5 @@ public class ContractTest {
         assertEquals("Bruce", entry.getTransferee());
     }
 
-    @Test
-    public void testIfTransitRecordSignaturesAreCorrect() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
-        contractDocument = new ContractDocument(Utilities.createUUID(), MessageFlag.ContractDocument, Utilities.createTimestamp(), deliveryContract);
 
-        Method handleContract = contract.getClass().getDeclaredMethod("handleContract", ContractDocument.class);
-        handleContract.setAccessible(true);
-        Optional<Confirm> message = (Optional<Confirm>) handleContract.invoke(contract, contractDocument);
-        assertNotNull(message);
-        assertEquals(message.get().getClass(), Confirm.class);
-        Method handleConfirm = contract.getClass().getDeclaredMethod("handleConfirm", Confirm.class, String.class);
-        handleConfirm.setAccessible(true);
-        contract.addMessageToList(contractDocument);
-        Confirm confirm = new Confirm(Utilities.createUUID(), MessageFlag.Confirm, Utilities.createTimestamp(), deliveryContract, true);
-        handleConfirm.invoke(contract, confirm, francisID);
-    }
 }

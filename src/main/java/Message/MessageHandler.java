@@ -17,7 +17,7 @@ public class MessageHandler implements IMessageHandler {
     public boolean checkRecipient(byte[] message) {
         try {
             this.encryptedMessagePackage = ASAPCryptoAlgorithms.parseEncryptedMessagePackage(message);
-            if (!this.encryptedMessagePackage.getReceiver().equals(AppConstant.PeerName.toString())) {
+            if (!this.encryptedMessagePackage.getReceiver().equals(AppConstant.PEER_NAME.toString())) {
                 return false;
             }
         } catch (IOException | ASAPException e) {

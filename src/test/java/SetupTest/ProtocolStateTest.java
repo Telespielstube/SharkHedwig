@@ -2,12 +2,11 @@ package SetupTest;
 
 import DeliveryContract.*;
 import Location.Location;
-import Session.SessionManager;
 import Setup.ProtocolState;
 import org.junit.jupiter.api.Test;
 
-import static Setup.ProtocolState.Transferee;
-import static Setup.ProtocolState.Transferor;
+import static Setup.ProtocolState.TRANSFEREE;
+import static Setup.ProtocolState.TRANSFEROR;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ProtocolStateTest {
@@ -20,7 +19,7 @@ public class ProtocolStateTest {
                 null, null, 0.0);
 
         assertFalse(shippingLabel.getIsCreated());
-        assertEquals(Transferee, ProtocolState.Transferee.isActive());
+        assertEquals(TRANSFEREE, ProtocolState.TRANSFEREE.isActive());
     }
 
     @Test
@@ -29,39 +28,39 @@ public class ProtocolStateTest {
                 new Location(52.456931, 13.526444), "Bob", "Ostbahnhof",
                 new Location(52.5105, 13.4346), 1.2);
         assertFalse(shippingLabel.getIsCreated());
-        assertEquals(Transferor, Transferor.isActive());
+        assertEquals(TRANSFEROR, TRANSFEROR.isActive());
     }
 
     @Test
     public void testIfTheSwitchBetweenDeviceStatesInTheSessionManagerIsWorking() {
-        ProtocolState state = Transferor;
-        assertEquals(Transferor, state);
+        ProtocolState state = TRANSFEROR;
+        assertEquals(TRANSFEROR, state);
     }
 
 
     @Test
     public void checkIfCurrentStateIsTransferor() {
-        ProtocolState state = ProtocolState.Transferor.isActive();
+        ProtocolState state = ProtocolState.TRANSFEROR.isActive();
 
-        assertEquals(Transferor, state);
+        assertEquals(TRANSFEROR, state);
     }
 
     @Test
     public void assertANotEqualResultIfTransferorAndTransfereeStatesAreSetToTrue() {
-        ProtocolState state = Transferee.isActive();
+        ProtocolState state = TRANSFEREE.isActive();
 
-        assertEquals(Transferee, state);
+        assertEquals(TRANSFEREE, state);
     }
 
     @Test
     public void returnEqualsIfTransferorStateIsInActiveAndTransfereeIsActive() {
-        ProtocolState state = Transferor;
-        assertNotEquals(Transferee, state);
+        ProtocolState state = TRANSFEROR;
+        assertNotEquals(TRANSFEREE, state);
     }
 
     @Test
     public void returnEqualsIfTransferorStateIsActiveAndTransfereeIsInactive() {
-        ProtocolState state = Transferee;
-        assertNotEquals(Transferor, state);
+        ProtocolState state = TRANSFEREE;
+        assertNotEquals(TRANSFEROR, state);
     }
 }

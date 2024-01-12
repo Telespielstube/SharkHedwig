@@ -29,33 +29,33 @@ public class Request extends AbstractSession {
 
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
-        Optional<AbstractRequest> messageObject = Optional.empty();
+        Optional<AbstractRequest> optionalMessage = Optional.empty();
         switch(message.getMessageFlag()) {
             case Offer:
-                messageObject = Optional.of(handleOffer((Offer) message).get());
+                optionalMessage = Optional.of(handleOffer((Offer) message).get());
                 break;
             case Confirm:
-                messageObject = Optional.ofNullable(handleConfirm((Confirm) message).orElse(null));
+                optionalMessage = Optional.ofNullable(handleConfirm((Confirm) message).orElse(null));
                 break;
             case Ready:
-                messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
-                if (messageObject.isPresent()) {
-                    this.logEntry = new LogEntry(messageObject.get().getUUID(), Utilities.createReadableTimestamp(),
-                            this.deliveryContract.getShippingLabel().getPackageDestination(),true, AppConstant.PeerName.toString(), sender);
-                    Logger.writeLog(logEntry.toString(), AppConstant.RequestLogPath.toString() +
-                            messageObject.get().getUUID());
+                optionalMessage = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
+                if (optionalMessage.isPresent()) {
+                    this.logEntry = new LogEntry(optionalMessage.get().getUUID(), Utilities.createReadableTimestamp(),
+                            this.deliveryContract.getShippingLabel().getPackageDestination(),true, AppConstant.PEER_NAME.toString(), sender);
+                    Logger.writeLog(logEntry.toString(), AppConstant.REQUEST_LOG_PATH.toString() +
+                            optionalMessage.get().getUUID());
                 }
                 break;
             default:
                 System.err.println("Missing message flag.");
                 break;
         }
-        if (!messageObject.isPresent()) {
+        if (!optionalMessage.isPresent()) {
             clearMessageList();
         } else {
-            addMessageToList(messageObject.get());
+            addMessageToList(optionalMessage.get());
         }
-        return Optional.of(messageObject);
+        return Optional.of(optionalMessage);
     }
 
     @Override
@@ -73,8 +73,8 @@ public class Request extends AbstractSession {
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 if (messageObject.isPresent()) {
                     this.logEntry = new LogEntry(messageObject.get().getUUID(), Utilities.createReadableTimestamp(),
-                            this.deliveryContract.getShippingLabel().getPackageDestination(), true, AppConstant.PeerName.toString(), sender);
-                    Logger.writeLog(logEntry.toString(), AppConstant.RequestLogPath.toString() +
+                            this.deliveryContract.getShippingLabel().getPackageDestination(), true, AppConstant.PEER_NAME.toString(), sender);
+                    Logger.writeLog(logEntry.toString(), AppConstant.REQUEST_LOG_PATH.toString() +
                             messageObject.get().getUUID());
                 }
                 break;

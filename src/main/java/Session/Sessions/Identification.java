@@ -17,9 +17,10 @@ import net.sharksystem.pki.SharkPKIComponent;
 
 public class Identification extends AbstractSession {
 
-    private final SharkPKIComponent sharkPKIComponent;
+    private SharkPKIComponent sharkPKIComponent;
     private byte[] secureNumber;
 
+    public Identification(){}
     /**
      * Identification constructor
      *

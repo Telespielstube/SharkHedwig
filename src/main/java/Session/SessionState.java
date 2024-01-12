@@ -10,53 +10,50 @@ package Session;
  */
 public enum SessionState {
 
-    NoSession {
+    NOSESSION {
         @Override
         public SessionState resetState() {
-            return NoSession;
+            return NOSESSION;
         }
 
         @Override
         public SessionState nextState() {
-            return Identification;
+            return IDENTIFICATION;
         }
     },
 
-    Identification {
+    IDENTIFICATION {
         @Override
         public SessionState resetState() {
-            return NoSession;
+            return NOSESSION;
         }
 
         @Override
         public SessionState nextState() {
-            return Request;
+            return REQUEST;
         }
     },
 
-
-
-
-    Request {
+    REQUEST {
         @Override
         public SessionState resetState() {
-            return NoSession;
+            return NOSESSION;
         }
         @Override
         public SessionState nextState() {
-            return Contract;
+            return CONTRACT;
         }
     },
 
-    Contract() {
+    CONTRACT() {
         @Override
         public SessionState resetState() {
-            return NoSession;
+            return NOSESSION;
         }
 
         @Override
         public SessionState nextState() {
-            return NoSession;
+            return NOSESSION;
         }
     };
 

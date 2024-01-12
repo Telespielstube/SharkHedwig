@@ -28,7 +28,7 @@ public class ShippingLabel extends Observable implements IDeliveryContract, Seri
     private String destination = null;
     private Location locationOrigin = null;
     private Location locationDestination = null;
-    private SessionManager sessionManager = new SessionManager();
+
 
     /**
      * Creates the shipping label object from the user input data, the uuid and the PEER_NAME.
@@ -94,6 +94,10 @@ public class ShippingLabel extends Observable implements IDeliveryContract, Seri
         return this.isCreated;
     }
 
+    public void setIsCreated(boolean isCreated) {
+        this.isCreated =isCreated;
+    }
+
     // Getter methods to get the value of the Object field. No setters because the attriibute values where set
     // remote in the user interface.
     public UUID getUUID() {
@@ -133,8 +137,7 @@ public class ShippingLabel extends Observable implements IDeliveryContract, Seri
      *
      * @return Formatted string representation of object.
      */
-    @Override
-    public String toString() {
+    public String getString() {
         return String.format("PackageUUID: " + this.packageUUID + "; Sender: " + this.sender + "; Origin: " + this.origin +
                 "; Origin coordinates: " + this.locationOrigin + "; Recipient: " + this.recipient + "; Destination: " +
                 this.destination + "; Destination coordinates: " + this.locationDestination + "; Package weight: " + this.packageWeight);

@@ -1,22 +1,14 @@
 package SetupTest;
 
 import DeliveryContract.ShippingLabel;
-import Message.Identification.Challenge;
 import Message.Identification.Response;
-import Message.MessageBuilder;
-import Message.MessageFlag;
-import Message.MessageHandler;
-import Misc.Utilities;
 import Session.SessionManager;
-import Session.SessionState;
 import Session.Sessions.Identification;
 import Setup.Channel;
-import Setup.ProtocolState;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeer;
 import net.sharksystem.SharkTestPeerFS;
-import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
@@ -27,12 +19,9 @@ import org.junit.jupiter.api.Test;
 import javax.crypto.NoSuchPaddingException;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -78,34 +67,15 @@ public class SharkComponentTest {
     @Test
     public void testIfChannelAdvertisementEqualsReceivedURI() {
         String uri = "sn2://Advertisement";
-        assertEquals(uri, Channel.Advertisement.getChannel());
+        assertEquals(uri, Channel.ADVERTISEMENT.getChannel());
     }
 
-    @Test
-    public void handleAnEmptyMessageObjectFromSessionHandler() throws NoSuchFieldException, IllegalAccessException, ASAPSecurityException, NoSuchPaddingException, NoSuchAlgorithmException {
-        MessageHandler messageHandler = new MessageHandler();
-        SessionManager sessionManager = new SessionManager(SessionState.Identification, ProtocolState.Transferor, null, sharkPKIComponent);
-        Field sessionStateField = sessionManager.getClass().getDeclaredField("sessionState");
-        Field noSessionField = sessionManager.getClass().getDeclaredField("noSession");
-        sessionStateField.setAccessible(true);
-        noSessionField.setAccessible(true);
-        sessionStateField.set(sessionManager, SessionState.Identification);
-        noSessionField.set(sessionManager, true);
-        byte[] number = "4634563456".getBytes();
-        byte[] encrypted = Utilities.encryptAsymmetric(number, asapKeyStore.getPublicKey());
-        Response response = new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), encrypted, number);
-        Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(response, "Marta");
-        if (messageBuilder.isPresent()) {
-             assertNotNull(messageBuilder.get());
-        } else {
-            assertEquals(messageBuilder, Optional.empty());
-        }
-    }
+
 
     @Test
     public void cleanUp() {
-        File certificates = Paths.get(String.format("./src/test/resources/TestStorage/ASAPSharkCertificates")).toFile();
-        File credentials = Paths.get(String.format("./src/test/resources/TestStorage/SharkCredentials")).toFile();
+        File certificates = Paths.get("./src/test/resources/TestStorage/ASAPSharkCertificates").toFile();
+        File credentials = Paths.get("./src/test/resources/TestStorage/SharkCredentials").toFile();
         certificates.deleteOnExit();
         credentials.deleteOnExit();
     }

@@ -91,7 +91,7 @@ public class TransitRecord implements IDeliveryContract, Serializable {
         return this.entryList.size();
     }
 
-    public String toString() {
+    public String getString() {
         return this.entryList.toString().replace("[","").replace("]","").replace(", ", "");
     }
 }

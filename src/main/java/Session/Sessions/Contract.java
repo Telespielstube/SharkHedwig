@@ -17,7 +17,7 @@ import java.util.*;
 
 public class Contract extends AbstractSession {
 
-    private final SharkPKIComponent sharkPKIComponent;
+    private SharkPKIComponent sharkPKIComponent;
     private DeliveryContract deliveryContract;
     private IDeliveryContract shippingLabel;
     private IGeoSpatial geoSpatial;
@@ -25,6 +25,7 @@ public class Contract extends AbstractSession {
     private byte[] signedField;
     private ContractState contractState;
 
+    public Contract() {}
 
     public Contract(SharkPKIComponent sharkPKIComponent) {
         this.sharkPKIComponent = sharkPKIComponent;
@@ -38,6 +39,7 @@ public class Contract extends AbstractSession {
         // Check object state to make sure to send the contract documents only once.
         if (!contractState.equals(ContractState.CREATED)) {
             messageObject = Optional.of(createDeliveryContract(sender));
+            this.deliveryContract.setIsSent(true);
         }
 
         switch(message.getMessageFlag()) {
@@ -47,7 +49,7 @@ public class Contract extends AbstractSession {
             case Ack:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 if (messageObject.isPresent()) {
-                    Logger.writeLog(this.deliveryContract.toString(), AppConstant.DeliveryContractLogPath.toString() +
+                    Logger.writeLog(this.deliveryContract.getString(), AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString() +
                             this.deliveryContract.getShippingLabel().getUUID());
                 }
                 break;
@@ -77,7 +79,7 @@ public class Contract extends AbstractSession {
             case PickUp:
                 messageObject = Optional.ofNullable(handlePickUp((PickUp) message, sender).orElse(null));
                 if (messageObject.isPresent()) {
-                    Logger.writeLog(this.deliveryContract.toString(), AppConstant.DeliveryContractLogPath.toString() +
+                    Logger.writeLog(this.deliveryContract.toString(), AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString() +
                             this.deliveryContract.getShippingLabel().getUUID());
                 }
                 break;
@@ -148,7 +150,7 @@ public class Contract extends AbstractSession {
                 this.signedField = ASAPCryptoAlgorithms.sign(MessageHandler.objectToByteArray(this.transitRecord.getLastElement()), sharkPKIComponent);
                 this.transitRecord.getLastElement().setSignatureTransferee(this.signedField);
             } catch (ASAPSecurityException e) {
-                e.printStackTrace();
+                System.err.println("Caught ans ASAPSecurityException: " + e);
                 throw new RuntimeException(e);
             }
             inMemoDeliveryContract(message.getDeliveryContract());
