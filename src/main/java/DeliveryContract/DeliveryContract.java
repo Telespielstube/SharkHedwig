@@ -1,16 +1,32 @@
 package DeliveryContract;
 
-public class DeliveryContract implements IDeliveryContract {
+import Location.IGeoSpatial;
+import Misc.Utilities;
+import Setup.AppConstant;
 
-    private final IDeliveryContract transitRecord;
-    private final IDeliveryContract shippingLabel;
-    private boolean isSent = false;
+import java.io.Serializable;
+import java.util.Observable;
+
+public class DeliveryContract extends Observable implements IDeliveryContract, Serializable {
+
+    private final TransitRecord transitRecord;
+    private final ShippingLabel shippingLabel;
     private boolean isCreated = false;
 
-    public DeliveryContract(IDeliveryContract shippingLabel, IDeliveryContract transitRecord) {
+    public DeliveryContract(String sender, IGeoSpatial geoSpatial) {
+        this.shippingLabel = getShippingLabel();
+        this.transitRecord = new TransitRecord();
+        this.transitRecord.addEntry(new TransitEntry(this.transitRecord.countUp(), this.shippingLabel.getUUID(), AppConstant.PeerName.toString(),
+                sender, geoSpatial.getCurrentLocation(), Utilities.createTimestamp(), null, null));
+        setChanged();
+        notifyObservers(this.isCreated);
+    }
+
+    public DeliveryContract(ShippingLabel shippingLabel, TransitRecord transitRecord){
         this.shippingLabel = shippingLabel;
         this.transitRecord = transitRecord;
-        this.isCreated = true;
+        setChanged();
+        notifyObservers(this.isCreated = true);
     }
 
     @Override
@@ -18,43 +34,27 @@ public class DeliveryContract implements IDeliveryContract {
         return this;
     }
 
-    @Override
-    public boolean getIsCreated() {
-        return this.isCreated;
-    }
-
-    @Override
     public void setIsCreated(boolean isCreated) {
         this.isCreated = isCreated;
     }
 
+    public boolean getIsCreated() {
+        return this.isCreated;
+    }
+
+
+
+
     /**
      * After the hand over is complete the former transferor has to reset all DeliveryContract states to the initial states.
      */
-    public void resetContractState() {
-        this.isCreated = false;
-        this.setContractSent(false);
-        this.shippingLabel.setIsCreated(false);
-        this.transitRecord.setIsCreated(false);
-    }
-
-    /**
-     * Gets the current state if contract is sent or not
-     *
-     * @return    true if sent and false if not.
-     */
-    public boolean getContractSent() {
-        return this.isSent;
-    }
-
-    /**
-     * Sets the state if contract is sent.
-     *
-     * @param isSent    true if sent, false if not.
-     */
-    public void setContractSent(boolean isSent) {
-        this.isSent = isSent;
-    }
+//    public void resetContractState() {
+//        this.isCreated = false;
+//        this.setContractSent(false);
+////        this.shippingLabel.setIsCreated(false);
+////        this.transitRecord.setIsCreated(false);
+//    }
+//
 
     /**
      * Gets the ShippingLabel object.

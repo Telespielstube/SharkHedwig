@@ -38,7 +38,7 @@ public class DeliveryContractTest {
         transitRecord = new TransitRecord();
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         assertNotNull(deliveryContract);
-        assertFalse(deliveryContract.getContractSent());
+        assertTrue(deliveryContract.getIsCreated());
         assertNotNull(transitRecord.getClass());
     }
 
@@ -48,21 +48,14 @@ public class DeliveryContractTest {
         transitRecord = new TransitRecord();
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         assertFalse(shippingLabel.getIsCreated());
-        assertTrue(transitRecord.getIsCreated());
+        assertNotNull(transitRecord.get());
     }
     @Test
     public void returnTrueIfContractSetMethodIsCalled() {
         assertNotNull(deliveryContract = new DeliveryContract(shippingLabel, transitRecord));
-        deliveryContract.setContractSent(true);
-        assertTrue(deliveryContract.getContractSent());
+        assertTrue(deliveryContract.getIsCreated());
     }
 
-    @Test
-    public void returnFalseIfContractSetMethodIsNotCalled() {
-        assertNotNull(deliveryContract = new DeliveryContract(shippingLabel, transitRecord));
-        assertFalse(deliveryContract.getContractSent());
-
-    }
 
     @Test
     public void ShippingLabelAndTransitRecordObjectsAreAccessible() {

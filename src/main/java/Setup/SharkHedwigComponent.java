@@ -1,5 +1,7 @@
 package Setup;
 
+import DeliveryContract.DeliveryContract;
+import DeliveryContract.ShippingLabel;
 import Misc.ErrorLogger;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkException;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Observer;
 import java.util.Optional;
 
 import Misc.Logger;
@@ -27,6 +30,8 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
     private ProtocolState protocolState;
     private final SharkPeerFS sharkPeerFS;
     private ASAPMessages messages;
+    private ShippingLabel shippingLabel = new ShippingLabel();
+    private DeliveryContract deliveryContract = new DeliveryContract("", null);
 
     public SharkHedwigComponent(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         ErrorLogger.redirectErrorStream(AppConstant.PeerFolder.toString(), AppConstant.LogFolder.toString(), "errorLog.txt");
@@ -83,6 +88,8 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
         new PKIManager(sharkPKIComponent);
         try {
             this.sessionManager = new SessionManager(SessionState.NoSession, ProtocolState.Transferee , this.peer, this.sharkPKIComponent);
+            shippingLabel.addObserver((Observer) this.sessionManager);
+            deliveryContract.addObserver((Observer) this.shippingLabel);
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
             System.err.println("Caught an Exception: " + e);
             throw new RuntimeException(e);

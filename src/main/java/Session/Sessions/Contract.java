@@ -23,6 +23,7 @@ public class Contract extends AbstractSession {
     private IGeoSpatial geoSpatial;
     private TransitRecord transitRecord;
     private byte[] signedField;
+    private ContractState contractState;
 
 
     public Contract(SharkPKIComponent sharkPKIComponent) {
@@ -35,10 +36,10 @@ public class Contract extends AbstractSession {
     public Optional<Object> transferor(IMessage message, String sender) {
         Optional<AbstractContract> messageObject = Optional.empty();
         // Check object state to make sure to send the contract documents only once.
-        if (!this.deliveryContract.getContractSent()) {
+        if (!contractState.equals(ContractState.CREATED)) {
             messageObject = Optional.of(createDeliveryContract(sender));
-            this.deliveryContract.setContractSent(true);
         }
+
         switch(message.getMessageFlag()) {
             case Confirm:
                 messageObject = Optional.ofNullable(handleConfirm((Confirm) message, sender).orElse(null));
@@ -103,13 +104,10 @@ public class Contract extends AbstractSession {
      * @return    new ContractDocument message object.
      */
     private ContractDocument createDeliveryContract(String sender) {
-        ShippingLabel label = this.deliveryContract.getShippingLabel();
-        this.transitRecord = new TransitRecord();
-        this.transitRecord.addEntry(new TransitEntry(this.transitRecord.countUp(), label.getUUID(), AppConstant.PeerName.toString(),
-                sender, this.geoSpatial.getCurrentLocation(), Utilities.createTimestamp(), null, null));
-        this.deliveryContract.setContractSent(true);
+        this.deliveryContract = new DeliveryContract(sender, geoSpatial);
+        this.contractState = ContractState.CREATED;
         return new ContractDocument(Utilities.createUUID(), MessageFlag.ContractDocument,
-                Utilities.createTimestamp(), new DeliveryContract(label, this.transitRecord));
+                Utilities.createTimestamp(), this.deliveryContract);
     }
 
     /**
@@ -166,9 +164,10 @@ public class Contract extends AbstractSession {
      */
     private void inMemoDeliveryContract(DeliveryContract message) {
         ShippingLabel label = message.getShippingLabel();
-        this.shippingLabel = new ShippingLabel(label.getUUID(), label.getSender(), label.getOrigin(), label.getPackageOrigin(),
-                label.getRecipient(), label.getDestination(), label.getPackageDestination(), label.getPackageWeight());
-        this.deliveryContract = new DeliveryContract(this.shippingLabel, new TransitRecord(this.transitRecord.getAllEntries()));
+        this.deliveryContract = new DeliveryContract(new ShippingLabel(label.getUUID(), label.getSender(), label.getOrigin(),
+                label.getPackageOrigin(), label.getRecipient(), label.getDestination(), label.getPackageDestination(),
+                label.getPackageWeight()), new TransitRecord(this.transitRecord.getAllEntries()));
+        this.contractState = ContractState.CREATED;
     }
 
     /**

@@ -2,10 +2,11 @@ package DeliveryContract;
 
 import Location.Location;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class TransitEntry {
+public class TransitEntry implements Serializable {
 
     private int serialNumber = 0;
     private UUID packageUUID;

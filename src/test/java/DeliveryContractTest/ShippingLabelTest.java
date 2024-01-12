@@ -18,7 +18,7 @@ public class ShippingLabelTest {
     public void testIfCreateReturnsFalseWhenPassedObjectHasNullValue() {
         boolean created = shippingLabel.create(nullUserInputBuilder);
         assertFalse(created);
-        assertFalse(shippingLabel.getIsCreated());
+
     }
 
     @Test

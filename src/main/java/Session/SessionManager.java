@@ -1,8 +1,6 @@
 package Session;
 
-import DeliveryContract.DeliveryContract;
-import DeliveryContract.IDeliveryContract;
-import DeliveryContract.ShippingLabel;
+import DeliveryContract.*;
 import Misc.LogEntry;
 import Misc.Utilities;
 import Session.Sessions.*;
@@ -13,9 +11,11 @@ import net.sharksystem.asap.ASAPPeer;
 import net.sharksystem.pki.SharkPKIComponent;
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Optional;
 
-public class SessionManager implements ISessionManager {
+public class SessionManager implements Observer, ISessionManager {
 
     private SessionState sessionState;
     private ProtocolState protocolState;
@@ -26,10 +26,13 @@ public class SessionManager implements ISessionManager {
     private Advertisement advertisement;
     private LogEntry logEntry;
     private MessageBuilder messageBuilder;
-    private final IDeliveryContract shippingLabel = new ShippingLabel();
     private boolean noSession = false; // attribute because NoSession has no Session Object.
     private DeliveryContract deliveryContract;
     private Optional<Object> messageObject;
+    private boolean contractCreated;
+    private boolean labelCreated;
+
+    public SessionManager() {}
 
     public SessionManager(SessionState sessionState, ProtocolState protocolState, ASAPPeer peer, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.protocolState = protocolState;
@@ -50,19 +53,23 @@ public class SessionManager implements ISessionManager {
     }
 
     @Override
-    public void checkDeviceState() {
-        if (this.shippingLabel.getIsCreated() ) {
-            this.protocolState = ProtocolState.Transferor.isActive();
+    public void update(Observable o, Object arg) {
+        if (o instanceof ShippingLabel ) {
+            this.protocolState = ProtocolState.Transferor;
+            this.labelCreated = ((ShippingLabel) o).getIsCreated();
+
         }
-        this.protocolState = ProtocolState.Transferee.isActive();
+        if (o instanceof DeliveryContract) {
+            this.contractCreated = ((DeliveryContract) o).getIsCreated();
+        }
     }
 
     @Override
     public Optional<MessageBuilder> sessionHandling(IMessage message, String sender) {
-        checkDeviceState();
+
         switch (this.sessionState) {
             case NoSession:
-                if (this.protocolState.equals(ProtocolState.Transferor.isActive())) {
+                if (this.protocolState.equals(ProtocolState.Transferor) && this.labelCreated) {
                     this.messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetState()));
                 }
                 // Only the NoSession combined with Transferee state creates an Advertisement message.
@@ -116,7 +123,7 @@ public class SessionManager implements ISessionManager {
      * @param message    Received identification message
      */
     private void processIdentification(IMessage message) {
-        if (this.protocolState.equals(ProtocolState.Transferor.isActive())) {
+        if (this.protocolState.equals(ProtocolState.Transferor)) {
             this.messageObject = Optional.ofNullable(this.identification.transferor(message, sender).orElse(this.sessionState.resetState()));
         } else {
             this.messageObject = Optional.ofNullable(this.identification.transferee(message, sender).orElse(this.sessionState.resetState()));
@@ -134,7 +141,7 @@ public class SessionManager implements ISessionManager {
      * @param message    Received request message
      */
     private void processRequest(IMessage message) {
-        if (this.protocolState.equals(ProtocolState.Transferor.isActive())) {
+        if (this.protocolState.equals(ProtocolState.Transferor)) {
             this.messageObject = Optional.ofNullable(this.request.transferor(message, sender).orElse(this.sessionState.resetState()));
         } else {
             this.messageObject = Optional.ofNullable(this.request.transferee(message, sender).orElse(this.sessionState.resetState()));
@@ -152,7 +159,7 @@ public class SessionManager implements ISessionManager {
      * @param message    Received contract message
      */
     private void processContract(IMessage message) {
-        if (protocolState.equals(ProtocolState.Transferor.isActive())) {
+        if (protocolState.equals(ProtocolState.Transferor)) {
             this.messageObject = Optional.ofNullable(this.contract.transferor(message, sender).orElse(this.sessionState.resetState()));
         } else {
             this.messageObject = Optional.ofNullable(this.contract.transferee(message, sender).orElse(this.sessionState.resetState()));
@@ -170,10 +177,10 @@ public class SessionManager implements ISessionManager {
      */
     public void changeDeviceState() {
         if (protocolState.equals(ProtocolState.Transferor)) {
-            protocolState = ProtocolState.Transferee.isActive();
-            this.deliveryContract.resetContractState();
+            protocolState = ProtocolState.Transferee;
+          //  this.deliveryContract.resetContractState();
         } else { // New transferor does not have to set the contract state. Already set in 'storeDeliveryContract' methode.
-            protocolState = ProtocolState.Transferor.isActive();
+            protocolState = ProtocolState.Transferor;
         }
     }
 
@@ -189,6 +196,5 @@ public class SessionManager implements ISessionManager {
         this.request.clearMessageList();
         this.contract.clearMessageList();
         this.sessionState.resetState();
-        this.deliveryContract.setContractSent(false);
     }
 }

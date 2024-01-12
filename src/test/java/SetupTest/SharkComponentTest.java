@@ -1,6 +1,7 @@
 package SetupTest;
 
 import DeliveryContract.ShippingLabel;
+import Message.Identification.Challenge;
 import Message.Identification.Response;
 import Message.MessageBuilder;
 import Message.MessageFlag;

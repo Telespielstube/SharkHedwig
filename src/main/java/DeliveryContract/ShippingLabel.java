@@ -1,10 +1,14 @@
 package DeliveryContract;
 
+import HedwigUI.IUserInterface;
 import HedwigUI.UserInputObject;
 import Location.Location;
 import Misc.Utilities;
+import Session.SessionManager;
 
+import java.io.Serializable;
 import java.util.Objects;
+import java.util.Observable;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -13,8 +17,9 @@ import java.util.stream.Stream;
  * their entry. The input is immutable that means it cannot be changed after confimration.
  * That is why there are no set methods in this class.
  */
-public class ShippingLabel implements IDeliveryContract {
+public class ShippingLabel extends Observable implements IDeliveryContract, Serializable, IUserInterface {
 
+    private boolean isCreated;
     private UUID packageUUID;
     private String sender = null;
     private String origin = null;
@@ -23,7 +28,7 @@ public class ShippingLabel implements IDeliveryContract {
     private String destination = null;
     private Location locationOrigin = null;
     private Location locationDestination = null;
-    private boolean isCreated = false;
+    private SessionManager sessionManager = new SessionManager();
 
     /**
      * Creates the shipping label object from the user input data, the uuid and the PEER_NAME.
@@ -45,6 +50,7 @@ public class ShippingLabel implements IDeliveryContract {
         this.destination = destination;
         this.locationDestination = locationDestination;
         this.packageWeight = packageWeight;
+        this.isCreated = false;
     }
 
     public ShippingLabel() {}
@@ -57,13 +63,12 @@ public class ShippingLabel implements IDeliveryContract {
 
     public boolean create(UserInputObject object) {
         if (verifyUserData(object)) {
-            new ShippingLabel(Utilities.createUUID(), object.getSender(), object.getOrigin(), new Location(object.getLatitudeOrigin(),
-                    object.getLongitudeOrigin()), object.getRecipient(), object.getDestination(), new Location(object.getLatitudeDest(),
-                    object.getLongitudeDest()), object.getPackageWeight());
-            this.isCreated = true;
+            new ShippingLabel(Utilities.createUUID(), object.getSender(), object.getOrigin(), new Location(object.getLatitudeOrigin(), object.getLongitudeOrigin()), object.getRecipient(), object.getDestination(), new Location(object.getLatitudeDest(), object.getLongitudeDest()), object.getPackageWeight());
+            setChanged();
+            notifyObservers(this.isCreated = true);
             return true;
         }
-        this.isCreated = false;
+
         return false;
     }
 
@@ -85,14 +90,8 @@ public class ShippingLabel implements IDeliveryContract {
         return this;
     }
 
-    @Override
     public boolean getIsCreated() {
         return this.isCreated;
-    }
-
-    @Override
-    public void setIsCreated(boolean isCreated) {
-        this.isCreated = isCreated;
     }
 
     // Getter methods to get the value of the Object field. No setters because the attriibute values where set

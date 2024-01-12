@@ -22,16 +22,13 @@ import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;

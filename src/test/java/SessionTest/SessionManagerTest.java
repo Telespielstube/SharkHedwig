@@ -22,6 +22,7 @@ import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -80,7 +81,6 @@ public class SessionManagerTest {
         ShippingLabel shippingLabel = new ShippingLabel();
         sessionManager = new SessionManager(SessionState.Identification, ProtocolState.Transferee, null, sharkPKIComponent);
         assertFalse(shippingLabel.getIsCreated());
-        sessionManager.checkDeviceState();
         assertNotEquals(ProtocolState.Transferor, ProtocolState.Transferee);
     }
 
@@ -88,7 +88,6 @@ public class SessionManagerTest {
     public void transfereeIsNotChangedIfCreateMethodeIsNotCalled() throws NoSuchPaddingException, NoSuchAlgorithmException {
         shippingLabel = new ShippingLabel();
         sessionManager = new SessionManager(SessionState.NoSession, ProtocolState.Transferee, null, sharkPKIComponent);
-        sessionManager.checkDeviceState();
         assertEquals(ProtocolState.Transferee, ProtocolState.Transferee);
         shippingLabel = new ShippingLabel(null, "Alice", "HTW-Berlin",
                 new Location(52.456931, 13.526444), "Bob", "Ostbahnhof",
@@ -100,11 +99,9 @@ public class SessionManagerTest {
     public void transfereeStateChangesWhenCreateIsCalled() throws NoSuchPaddingException, NoSuchAlgorithmException {
         shippingLabel = new ShippingLabel();
         sessionManager = new SessionManager(SessionState.Identification, ProtocolState.Transferee, null, sharkPKIComponent);
-        sessionManager.checkDeviceState();
         UserInputObject userInput = new UserInputObject("Alice", "HTW-Berlin", 52.456931, 13.526444,
                 "Bob", "Ostbahnhof", 52.5105, 13.4346, 1.2);
         shippingLabel.create(userInput);
-        sessionManager.checkDeviceState();
         assertNotEquals(ProtocolState.Transferee, ProtocolState.Transferor);
     }
 
@@ -132,7 +129,7 @@ public class SessionManagerTest {
         Optional<Object> object = Optional.ofNullable(sessionManager.sessionHandling(advertisement,"Bobby"));
         Field protocolStateField = sessionManager.getClass().getDeclaredField("protocolState");
         protocolStateField.setAccessible(true);
-        assertNotEquals(ProtocolState.Transferor, protocolStateField.get(sessionManager));
+        assertEquals(ProtocolState.Transferor, protocolStateField.get(sessionManager));
         assertTrue(object.isPresent()); // This is true because uri and sender are present
     }
 
@@ -159,9 +156,7 @@ public class SessionManagerTest {
         byte[] encrypted = Utilities.encryptAsymmetric(number, asapKeyStore.getPublicKey());
         Response response = new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), encrypted, number);
         Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(response, francisID);
-        if (messageBuilder.isPresent()) {
-            assertNotNull(messageBuilder.get());
-        }
+        messageBuilder.ifPresent(Assertions::assertNotNull);
         //assertNotEquals("Message flag was incorrect: Response", Optional.empty().toString());
     }
 

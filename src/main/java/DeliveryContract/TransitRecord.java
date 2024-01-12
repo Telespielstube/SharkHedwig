@@ -1,5 +1,6 @@
 package DeliveryContract;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  * Class to add a new entry to the list of all previous handovers of this package.
  */
-public class TransitRecord implements IDeliveryContract {
+public class TransitRecord implements IDeliveryContract, Serializable {
 
     private TransitEntry transitEntry;
     private List<TransitEntry> entryList = null;
@@ -47,15 +48,15 @@ public class TransitRecord implements IDeliveryContract {
         return this;
     }
 
-    @Override
-    public boolean getIsCreated() {
-        return this.isCreated;
-    }
-
-    @Override
-    public void setIsCreated(boolean isCreated) {
-        this.isCreated = isCreated;
-    }
+//    @Override
+//    public boolean getIsCreated() {
+//        return this.isCreated;
+//    }
+//
+//    @Override
+//    public void setIsCreated(boolean isCreated) {
+//        this.isCreated = isCreated;
+//    }
 
     /**
      * Adds a new entry to the transit record list.
