@@ -1,5 +1,7 @@
 package Setup;
 
+import DeliveryContract.DeliveryContract;
+import DeliveryContract.ShippingLabel;
 import Misc.ErrorLogger;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkException;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Observer;
 import java.util.Optional;
 
 import Misc.Logger;
@@ -27,10 +30,16 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
     private final MessageHandler messageHandler;
     private ISessionManager sessionManager;
     private final SharkPeerFS sharkPeerFS;
+<<<<<<< HEAD
+=======
+    private ASAPMessages messages;
+    private ShippingLabel shippingLabel = new ShippingLabel();
+    private DeliveryContract deliveryContract = new DeliveryContract("", null);
+>>>>>>> tmp
 
     public SharkHedwigComponent(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
-        ErrorLogger.redirectErrorStream(AppConstant.PeerFolder.toString(), AppConstant.LogFolder.toString(), "errorLog.txt");
-        this.sharkPeerFS = new SharkPeerFS(AppConstant.PeerName.toString(), AppConstant.PeerFolder.toString() + "/" + AppConstant.PeerName.toString() );
+        ErrorLogger.redirectErrorStream(AppConstant.PEER_FOLDER.toString(), AppConstant.LOG_FOLDER.toString(), "errorLog.txt");
+        this.sharkPeerFS = new SharkPeerFS(AppConstant.PEER_NAME.toString(), AppConstant.PEER_FOLDER.toString() + "/" + AppConstant.PEER_NAME.toString() );
         this.sharkPKIComponent = pkiComponent;
         this.messageHandler = new MessageHandler();
 
@@ -67,11 +76,11 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
     @Override
     public void onStart(ASAPPeer asapPeer) throws SharkException {
         this.peer = asapPeer;
-        this.peer.addASAPMessageReceivedListener(AppConstant.AppFormat.toString(), this);
+        this.peer.addASAPMessageReceivedListener(AppConstant.APP_FORMAT.toString(), this);
         try {
-            this.peer.setASAPRoutingAllowed(AppConstant.AppFormat.toString(), true);
+            this.peer.setASAPRoutingAllowed(AppConstant.APP_FORMAT.toString(), true);
             this.setupChannel();
-            this.peer.getASAPStorage(AppConstant.AppFormat.toString()).getOwner();
+            this.peer.getASAPStorage(AppConstant.APP_FORMAT.toString()).getOwner();
             this.setupLogger();
             ErrorLogger.redirectErrorStream(AppConstant.PeerFolder.toString(), AppConstant.LogFolder.toString(), "errorLog.txt");
         } catch (IOException e) {
@@ -79,7 +88,9 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
         }
         new PKIManager(sharkPKIComponent);
         try {
-            this.sessionManager = new SessionManager(SessionState.NoSession, ProtocolState.Transferee , this.peer, this.sharkPKIComponent);
+            this.sessionManager = new SessionManager(SessionState.NOSESSION, ProtocolState.TRANSFEREE, this.peer, this.sharkPKIComponent);
+            shippingLabel.addObserver((Observer) this.sessionManager);
+            deliveryContract.addObserver((Observer) this.shippingLabel);
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
             System.err.println("Caught an Exception: " + e);
             throw new RuntimeException(e);
@@ -92,7 +103,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
     public void setupChannel()  {
         for (Channel type : Channel.values()) {
             try {
-                this.peer.getASAPStorage(AppConstant.AppFormat.toString()).createChannel(type.getChannel());
+                this.peer.getASAPStorage(AppConstant.APP_FORMAT.toString()).createChannel(type.getChannel());
             } catch (IOException | ASAPException e) {
                 System.err.println("Caught an Exception: " + e);
                 throw new RuntimeException(e);
@@ -104,10 +115,10 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
      * Setting up all things logging. The folder and the files to differentiate between request session and contract session.
      */
     public void setupLogger() {
-        String[] directories = { AppConstant.RequestLog.toString(), AppConstant.DeliveryContract.toString() };
+        String[] directories = { AppConstant.REQUEST_LOG.toString(), AppConstant.DELIVERY_CONTRACT.toString() };
         try {
             for (String directory : directories) {
-                Logger.createLogDirectory(AppConstant.PeerFolder.toString(), AppConstant.LogFolder.toString(), directory);
+                Logger.createLogDirectory(AppConstant.PEER_FOLDER.toString(), AppConstant.LOG_FOLDER.toString(), directory);
             }
         } catch (IOException e) {
             System.err.println("Caught an IOException: " + e.getMessage());
@@ -127,6 +138,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
 
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list)      throws IOException {
         CharSequence uri = messages.getURI();
+<<<<<<< HEAD
         if (uri.equals(Channel.Advertisement.getChannel())) {
             processMessages(messages, senderE2E);
         } else if (uri.equals(Channel.Identification.getChannel())) {
@@ -134,6 +146,15 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
         } else if (uri.equals(Channel.Request.getChannel()))  {
             processMessages(messages, senderE2E);
         } else if (uri.equals(Channel.Contract.getChannel()))  {
+=======
+        if ( uri.equals(Channel.ADVERTISEMENT.getChannel()) ) {
+            processMessages(messages, senderE2E);
+        } else if ( (uri.equals(Channel.IDENTIFICATION.getChannel()))) {
+            processMessages(messages, senderE2E);
+        } else if (uri.equals(Channel.REQUEST.toString()))  {
+            processMessages(messages, senderE2E);
+        } else if (uri.equals(Channel.CONTRACT.toString()))  {
+>>>>>>> tmp
             processMessages(messages, senderE2E);
         }
         System.err.println("Message has invalid format: ");
@@ -165,7 +186,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
                 encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.get().getMessage(),
                         messageBuilder.get().getUri(), messageBuilder.get().getSender(), sharkPKIComponent);
                 try {
-                    this.peer.sendASAPMessage(AppConstant.AppFormat.toString(), AppConstant.Scheme +
+                    this.peer.sendASAPMessage(AppConstant.APP_FORMAT.toString(), AppConstant.SCHEME +
                             messageBuilder.get().getUri(), encryptedMessage);
                 } catch (ASAPException e) {
                     System.err.println("Caught an Exception: " + e);

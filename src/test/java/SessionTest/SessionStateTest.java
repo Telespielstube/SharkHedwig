@@ -10,31 +10,31 @@ public class SessionStateTest {
 
     @Test
     public void testIfNextSessionIsIdentification() {
-        assertEquals(SessionState.Identification, SessionState.NoSession.nextState());
+        assertEquals(SessionState.IDENTIFICATION, SessionState.NOSESSION.nextState());
     }
 
     @Test
     public void testIfNexSessioneIsRequest() {
-        assertEquals(SessionState.Request, SessionState.Identification.nextState());
+        assertEquals(SessionState.REQUEST, SessionState.IDENTIFICATION.nextState());
     }
 
     @Test
     public void testIfNextSessionIsActive() {
-        assertEquals(SessionState.Contract, SessionState.Request.nextState());
+        assertEquals(SessionState.CONTRACT, SessionState.REQUEST.nextState());
     }
 
     @Test
     public void testIfResetNoSessionIsNoSession() {
-        assertEquals(SessionState.NoSession, SessionState.NoSession.resetState());
+        assertEquals(SessionState.NOSESSION, SessionState.NOSESSION.resetState());
     }
 
     @Test
     public void testIResetContractSessionIsNoSession() {
-        assertEquals(SessionState.NoSession, SessionState.Contract.resetState());
+        assertEquals(SessionState.NOSESSION, SessionState.CONTRACT.resetState());
     }
 
     @Test
     public void testIResetContractSessionIsNotIdentificationSession() {
-        assertNotEquals(SessionState.Identification, SessionState.Contract.resetState());
+        assertNotEquals(SessionState.IDENTIFICATION, SessionState.CONTRACT.resetState());
     }
 }

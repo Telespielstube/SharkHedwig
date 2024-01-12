@@ -2,10 +2,11 @@ package DeliveryContract;
 
 import Location.Location;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class TransitEntry {
+public class TransitEntry implements Serializable {
 
     private int serialNumber = 0;
     private UUID packageUUID;
@@ -86,7 +87,7 @@ public class TransitEntry {
      *
      * @return    String object of  all attributes.
      */
-    public String toString() {
+    public String getString() {
         return String.format("S/N: " + this.serialNumber + "; PackageUUID: " + this.packageUUID + "; Transferor: " +
                 this.transferor + "; Transferee: " + this.transferee + "; Pick up Location: " +
                 this.pickUpLocation + "; Timestamp: " + this.timestamp + "; Signature Transferee: " +

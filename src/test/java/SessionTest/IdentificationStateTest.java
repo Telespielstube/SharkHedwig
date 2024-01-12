@@ -9,32 +9,32 @@ public class IdentificationStateTest {
 
     @Test
     public void testIfStateVariableProceedsToNextState() {
-        SessionState state = SessionState.NoSession.resetState();
+        SessionState state = SessionState.NOSESSION.resetState();
 
         //state.nextState();
         assertEquals("Identification", state.nextState().toString());
     }
     @Test
     public void testIfNoStateIsActive() {
-        SessionState state = SessionState.NoSession.resetState();
-        assertEquals(SessionState.NoSession.resetState(), state);
+        SessionState state = SessionState.NOSESSION.resetState();
+        assertEquals(SessionState.NOSESSION.resetState(), state);
     }
 
     @Test
     public void checkIfNextStateAfterNoStateIsIdentificationState() {
-        SessionState state = SessionState.NoSession.nextState();
-        assertEquals(SessionState.Identification, state);
+        SessionState state = SessionState.NOSESSION.nextState();
+        assertEquals(SessionState.IDENTIFICATION, state);
     }
 
     @Test
     public void checkIfNextStateAfterRequestIsContractState() {
-        SessionState state = SessionState.Request.nextState();
-        assertEquals(SessionState.Contract, state);
+        SessionState state = SessionState.REQUEST.nextState();
+        assertEquals(SessionState.CONTRACT, state);
     }
 
     @Test
     public void checkIfNextStateAfterHandoverIsNoState() {
-        SessionState state = SessionState.Contract.nextState();
-        assertEquals(SessionState.NoSession.resetState(), state);
+        SessionState state = SessionState.CONTRACT.nextState();
+        assertEquals(SessionState.NOSESSION.resetState(), state);
     }
 }

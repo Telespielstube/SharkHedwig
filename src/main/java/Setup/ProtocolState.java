@@ -8,17 +8,17 @@ package Setup;
  * This would change the state back to transferee.
  */
 public enum ProtocolState {
-    Transferor {
+    TRANSFEROR {
 
         @Override
         public ProtocolState isActive() {
-            return Transferor;
+            return TRANSFEROR;
         }
     },
-    Transferee {
+    TRANSFEREE {
         @Override
         public ProtocolState isActive() {
-            return Transferee;
+            return TRANSFEREE;
         }
     };
 

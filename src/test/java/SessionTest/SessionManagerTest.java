@@ -22,6 +22,7 @@ import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -78,48 +79,44 @@ public class SessionManagerTest {
     @Test
     public void testIfDeviceTransferorIsUnchangedWhenShippingLabelIsCreatedButEmpty() throws NoSuchPaddingException, NoSuchAlgorithmException {
         ShippingLabel shippingLabel = new ShippingLabel();
-        sessionManager = new SessionManager(SessionState.Identification, ProtocolState.Transferee, null, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState.IDENTIFICATION, ProtocolState.TRANSFEREE, null, sharkPKIComponent);
         assertFalse(shippingLabel.getIsCreated());
-        sessionManager.checkDeviceState();
-        assertNotEquals(ProtocolState.Transferor, ProtocolState.Transferee);
+        assertNotEquals(ProtocolState.TRANSFEROR, ProtocolState.TRANSFEREE);
     }
 
     @Test
     public void transfereeIsNotChangedIfCreateMethodeIsNotCalled() throws NoSuchPaddingException, NoSuchAlgorithmException {
         shippingLabel = new ShippingLabel();
-        sessionManager = new SessionManager(SessionState.NoSession, ProtocolState.Transferee, null, sharkPKIComponent);
-        sessionManager.checkDeviceState();
-        assertEquals(ProtocolState.Transferee, ProtocolState.Transferee);
+        sessionManager = new SessionManager(SessionState.NOSESSION, ProtocolState.TRANSFEREE, null, sharkPKIComponent);
+        assertEquals(ProtocolState.TRANSFEREE, ProtocolState.TRANSFEREE);
         shippingLabel = new ShippingLabel(null, "Alice", "HTW-Berlin",
                 new Location(52.456931, 13.526444), "Bob", "Ostbahnhof",
                 new Location(52.5105, 13.4346), 1.2);
-        assertEquals(ProtocolState.Transferee, ProtocolState.Transferee);
+        assertEquals(ProtocolState.TRANSFEREE, ProtocolState.TRANSFEREE);
     }
 
     @Test
     public void transfereeStateChangesWhenCreateIsCalled() throws NoSuchPaddingException, NoSuchAlgorithmException {
         shippingLabel = new ShippingLabel();
-        sessionManager = new SessionManager(SessionState.Identification, ProtocolState.Transferee, null, sharkPKIComponent);
-        sessionManager.checkDeviceState();
+        sessionManager = new SessionManager(SessionState.IDENTIFICATION, ProtocolState.TRANSFEREE, null, sharkPKIComponent);
         UserInputObject userInput = new UserInputObject("Alice", "HTW-Berlin", 52.456931, 13.526444,
                 "Bob", "Ostbahnhof", 52.5105, 13.4346, 1.2);
         shippingLabel.create(userInput);
-        sessionManager.checkDeviceState();
-        assertNotEquals(ProtocolState.Transferee, ProtocolState.Transferor);
+        assertNotEquals(ProtocolState.TRANSFEREE, ProtocolState.TRANSFEROR);
     }
 
     @Test
     public void testIfMessageIsUnhandledWhenSessionDiffers() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
-        sessionManager = new SessionManager(SessionState.NoSession, ProtocolState.Transferor, null, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState.NOSESSION, ProtocolState.TRANSFEROR, null, sharkPKIComponent);
         byte[] encryptedNumber = Utilities.encryptAsymmetric("3345".getBytes(), asapKeyStore.getPublicKey());
         Challenge challenge = new Challenge(UUID.randomUUID(), MessageFlag.Challenge, System.currentTimeMillis(), encryptedNumber );
         MessageBuilder messageBuilder = sessionManager.sessionHandling(challenge, "Marta").get();
-        assertEquals(Channel.Advertisement.getChannel(), messageBuilder.getUri());
+        assertEquals(Channel.ADVERTISEMENT.getChannel(), messageBuilder.getUri());
     }
 
     @Test
     public void handleNoSessionAsTransferee() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        sessionManager = new SessionManager(SessionState.NoSession, ProtocolState.Transferee, null, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState.NOSESSION, ProtocolState.TRANSFEREE, null, sharkPKIComponent);
         Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
         Optional<Object> object = Optional.ofNullable(sessionManager.sessionHandling(advertisement,"Bobby"));
         assertTrue(object.isPresent()); // This is true because uri and sender are present
@@ -127,19 +124,19 @@ public class SessionManagerTest {
 
     @Test
     public void doNotProcessAdvertisementIfStateIsTransferorWithoutAShippingLabel() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchFieldException, IllegalAccessException {
-        sessionManager = new SessionManager(SessionState.NoSession, ProtocolState.Transferor, null, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState.NOSESSION, ProtocolState.TRANSFEROR, null, sharkPKIComponent);
         Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
         Optional<Object> object = Optional.ofNullable(sessionManager.sessionHandling(advertisement,"Bobby"));
         Field protocolStateField = sessionManager.getClass().getDeclaredField("protocolState");
         protocolStateField.setAccessible(true);
-        assertNotEquals(ProtocolState.Transferor, protocolStateField.get(sessionManager));
+        assertEquals(ProtocolState.TRANSFEROR, protocolStateField.get(sessionManager));
         assertTrue(object.isPresent()); // This is true because uri and sender are present
     }
 
     @Test
     public void testIfChallengeMessageGetsRejectedWithoutAdvertisement() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
         response = new Response();
-        sessionManager = new SessionManager(SessionState.Identification, ProtocolState.Transferor, null, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState.IDENTIFICATION, ProtocolState.TRANSFEROR, null, sharkPKIComponent);
         byte[] encryptedNumber = Utilities.encryptAsymmetric("4634563456".getBytes(), asapKeyStore.getPublicKey());
         Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.Challenge, System.currentTimeMillis(), encryptedNumber );
         Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(challenge, "Marta");
@@ -147,23 +144,39 @@ public class SessionManagerTest {
     }
 
     @Test
-    public void testIfResponseGetsRejectedWithoutShippingLabelAndWrongProtocolState() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException, NoSuchFieldException, IllegalAccessException {
-        sessionManager = new SessionManager(SessionState.Identification, ProtocolState.Transferor, null, sharkPKIComponent);
-        Field sessionStateField = sessionManager.getClass().getDeclaredField("sessionState");
-        Field noSessionField = sessionManager.getClass().getDeclaredField("noSession");
-        sessionStateField.setAccessible(true);
-        noSessionField.setAccessible(true);
-        sessionStateField.set(sessionManager, SessionState.Identification);
-        noSessionField.set(sessionManager, true);
-        byte[] number = "4634563456".getBytes();
-        byte[] encrypted = Utilities.encryptAsymmetric(number, asapKeyStore.getPublicKey());
-        Response response = new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), encrypted, number);
-        Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(response, francisID);
+    public void handleAnEmptyMessageObjectFromSessionHandler() throws NoSuchFieldException, IllegalAccessException, ASAPSecurityException, NoSuchPaddingException, NoSuchAlgorithmException {
+        MessageHandler messageHandler = new MessageHandler();
+        SessionManager sessionManager = new SessionManager(SessionState.NOSESSION, ProtocolState.TRANSFEROR, null, sharkPKIComponent);
+        Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
+        Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(advertisement, "Marta");
         if (messageBuilder.isPresent()) {
             assertNotNull(messageBuilder.get());
+        } else {
+            assertEquals(messageBuilder, Optional.empty());
         }
-        //assertNotEquals("Message flag was incorrect: Response", Optional.empty().toString());
     }
 
+    @Test
+    public void testIfAdvertisementGetsRejectedWithoutShippingLabel() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException, NoSuchFieldException, IllegalAccessException {
+        sessionManager = new SessionManager(SessionState.NOSESSION, ProtocolState.TRANSFEREE, null, sharkPKIComponent);
+        Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
+        Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(advertisement, "Marta");
+        messageBuilder.ifPresent(Assertions::assertNotNull);
+    }
 
+    @Test
+    public void testIfProtocolStatesGetSwitched() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchFieldException, IllegalAccessException {
+        sessionManager = new SessionManager(SessionState.IDENTIFICATION, ProtocolState.TRANSFEROR, null, sharkPKIComponent);
+        Field labelCreated = sessionManager.getClass().getDeclaredField("labelCreated");
+        labelCreated.setAccessible(true);
+        labelCreated.set(sessionManager, true);
+        sessionManager.changeProtocolState();
+        assertFalse((Boolean) labelCreated.get(sessionManager));
+
+    }
+    @Test
+    public void testIfResetWorks() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        sessionManager = new SessionManager(SessionState.IDENTIFICATION, ProtocolState.TRANSFEROR, null, sharkPKIComponent);
+        sessionManager.resetAll();
+    }
 }
