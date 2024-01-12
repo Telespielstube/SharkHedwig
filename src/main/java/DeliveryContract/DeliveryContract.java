@@ -59,7 +59,6 @@ public class DeliveryContract extends Observable implements IDeliveryContract, S
     public void resetContractState() {
         this.isCreated = false;
         this.isSent = false;
-        this.shippingLabel.setIsCreated(false);
     }
 
 

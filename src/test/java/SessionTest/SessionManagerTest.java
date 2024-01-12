@@ -158,27 +158,25 @@ public class SessionManagerTest {
 
     @Test
     public void testIfAdvertisementGetsRejectedWithoutShippingLabel() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException, NoSuchFieldException, IllegalAccessException {
-        sessionManager = new SessionManager(SessionState.IDENTIFICATION, ProtocolState.TRANSFEROR, null, sharkPKIComponent);
-        Field sessionStateField = sessionManager.getClass().getDeclaredField("sessionState");
-        Field noSessionField = sessionManager.getClass().getDeclaredField("noSession");
-        sessionStateField.setAccessible(true);
-        noSessionField.setAccessible(true);
-        sessionStateField.set(sessionManager, SessionState.IDENTIFICATION);
-        noSessionField.set(sessionManager, true);
-        byte[] number = "4634563456".getBytes();
-        byte[] encrypted = Utilities.encryptAsymmetric(number, asapKeyStore.getPublicKey());
-        Response response = new Response(Utilities.createUUID(), MessageFlag.Response, Utilities.createTimestamp(), encrypted, number);
-        Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(response, francisID);
+        sessionManager = new SessionManager(SessionState.NOSESSION, ProtocolState.TRANSFEREE, null, sharkPKIComponent);
+        Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
+        Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(advertisement, "Marta");
         messageBuilder.ifPresent(Assertions::assertNotNull);
     }
 
     @Test
-    public void testIfProtocolStatesGetSwitched() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public void testIfProtocolStatesGetSwitched() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchFieldException, IllegalAccessException {
         sessionManager = new SessionManager(SessionState.IDENTIFICATION, ProtocolState.TRANSFEROR, null, sharkPKIComponent);
+        Field labelCreated = sessionManager.getClass().getDeclaredField("labelCreated");
+        labelCreated.setAccessible(true);
+        labelCreated.set(sessionManager, true);
         sessionManager.changeProtocolState();
+        assertFalse((Boolean) labelCreated.get(sessionManager));
+
     }
     @Test
-    public void testIfResetWorks() {
+    public void testIfResetWorks() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        sessionManager = new SessionManager(SessionState.IDENTIFICATION, ProtocolState.TRANSFEROR, null, sharkPKIComponent);
         sessionManager.resetAll();
     }
 }

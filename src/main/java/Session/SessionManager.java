@@ -19,18 +19,19 @@ public class SessionManager implements Observer, ISessionManager {
 
     private SessionState sessionState;
     private ProtocolState protocolState;
-    private AbstractSession identification = new Identification();
-    private AbstractSession request = new Request();
-    private AbstractSession contract = new Contract();
+    private AbstractSession identification;
+    private AbstractSession request;
+    private AbstractSession contract;
     private String sender;
     private Advertisement advertisement;
     private LogEntry logEntry;
     private MessageBuilder messageBuilder;
-    private DeliveryContract deliveryContract = new DeliveryContract();
+    private DeliveryContract deliveryContract;
     private Optional<Object> optionalMessage;
     private boolean contractCreated;
     private boolean labelCreated;
     private boolean noSession = false; // attribute because NoSession has no Session Object.
+    private ShippingLabel shippingLabel;
 
     public SessionManager() throws NoSuchPaddingException, NoSuchAlgorithmException {}
 
@@ -179,8 +180,8 @@ public class SessionManager implements Observer, ISessionManager {
         if (protocolState.equals(ProtocolState.TRANSFEROR)) {
             protocolState = ProtocolState.TRANSFEREE;
             this.deliveryContract.resetContractState();
+            this.labelCreated = false;
         } else {
-            // New transferor does not have to set the contract state. Already set in 'storeDeliveryContract' methode.
             protocolState = ProtocolState.TRANSFEROR;
         }
     }
