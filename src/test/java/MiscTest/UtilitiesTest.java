@@ -38,7 +38,7 @@ public class UtilitiesTest {
     @BeforeAll
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
 
-        SharkTestPeerFS aliceSharkPeer = new SharkTestPeerFS(TestConstant.PeerName.getTestConstant(), TestConstant.PeerFolder.getTestConstant());
+        SharkTestPeerFS aliceSharkPeer = new SharkTestPeerFS(TestConstant.PEER_NAME.getTestConstant(), TestConstant.PEER_FOLDER.getTestConstant());
         SharkPKIComponent sharkPKIComponent = setupComponent(aliceSharkPeer);
 
         aliceSharkPeer.start();

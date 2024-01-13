@@ -16,7 +16,7 @@ public class GeoSpatial implements IGeoSpatial {
      * @return    Current location of Hedwig drone.
      */
     public Location getCurrentLocation() {
-        return new Location();
+        return new Location("HTW-Berlin", 52.456931, 13.526444);
     }
 
     public void setPickUpLocation(Location pickupLocation) {
@@ -33,8 +33,10 @@ public class GeoSpatial implements IGeoSpatial {
      */
     @Override
     public double pointToPointDistance(Location sender, Location recipient) {
-        double dx = Parallel.ParallelOfLatitude.getParalelle() * (sender.getLatitude() - recipient.getLatitude()); // delta of latitude points
-        double dy = Parallel.ParallelOfLongitude.getParalelle() * (sender.getLongitude() - recipient.getLongitude()); // delta of longitude points
+        double dx = Parallel.ParallelOfLatitude.getParalelle() *
+                (sender.getLatitude() - recipient.getLatitude());
+        double dy = Parallel.ParallelOfLongitude.getParalelle() *
+                (sender.getLongitude() - recipient.getLongitude());
         return sqrt(dx * dx + dy * dy);
     }
 

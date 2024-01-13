@@ -1,45 +1,30 @@
 package Message.Request;
 
 import Location.Location;
+import Message.Message;
 import Message.MessageFlag;
 
 import java.util.UUID;
 
-public class OfferReply extends AbstractRequest {
+public class OfferReply extends Message {
 
-    private double actualFreightWeight = 0.0;
+    private double packageWeight = 0.0;
     private Location packageDestination = null;
 
-    public OfferReply() {}
-    public OfferReply(UUID uuid, MessageFlag messageFlag, long timestamp, double actualFreightWeight, Location packageDestination ) {
+    public OfferReply(UUID uuid, MessageFlag messageFlag, long timestamp, double packageWeight, Location packageDestination ) {
+        super(uuid, messageFlag, timestamp);
         this.uuid = uuid;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
-        this.actualFreightWeight = actualFreightWeight;
+        this.packageWeight = packageWeight;
         this.packageDestination = packageDestination;
     }
 
-    public MessageFlag getMessageFlag() {
-        return this.messageFlag;
-    }
-
-    public void setMessageFlag(MessageFlag messageFlag) {
-        this.messageFlag = messageFlag;
-    }
-
-    public double getActualFreightWeight() {
-        return this.actualFreightWeight;
-    }
-
-    public void setActualFreightWeight(double actualFreightWeight) {
-        this.actualFreightWeight = actualFreightWeight;
+    public double getPackageWeight() {
+        return this.packageWeight;
     }
 
     public Location getPackageDestination() {
         return this.packageDestination;
-    }
-
-    public void setPackageDestination(Location packageDestination) {
-        this.packageDestination = packageDestination;
     }
 }

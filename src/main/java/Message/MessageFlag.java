@@ -1,18 +1,18 @@
 package Message;
 
 public enum MessageFlag {
-    Advertisement(0),
-    Challenge(1),
-    Response(3),
-    ResponseReply(4),
-    Offer(5),
-    OfferReply(6),
-    Confirm(7),
-    ContractDocument(8),
-    PickUp(9),
-    Ack(10),
-    Ready(11),
-    Complete(12);
+    ADVERTISEMENT(0),
+    CHALLENGE(1),
+    RESPONSE(2),
+    RESPONSE_REPLY(3),
+    OFFER(4),
+    OFFER_REPLY(5),
+    CONFIRM(6),
+    CONTRACT_DOCUMENT(7),
+    PICK_UP(8),
+    ACK(9),
+    READY(10),
+    COMPLETE(11);
 
     private final int flag;
 

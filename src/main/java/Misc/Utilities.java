@@ -53,15 +53,14 @@ public class Utilities {
      * @return    Encrypted challenge number.
      */
     public static byte[] encryptAsymmetric(byte[] unencrypted, Key publicKey) {
-        Cipher cipher = null;
         byte[] encrypted = new byte[0];
         try {
-            cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             encrypted = cipher.doFinal(unencrypted);
-        } catch (InvalidKeyException | NoSuchAlgorithmException |
-                 NoSuchPaddingException |IllegalBlockSizeException | BadPaddingException e) {
-            e.printStackTrace();
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException |
+                 BadPaddingException e) {
+            System.err.println("Caught an encryption exception: " + e);
         }
         return encrypted;
     }

@@ -10,10 +10,10 @@ package Session;
  */
 public enum SessionState {
 
-    NOSESSION {
+    NO_SESSION {
         @Override
         public SessionState resetState() {
-            return NOSESSION;
+            return NO_SESSION;
         }
 
         public SessionState nextState() {
@@ -23,20 +23,15 @@ public enum SessionState {
 
     IDENTIFICATION {
         @Override
-        public SessionState resetState() {
-            return NOSESSION;
-        }
-
+        public SessionState resetState() { return NO_SESSION; }
         @Override
-        public SessionState nextState() {
-            return REQUEST;
-        }
+        public SessionState nextState() { return REQUEST; }
     },
 
     REQUEST {
         @Override
         public SessionState resetState() {
-            return NOSESSION;
+            return NO_SESSION;
         }
         @Override
         public SessionState nextState() {
@@ -47,12 +42,12 @@ public enum SessionState {
     CONTRACT() {
         @Override
         public SessionState resetState() {
-            return NOSESSION;
+            return NO_SESSION;
         }
 
         @Override
         public SessionState nextState() {
-            return NOSESSION;
+            return NO_SESSION;
         }
     };
 
@@ -62,7 +57,6 @@ public enum SessionState {
      * @return    Session state enum object.
      */
     public abstract SessionState resetState();
-
 
     /**
      * Proceeds to the next state.

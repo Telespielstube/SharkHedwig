@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Class to add a new entry to the list of all previous handovers of this package.
  */
-public class TransitRecord implements IDeliveryContract, Serializable {
+public class TransitRecord implements IDeliveryContract {
 
     private TransitEntry transitEntry;
     private List<TransitEntry> entryList = null;
@@ -19,6 +19,7 @@ public class TransitRecord implements IDeliveryContract, Serializable {
      * The TransitRecord object is a dynamic vector where TransitEntry objects are added.
      * The advantage of the Java Vector object is its threadsaty.
      */
+
     public TransitRecord() {
         this.entryList = Collections.synchronizedList(new ArrayList<TransitEntry>());
         this.isCreated = true;
@@ -32,6 +33,7 @@ public class TransitRecord implements IDeliveryContract, Serializable {
      */
     public TransitRecord(List<TransitEntry> entries) {
         this.entryList = entries;
+        this.isCreated = true;
     }
 
     /**
@@ -48,18 +50,16 @@ public class TransitRecord implements IDeliveryContract, Serializable {
         return this;
     }
 
-//    @Override
-//    public boolean getIsCreated() {
-//        return this.isCreated;
-//    }
-//
-//    @Override
-//    public void setIsCreated(boolean isCreated) {
-//        this.isCreated = isCreated;
-//    }
+    public boolean getIsCreated() {
+        return this.isCreated;
+    }
+
+    public void setIsCreated(boolean isCreated) {
+        this.isCreated = isCreated;
+    }
 
     /**
-     * Adds a new entry to the transit record list.
+     * Adds a new entry to the end of the transit record list.
      * @param entry    TransitEntry object
      */
     public void addEntry(TransitEntry entry) {
@@ -82,15 +82,21 @@ public class TransitRecord implements IDeliveryContract, Serializable {
     public List<TransitEntry> getAllEntries() {
         return this.entryList;
     }
+
     /**
-     * The size of the current transit record list.
+     * Returns the size of the list.
      *
-     * @return    integer which represents the entries in the list.
+     * @return    Size of the list.
      */
-    public int getTransitRecordSize() {
+    public int getListSize() {
         return this.entryList.size();
     }
 
+    /**
+     * Formats the list entries to a nice readlable String format.
+     *
+     * @return    Formatted list entries.
+     */
     public String getString() {
         return this.entryList.toString().replace("[","").replace("]","").replace(", ", "");
     }

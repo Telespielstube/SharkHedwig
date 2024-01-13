@@ -6,7 +6,7 @@ import java.util.UUID;
 /**
  * The advertisement messages is a small message that only has the task of offering the recipient a service.
  */
-public class Advertisement implements IMessage, Serializable {
+public class Advertisement implements IMessage {
 
     private UUID uuid;
     private boolean adTag;
@@ -20,33 +20,26 @@ public class Advertisement implements IMessage, Serializable {
         this.adTag = adTag;
     }
 
+    @Override
     public UUID getUUID() {
         return this.uuid;
     }
 
-    public boolean getAdTag() {
-        return this.adTag;
-    }
-
-    public void setAdTag(boolean adTag) {
-        this.adTag = adTag;
-    }
-
+    @Override
     public MessageFlag getMessageFlag() {
         return this.messageFlag;
     }
-
-    public void setMessageFlag(MessageFlag messageFlag) {
-        this.messageFlag = messageFlag;
-    }
-
     @Override
     public long getTimestamp() {
         return this.timestamp;
     }
 
-    @Override
-    public void setTimestamp(long currentTime) {
-
+    /**
+     * Returns the advertisment tag.
+     *
+     * @return    true if tag is set, false if not.
+     */
+    public boolean getAdTag() {
+        return this.adTag;
     }
 }

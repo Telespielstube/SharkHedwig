@@ -1,32 +1,23 @@
 package Message.Request;
 
+import Message.Message;
 import Message.MessageFlag;
 
 import java.util.UUID;
 
-public class Confirm extends AbstractRequest {
+public class Confirm extends Message {
 
     private boolean isConfirmed = false;
-    public Confirm() {}
+
     public Confirm(UUID uuid, MessageFlag messageFlag, long timestamp, boolean isConfirm) {
+        super(uuid, messageFlag, timestamp);
         this.uuid = uuid;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
         this.isConfirmed = isConfirm;
     }
 
-    public MessageFlag getMessageFlag() {
-        return this.messageFlag;
-    }
-
-    public void setMessageFlag(MessageFlag messageFlag) {
-        this.messageFlag = messageFlag;
-    }
-
     public boolean getConfirmed() {
         return this.isConfirmed;
-    }
-    public void setConfirm(boolean isAck) {
-        this.isConfirmed = isConfirmed;
     }
 }

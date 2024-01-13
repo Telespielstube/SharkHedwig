@@ -1,4 +1,4 @@
-package Misc;
+package HedwigUI;
 
 /**
  * Users need to be informed about an arriving package.

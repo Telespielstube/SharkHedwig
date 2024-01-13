@@ -7,8 +7,8 @@ import Message.Contract.ContractDocument;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import Misc.Utilities;
-import Session.Sessions.Contract;
-import Session.Sessions.Identification;
+import Session.Contract;
+import Session.Identification;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -44,7 +44,7 @@ public class ContractTest {
 
     @BeforeAll
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
-        SharkTestPeerFS testSharkPeer = new SharkTestPeerFS(TestConstant.PeerName.getTestConstant(), TestConstant.PeerFolder.getTestConstant());
+        SharkTestPeerFS testSharkPeer = new SharkTestPeerFS(TestConstant.PEER_NAME.getTestConstant(), TestConstant.PEER_FOLDER.getTestConstant());
         sharkPKIComponent = setupComponent(testSharkPeer);
 
         testSharkPeer.start();
@@ -61,11 +61,11 @@ public class ContractTest {
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",
                 new Location(52.5105, 13.4346), 1.2);
         transitRecord = new TransitRecord();
-        transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PeerName.name(), "Peter", new Location
+        transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PEER_NAME.name(), "Peter", new Location
                 (57.5654645, 77.345345), 56563456, null, null));
-        transitRecord.addEntry(new TransitEntry(2, null, TestConstant.PeerName.name(), "Peter", new Location
+        transitRecord.addEntry(new TransitEntry(2, null, TestConstant.PEER_NAME.name(), "Peter", new Location
                 (55.5654645, 76.345345), 54863456, null, null));
-        transitRecord.addEntry(new TransitEntry(4, null, TestConstant.PeerName.name(), "Bob", new Location
+        transitRecord.addEntry(new TransitEntry(4, null, TestConstant.PEER_NAME.name(), "Bob", new Location
                 (55.5654645, 76.345345), 54566456, null, null));
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         ContractDocument contractDocument;
@@ -88,10 +88,11 @@ public class ContractTest {
         // project "clean code" :) we only use interfaces - unfortunately casting is unavoidable
         return (SharkPKIComponent) component;
     }
+
     @Test
     public void testIfTransitRecordSignaturesAreCorrect() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
-        contractDocument = new ContractDocument(Utilities.createUUID(), MessageFlag.ContractDocument, Utilities.createTimestamp(), deliveryContract);
+        contractDocument = new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), deliveryContract);
         Method handleContract = contract.getClass().getDeclaredMethod("handleContract", ContractDocument.class);
         handleContract.setAccessible(true);
         Optional<Confirm> message = (Optional<Confirm>) handleContract.invoke(contract, contractDocument);

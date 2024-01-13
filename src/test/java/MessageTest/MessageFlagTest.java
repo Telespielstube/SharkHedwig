@@ -11,11 +11,11 @@ public class MessageFlagTest {
 
     @Test
     public void testIfMessageFlagIsCorrect() {
-        assertEquals(1, MessageFlag.Challenge.getFlag());
+        assertEquals(1, MessageFlag.CHALLENGE.getFlag());
     }
 
     @Test
     public void wrongFlagGetsRejected() {
-        assertNotEquals(0, MessageFlag.Confirm.getFlag());
+        assertNotEquals(0, MessageFlag.CONFIRM.getFlag());
     }
 }

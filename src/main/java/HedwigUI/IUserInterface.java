@@ -2,5 +2,5 @@ package HedwigUI;
 
 public interface IUserInterface {
 
-    boolean create(UserInputObject userInputObject);
+    boolean create(UserInput userInput);
 }

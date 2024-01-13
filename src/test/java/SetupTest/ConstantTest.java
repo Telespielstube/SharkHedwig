@@ -16,7 +16,7 @@ public class ConstantTest {
     }
     @Test
     public void testIfHedwigStringGetsReturnedFromAppConstantsEnumClass() {
-        assertEquals("hedwig" , AppConstant.APP_FORMAT.toString());
+        assertEquals("SharkHedwig" , AppConstant.APP_FORMAT.toString());
     }
 
     @Test

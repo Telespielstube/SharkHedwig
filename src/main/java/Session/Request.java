@@ -1,7 +1,8 @@
-package Session.Sessions;
+package Session;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
+import Message.Message;
 import Message.IMessage;
 import Message.MessageFlag;
 import Message.Request.*;
@@ -10,7 +11,6 @@ import Misc.Logger;
 import Misc.Utilities;
 import Setup.AppConstant;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.TreeMap;
 
@@ -24,20 +24,20 @@ public class Request extends AbstractSession {
     private LogEntry logEntry;
 
     public Request() {
-        this.messageList = Collections.synchronizedSortedMap(new TreeMap<>());
+        this.messageList = new TreeMap<>();
     }
 
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
-        Optional<AbstractRequest> optionalMessage = Optional.empty();
+        Optional<Message> optionalMessage = Optional.empty();
         switch(message.getMessageFlag()) {
-            case Offer:
+            case OFFER:
                 optionalMessage = Optional.of(handleOffer((Offer) message).get());
                 break;
-            case Confirm:
+            case CONFIRM:
                 optionalMessage = Optional.ofNullable(handleConfirm((Confirm) message).orElse(null));
                 break;
-            case Ready:
+            case READY:
                 optionalMessage = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 if (optionalMessage.isPresent()) {
                     this.logEntry = new LogEntry(optionalMessage.get().getUUID(), Utilities.createReadableTimestamp(),
@@ -60,16 +60,16 @@ public class Request extends AbstractSession {
 
     @Override
     public Optional<Object> transferee(IMessage message, String sender) {
-        Optional<AbstractRequest> messageObject = Optional.empty();
+        Optional<Message> messageObject = Optional.empty();
 
         switch(message.getMessageFlag()) {
-            case OfferReply:
+            case OFFER_REPLY:
                 messageObject = Optional.ofNullable(handleOfferReply((OfferReply) message).orElse(null));
                 break;
-            case Confirm:
+            case CONFIRM:
                 messageObject = Optional.ofNullable(handleConfirm((Confirm) message).orElse(null));
                 break;
-            case Ack:
+            case ACK:
                 messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
                 if (messageObject.isPresent()) {
                     this.logEntry = new LogEntry(messageObject.get().getUUID(), Utilities.createReadableTimestamp(),
@@ -98,10 +98,10 @@ public class Request extends AbstractSession {
      */
     private Optional<OfferReply> handleOffer(Offer message) {
         ShippingLabel shippingData = this.deliveryContract.getShippingLabel();
-       if (processOfferData(shippingData, message)) {
-           return Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OfferReply, Utilities.createTimestamp(), shippingData.getPackageWeight(), shippingData.getPackageDestination()));
-       }
-       return Optional.empty();
+        if (processOfferData(shippingData, message)) {
+           return Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY, Utilities.createTimestamp(), shippingData.getPackageWeight(), shippingData.getPackageDestination()));
+        }
+        return Optional.empty();
     }
 
 
@@ -114,7 +114,7 @@ public class Request extends AbstractSession {
      */
     private Optional<Confirm> handleOfferReply(OfferReply message) {
         if (compareTimestamp(message.getTimestamp(), timeOffset) && processOfferReplyData(message)) {
-            return Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.Confirm, Utilities.createTimestamp(), true));
+            return Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
     }
@@ -129,7 +129,7 @@ public class Request extends AbstractSession {
     private Optional<Confirm> handleConfirm(Confirm message) {
         Object object = getLastValueFromList();
         if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getConfirmed() && (!(object instanceof Confirm))) {
-            return Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.Confirm, Utilities.createTimestamp(), true));
+            return Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
     }
@@ -140,9 +140,9 @@ public class Request extends AbstractSession {
      * @return    True if message check was valid. False if not
      */
     private Optional<AckMessage> handleAckMessage(AckMessage ackMessage)  {
-        boolean isFirstAck = compareTimestamp(ackMessage.getTimestamp(), timeOffset) && ackMessage.getIsAck() && ackMessage.getMessageFlag().equals(MessageFlag.Ack);
+        boolean isFirstAck = compareTimestamp(ackMessage.getTimestamp(), timeOffset) && ackMessage.getIsAck() && ackMessage.getMessageFlag().equals(MessageFlag.ACK);
         if (isFirstAck) {
-            return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.Ready, Utilities.createTimestamp(), true));
+            return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY, Utilities.createTimestamp(), true));
         }
         return Optional.empty();
     }
@@ -154,6 +154,7 @@ public class Request extends AbstractSession {
      * @return           True if the transferee is able to deliver, false if not.
      */
     private boolean processOfferReplyData(OfferReply message) {
+
         return true;
     }
 
@@ -164,7 +165,8 @@ public class Request extends AbstractSession {
      * @return    True if all data is valid and package can be delivered to destination.
      */
     private boolean processOfferData(ShippingLabel label, Offer message) {
-
+        double freightWeight = message.getMaxFreightWeight();
+        double flight = message.getFlightRange();
         // This need to be done when the battery and location component is implemented.
         return true;
     }

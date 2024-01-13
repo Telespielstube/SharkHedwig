@@ -1,8 +1,11 @@
 package Misc;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Saves communication sessions to disk to make them accessable for the future.
@@ -13,12 +16,16 @@ public class Logger {
     /**
      * Creates the logging folder for request and contract sessions.
      *
-     * @param peerFolder Name of the Application folder.
-     * @param logFolder  Name of the log folder.
+     * @param directory    Path to log directory,
      * @throws IOException is thrown when something is wrong in creating the folder.
      */
-    public static void createLogDirectory(String peerFolder, String logFolder, String directory) throws IOException {
-        Files.createDirectories(Paths.get(peerFolder + "/" + logFolder + "/" + directory));
+    public static void createLogDirectory(String directory) {
+        try {
+            Files.createDirectories(Paths.get(directory));
+        } catch (IOException e) {
+            System.err.println("Caught an Exception while creating the log folders: " + e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -29,11 +36,10 @@ public class Logger {
      * @return true if writing was successful.
      */
     public static boolean writeLog(String entry, String file) {
-        Path path = Paths.get(file);
-        try {
-            Files.write(path, entry.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(file), StandardCharsets.UTF_8, StandardOpenOption.CREATE)) {
+            writer.write(entry);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Caught an exception while writing log data: " + e);
             throw new RuntimeException(e);
         }
         return true;

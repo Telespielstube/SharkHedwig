@@ -10,7 +10,7 @@ public class SessionStateTest {
 
     @Test
     public void testIfNextSessionIsIdentification() {
-        assertEquals(SessionState.IDENTIFICATION, SessionState.NOSESSION.nextState());
+        assertEquals(SessionState.IDENTIFICATION, SessionState.NO_SESSION.nextState());
     }
 
     @Test
@@ -25,12 +25,12 @@ public class SessionStateTest {
 
     @Test
     public void testIfResetNoSessionIsNoSession() {
-        assertEquals(SessionState.NOSESSION, SessionState.NOSESSION.resetState());
+        assertEquals(SessionState.NO_SESSION, SessionState.NO_SESSION.resetState());
     }
 
     @Test
     public void testIResetContractSessionIsNoSession() {
-        assertEquals(SessionState.NOSESSION, SessionState.CONTRACT.resetState());
+        assertEquals(SessionState.NO_SESSION, SessionState.CONTRACT.resetState());
     }
 
     @Test

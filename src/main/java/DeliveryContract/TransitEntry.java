@@ -49,6 +49,9 @@ public class TransitEntry implements Serializable {
         return this.serialNumber;
     }
 
+    public String getTransferor() {
+        return this.transferor;
+    }
     /**
      * Sets the transferee attribute to complete the TransitEntry object.
      *

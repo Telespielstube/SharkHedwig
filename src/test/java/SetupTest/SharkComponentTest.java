@@ -3,7 +3,7 @@ package SetupTest;
 import DeliveryContract.ShippingLabel;
 import Message.Identification.Response;
 import Session.SessionManager;
-import Session.Sessions.Identification;
+import Session.Identification;
 import Setup.Channel;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -40,7 +40,7 @@ public class SharkComponentTest {
 
     @BeforeAll
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
-        SharkTestPeerFS testSharkPeer = new SharkTestPeerFS(TestConstant.PeerName.getTestConstant(), TestConstant.PeerFolder.getTestConstant());
+        SharkTestPeerFS testSharkPeer = new SharkTestPeerFS(TestConstant.PEER_NAME.getTestConstant(), TestConstant.PEER_FOLDER.getTestConstant());
         SharkPKIComponent sharkPKIComponent = setupComponent(testSharkPeer);
         testSharkPeer.start();
         String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
@@ -66,7 +66,7 @@ public class SharkComponentTest {
 
     @Test
     public void testIfChannelAdvertisementEqualsReceivedURI() {
-        String uri = "sn2://Advertisement";
+        String uri = "sn2://advertisement";
         assertEquals(uri, Channel.ADVERTISEMENT.getChannel());
     }
 

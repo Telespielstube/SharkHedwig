@@ -23,35 +23,30 @@ public class LoggerTest {
 
     @BeforeAll
     public static void testIfDirectoriesAreCreated() {
-    String[] directories = {RequestLog.getTestConstant(), DeliveryContractLogPath.getTestConstant() };
-        try {
-            for (String directory : directories) {
-                Logger.createLogDirectory(PeerFolder.getTestConstant(), LogFolder.getTestConstant(), directory);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Could not create logger files for request and contract sessions: " + e);
+        String[] directories = {REQUEST_LOG_PATH.getTestConstant(), DELIVERY_CONTRACT_LOG_PATH.getTestConstant()};
+        for (String directory : directories) {
+            Logger.createLogDirectory(directory);
         }
     }
 
     @Test
     public void testIfAckMessageGetsSavedInRequestDirectory() throws IOException {
-        String filepath = PeerFolder.getTestConstant() + "/" + LogFolder.getTestConstant() + "/" + RequestLog.getTestConstant();
         LogEntry logEntry = new LogEntry(Utilities.createUUID(), Utilities.createReadableTimestamp(), null ,
-                true, PeerName.getTestConstant(), "Bobby");
-        boolean written = Logger.writeLog(logEntry.toString(), filepath + "/" + "TestLogFile.txt");
+                true, PEER_NAME.getTestConstant(), "Bobby");
+        boolean written = Logger.writeLog(logEntry.toString(), "TestLogFile.txt");
         assertTrue(written);
     }
 
     @Test
     public void printOutLogEntry() {
-        AckMessage ackMessage = new AckMessage(Utilities.createUUID(), MessageFlag.Ack, Utilities.createTimestamp(), true);
-        LogEntry logEntry = new LogEntry(ackMessage.getUUID(), Utilities.createReadableTimestamp(), null , true, PeerName.getTestConstant(), "Bobby");
+        AckMessage ackMessage = new AckMessage(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true);
+        LogEntry logEntry = new LogEntry(ackMessage.getUUID(), Utilities.createReadableTimestamp(), null , true, PEER_NAME.getTestConstant(), "Bobby");
         System.out.println(logEntry);
     }
 
     @AfterAll
     public static void clear() throws IOException {
-        String filepath = PeerFolder.getTestConstant() + "/" + LogFolder.getTestConstant() + "/" + RequestLog.getTestConstant();
-        Files.delete(Paths.get(filepath + "/" + "TestLogFile.txt" ));
+        Files.delete(Paths.get("TestLogFile.txt" ));
+
     }
 }

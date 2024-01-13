@@ -2,31 +2,19 @@ package Setup;
 
 public enum AppConstant {
     // Component related constants
-<<<<<<< HEAD
-    AppFormat("sharkHedwig"),
-    PeerFolder("HedwigStorage"),
-    PeerName("hedwig123"),
-    CaId("certificateAuthority"),
-    Scheme("sn2://"),
-=======
-    APP_FORMAT("hedwig"),
+    APP_FORMAT("SharkHedwig"),
     PEER_FOLDER("HedwigStorage"),
     PEER_NAME("hedwig123"),
     CA_ID("certificateAuthority"),
     SCHEME("sn2://"),
->>>>>>> tmp
 
     // Constants for the log files. */
-    LOG_FOLDER("Log"),
-    REQUEST_LOG("Request"),
     REQUEST_LOG_PATH("HedwigStorage/Log/Request/"),
-    DELIVERY_CONTRACT("DeliveryContract"),
-    DELIVERY_CONTRACT_LOG_PATH("HedwigStorage/Log/DeliveryContract/");
+    DELIVERY_CONTRACT_LOG_PATH("HedwigStorage/Log/DeliveryContract/"),
+    ERROR_LOG_PATH("HedwigStorage/Log/ErrorLog.txt");
 
-    AppConstant(String name) {}
+    private String name;
 
-<<<<<<< HEAD
-=======
     AppConstant(String name) {
         this.name = name;
     }
@@ -34,6 +22,5 @@ public enum AppConstant {
     public String toString() {
         return name;
     }
->>>>>>> tmp
 }
 

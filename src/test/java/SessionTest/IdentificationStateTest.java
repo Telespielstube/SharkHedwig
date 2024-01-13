@@ -9,20 +9,18 @@ public class IdentificationStateTest {
 
     @Test
     public void testIfStateVariableProceedsToNextState() {
-        SessionState state = SessionState.NOSESSION.resetState();
-
-        //state.nextState();
-        assertEquals("Identification", state.nextState().toString());
+        SessionState state = SessionState.NO_SESSION.resetState();
+        assertEquals("IDENTIFICATION", state.nextState().toString());
     }
     @Test
     public void testIfNoStateIsActive() {
-        SessionState state = SessionState.NOSESSION.resetState();
-        assertEquals(SessionState.NOSESSION.resetState(), state);
+        SessionState state = SessionState.NO_SESSION.resetState();
+        assertEquals(SessionState.NO_SESSION.resetState(), state);
     }
 
     @Test
     public void checkIfNextStateAfterNoStateIsIdentificationState() {
-        SessionState state = SessionState.NOSESSION.nextState();
+        SessionState state = SessionState.NO_SESSION.nextState();
         assertEquals(SessionState.IDENTIFICATION, state);
     }
 
@@ -35,6 +33,6 @@ public class IdentificationStateTest {
     @Test
     public void checkIfNextStateAfterHandoverIsNoState() {
         SessionState state = SessionState.CONTRACT.nextState();
-        assertEquals(SessionState.NOSESSION.resetState(), state);
+        assertEquals(SessionState.NO_SESSION.resetState(), state);
     }
 }

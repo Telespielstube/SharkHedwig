@@ -1,4 +1,4 @@
-package Session.Sessions;
+package Session;
 
 import Message.IMessage;
 
@@ -62,8 +62,6 @@ public interface ISession {
 
     /**
      * Clears the messageList TreeMap object.
-     *
-     * @return    True if list is clear,
      */
-    boolean clearMessageList();
+    void clearMessageList();
 }

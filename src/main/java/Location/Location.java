@@ -8,19 +8,17 @@ import static java.lang.Math.sqrt;
  * Location object to determine the current location of a mobile device or geo location.
  */
 public class Location implements Serializable {
-
     private String name = null;
     private Double latitude = 0.0;
     private Double longitude = 0.0;
 
-    public Location() {}
     /**
      * This constructor is used when creating the ShippingLabel object.
      *
      * @param latitude  To make the location name more precise the latitude coordinate is given in degree
      * @param longitude To make the location name more precise the longitude coordinate is given in degree
      */
-    public Location( Double latitude, Double longitude) {
+    public Location(Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }

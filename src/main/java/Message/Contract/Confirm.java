@@ -1,11 +1,12 @@
 package Message.Contract;
 
 import DeliveryContract.DeliveryContract;
+import Message.Message;
 import Message.MessageFlag;
 
 import java.util.UUID;
 
-public class Confirm extends AbstractContract {
+public class Confirm extends Message {
 
     private final DeliveryContract deliveryContract;
     private boolean isConfirmed = false;
@@ -16,23 +17,11 @@ public class Confirm extends AbstractContract {
         this.isConfirmed = isConfirmed;
     }
 
-    public MessageFlag getMessageFlag() {
-        return this.messageFlag;
-    }
-
-    public void setMessageFlag(MessageFlag messageFlag) {
-        this.messageFlag = messageFlag;
-    }
-
     public DeliveryContract getDeliveryContract() {
         return this.deliveryContract;
     }
 
     public boolean getConfirmed() {
         return this.isConfirmed;
-    }
-
-    public void setConfirmed(boolean isConfirmed) {
-        this.isConfirmed = isConfirmed;
     }
 }

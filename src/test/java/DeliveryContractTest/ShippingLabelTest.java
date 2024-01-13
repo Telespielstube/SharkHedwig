@@ -1,7 +1,7 @@
 package DeliveryContractTest;
 
 import DeliveryContract.*;
-import HedwigUI.UserInputObject;
+import HedwigUI.UserInput;
 import Location.Location;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -9,10 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ShippingLabelTest {
 
-    private static ShippingLabel shippingLabel = new ShippingLabel();
-    private static UserInputObject userInputBuilder = new UserInputObject("Alice", "HTW-Berlin",
+    private static ShippingLabel shippingLabel = new ShippingLabel(null,null,null, null,
+            null, null, null, 0.0);
+    private static UserInput userInputBuilder = new UserInput("Alice", "HTW-Berlin",
             52.456931, 13.526444, "Bob", "Ostbahnhof", 52.5105, 13.4346, 1.2);
-    private static UserInputObject nullUserInputBuilder = new UserInputObject(null, null, null, null, null, null, null, null, null);
+    private static UserInput nullUserInputBuilder = new UserInput(null, null, null, null, null, null, null, null, null);
 
     @Test
     public void testIfCreateReturnsFalseWhenPassedObjectHasNullValue() {

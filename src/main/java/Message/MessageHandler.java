@@ -27,13 +27,14 @@ public class MessageHandler implements IMessageHandler {
         return true;
     }
 
-    public Object parseMessage(byte[] message, String senderE2E, SharkPKIComponent sharkPKIComponent) {
+    public Object parseIncomingMessage(byte[] message, String senderE2E, SharkPKIComponent sharkPKIComponent) {
         Object object;
         byte[] verifiedMessage;
         byte[] decryptedMessage;
         try {
             this.encryptedMessagePackage = ASAPCryptoAlgorithms.parseEncryptedMessagePackage(message);
-            decryptedMessage = ASAPCryptoAlgorithms.decryptPackage(encryptedMessagePackage, sharkPKIComponent.getASAPKeyStore());
+            decryptedMessage = ASAPCryptoAlgorithms.decryptPackage(this.encryptedMessagePackage,
+                    sharkPKIComponent.getASAPKeyStore());
             verifiedMessage = verifySignedMessage(decryptedMessage, senderE2E, sharkPKIComponent);
             object = byteArrayToObject(verifiedMessage);
         } catch (ASAPException | IOException e) {
@@ -66,13 +67,15 @@ public class MessageHandler implements IMessageHandler {
         return new byte[0];
     }
 
-    public byte[] buildOutgoingMessage(Object object, String uri, String recipient, SharkPKIComponent sharkPKIComponent) {
+    public byte[] buildOutgoingMessage(Object object, String uri, String recipient,
+                                       SharkPKIComponent sharkPKIComponent) {
         byte[] byteMessage = objectToByteArray(object);
         byte[] encryptedMessage;
         byte[] signedMessage;
         try {
             signedMessage = composeSignedMessage(byteMessage, sharkPKIComponent);
-            encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(signedMessage, recipient, sharkPKIComponent.getASAPKeyStore());
+            encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(signedMessage, recipient,
+                    sharkPKIComponent.getASAPKeyStore());
         } catch (ASAPException e) {
             System.err.println("Caught an ASAPException: " + e);
             throw new RuntimeException(e);
@@ -90,18 +93,15 @@ public class MessageHandler implements IMessageHandler {
      */
     private byte[] composeSignedMessage(byte[] byteMessage, SharkPKIComponent sharkPKIComponent) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        byte[] signedMessagePackage;
         try {
-            signedMessagePackage = ASAPCryptoAlgorithms.sign(byteMessage, sharkPKIComponent.getASAPKeyStore());
+            byte[] signedMessagePackage = ASAPCryptoAlgorithms.sign(byteMessage, sharkPKIComponent.getASAPKeyStore());
             ASAPSerialization.writeByteArray(signedMessagePackage, outputStream);
             ASAPSerialization.writeByteArray(byteMessage, outputStream);
-            signedMessagePackage = outputStream.toByteArray();
-            outputStream.flush();
         } catch (ASAPSecurityException | IOException e) {
             System.err.println("Caught an ASAPSecurityException: " + e);
             throw new RuntimeException(e);
         }
-        return signedMessagePackage;
+        return  outputStream.toByteArray();
     }
 
     public static byte[] objectToByteArray(Object object) {

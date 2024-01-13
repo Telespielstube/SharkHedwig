@@ -4,7 +4,7 @@ package HedwigUI;
  * This does nothing more than filling up the object constructor with the input data. This object mainly serves for testing purposes.
  * This can be/should be replaced by an e.g. JSON library to receive the user input from a phone, tablet, computer....
  */
-public class UserInputObject {
+public class UserInput {
 
     private String sender = null;
     private String origin = null;
@@ -16,8 +16,8 @@ public class UserInputObject {
     private Double longitudeDest = null;
     private Double packageWeight = null;
 
-    public UserInputObject(String sender, String origin, Double latitudeOrigin, Double longitudeOrigin, String recipient,
-                           String destination, Double latitudeDest, Double longitudeDest, Double packageWeight) {
+    public UserInput(String sender, String origin, Double latitudeOrigin, Double longitudeOrigin, String recipient,
+                     String destination, Double latitudeDest, Double longitudeDest, Double packageWeight) {
         this.sender = sender;
         this.origin = origin;
         this.latitudeOrigin = latitudeOrigin;

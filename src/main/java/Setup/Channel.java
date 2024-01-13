@@ -17,25 +17,25 @@ public enum Channel {
     ADVERTISEMENT {
         @Override
         public String getChannel() {
-            return AppConstant.SCHEME.toString() + ADVERTISEMENT;
+            return (AppConstant.SCHEME.toString() + ADVERTISEMENT).toLowerCase();
         }
     },
     IDENTIFICATION {
         @Override
         public String getChannel() {
-            return AppConstant.SCHEME.toString() + IDENTIFICATION;
+            return (AppConstant.SCHEME.toString() + IDENTIFICATION).toLowerCase();
         }
     },
     REQUEST {
         @Override
         public String getChannel() {
-            return AppConstant.SCHEME.toString() + REQUEST;
+            return (AppConstant.SCHEME.toString() + REQUEST).toLowerCase();
         }
     },
     CONTRACT {
         @Override
         public String getChannel() {
-            return AppConstant.SCHEME.toString() + CONTRACT;
+            return (AppConstant.SCHEME.toString() + CONTRACT).toLowerCase();
         }
     };
 

@@ -2,13 +2,15 @@ package Setup;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
-import Misc.ErrorLogger;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeerFS;
 import net.sharksystem.asap.*;
 import net.sharksystem.pki.SharkPKIComponent;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +23,8 @@ import Session.*;
 
 import javax.crypto.NoSuchPaddingException;
 
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 
 
 public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageReceivedListener {
@@ -30,19 +34,29 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
     private final MessageHandler messageHandler;
     private ISessionManager sessionManager;
     private final SharkPeerFS sharkPeerFS;
-<<<<<<< HEAD
-=======
     private ASAPMessages messages;
-    private ShippingLabel shippingLabel = new ShippingLabel();
-    private DeliveryContract deliveryContract = new DeliveryContract("", null);
->>>>>>> tmp
+    private ShippingLabel shippingLabel = new ShippingLabel(null,null,null, null,
+            null, null, null, 0.0);
+    private DeliveryContract deliveryContract = new DeliveryContract();
 
-    public SharkHedwigComponent(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
-        ErrorLogger.redirectErrorStream(AppConstant.PEER_FOLDER.toString(), AppConstant.LOG_FOLDER.toString(), "errorLog.txt");
+    /**
+     * The component implements a decentralized protocol that allows drones to transport a physical package from a
+     * starting point to a destination. To make the package hand-over process more secure and traceable the component
+     * includes the SharkPKIComponent for certificate exchange between the drones.
+     *
+     * Created my Martina Brüning
+     *
+     * @param pkiComponent                  Reference to the SharkPKICOmponent.
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     */
+    public SharkHedwigComponent(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {
+        System.setErr(new PrintStream(Files.newOutputStream(Paths.get(AppConstant.ERROR_LOG_PATH.toString()), CREATE, APPEND)));
         this.sharkPeerFS = new SharkPeerFS(AppConstant.PEER_NAME.toString(), AppConstant.PEER_FOLDER.toString() + "/" + AppConstant.PEER_NAME.toString() );
         this.sharkPKIComponent = pkiComponent;
         this.messageHandler = new MessageHandler();
-
+        setupComponent(sharkPeerFS);
     }
 
     /**
@@ -53,13 +67,14 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
      */
     public void setupComponent(SharkPeerFS sharkPeerFS) {
         SharkPKIComponentFactory sharkPkiComponentFactory = new SharkPKIComponentFactory();
-        ComponentFactory componentFactory;
+        SharkHedwigComponentFactory sharkHedwigComponentFactory;
         try {
             sharkPeerFS.addComponent(sharkPkiComponentFactory, SharkPKIComponent.class);
-            componentFactory = new ComponentFactory((SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class));
-            sharkPeerFS.addComponent(componentFactory, ISharkHedwigComponent.class);
-            // SharkPKIComponent is an Interface therefore --> Conversion from an interface type to a class type requires an explicit cast to the class type.
             this.sharkPKIComponent = (SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class);
+            sharkHedwigComponentFactory = new SharkHedwigComponentFactory((SharkPKIComponent)
+                    sharkPeerFS.getComponent(SharkPKIComponent.class));
+            sharkPeerFS.addComponent(sharkHedwigComponentFactory, ISharkHedwigComponent.class);
+
             this.sharkPeerFS.start();
         } catch (SharkException e) {
             System.err.println("Caught an Exception: " + e);
@@ -82,15 +97,14 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
             this.setupChannel();
             this.peer.getASAPStorage(AppConstant.APP_FORMAT.toString()).getOwner();
             this.setupLogger();
-            ErrorLogger.redirectErrorStream(AppConstant.PeerFolder.toString(), AppConstant.LogFolder.toString(), "errorLog.txt");
         } catch (IOException e) {
             System.err.println("Caught an IOException while setting up component:   " + e.getMessage());
         }
         new PKIManager(sharkPKIComponent);
         try {
-            this.sessionManager = new SessionManager(SessionState.NOSESSION, ProtocolState.TRANSFEREE, this.peer, this.sharkPKIComponent);
+            this.sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEREE, this.sharkPKIComponent);
             shippingLabel.addObserver((Observer) this.sessionManager);
-            deliveryContract.addObserver((Observer) this.shippingLabel);
+            deliveryContract.addObserver((Observer) this.sessionManager);
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
             System.err.println("Caught an Exception: " + e);
             throw new RuntimeException(e);
@@ -115,14 +129,9 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
      * Setting up all things logging. The folder and the files to differentiate between request session and contract session.
      */
     public void setupLogger() {
-        String[] directories = { AppConstant.REQUEST_LOG.toString(), AppConstant.DELIVERY_CONTRACT.toString() };
-        try {
-            for (String directory : directories) {
-                Logger.createLogDirectory(AppConstant.PEER_FOLDER.toString(), AppConstant.LOG_FOLDER.toString(), directory);
-            }
-        } catch (IOException e) {
-            System.err.println("Caught an IOException: " + e.getMessage());
-            throw new RuntimeException("Could not create logger files for request and contract sessions: " + e);
+        String[] directories = { AppConstant.REQUEST_LOG_PATH.toString(), AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString() };
+        for (String directory : directories) {
+            Logger.createLogDirectory(directory);
         }
     }
 
@@ -138,15 +147,6 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
 
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list)      throws IOException {
         CharSequence uri = messages.getURI();
-<<<<<<< HEAD
-        if (uri.equals(Channel.Advertisement.getChannel())) {
-            processMessages(messages, senderE2E);
-        } else if (uri.equals(Channel.Identification.getChannel())) {
-            processMessages(messages, senderE2E);
-        } else if (uri.equals(Channel.Request.getChannel()))  {
-            processMessages(messages, senderE2E);
-        } else if (uri.equals(Channel.Contract.getChannel()))  {
-=======
         if ( uri.equals(Channel.ADVERTISEMENT.getChannel()) ) {
             processMessages(messages, senderE2E);
         } else if ( (uri.equals(Channel.IDENTIFICATION.getChannel()))) {
@@ -154,10 +154,9 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
         } else if (uri.equals(Channel.REQUEST.toString()))  {
             processMessages(messages, senderE2E);
         } else if (uri.equals(Channel.CONTRACT.toString()))  {
->>>>>>> tmp
             processMessages(messages, senderE2E);
         }
-        System.err.println("Message has invalid format: ");
+        System.err.println("Message has invalid format: " + uri);
     }
 
     /**
@@ -169,22 +168,20 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
      * @throws IOException
      */
     public void processMessages(ASAPMessages messages, String senderE2E) {
-        IMessage message;
-        IMessage messageObject;
-        byte[] encryptedMessage;
         try {
             for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
                 if (!messageHandler.checkRecipient(it.next())) {
                     continue;
                 }
-                message = (IMessage) this.messageHandler.parseMessage(it.next(), senderE2E, sharkPKIComponent);
-                messageObject = (IMessage) MessageHandler.byteArrayToObject(it.next());
-                Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(messageObject, senderE2E);
+                IMessage message = (IMessage) this.messageHandler.parseIncomingMessage(it.next(), senderE2E, sharkPKIComponent);
+
+                Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(message, senderE2E);
                 if (!messageBuilder.isPresent()) {
                     continue;
                 }
-                encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.get().getMessage(),
+                byte[] encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.get().getMessage(),
                         messageBuilder.get().getUri(), messageBuilder.get().getSender(), sharkPKIComponent);
+
                 try {
                     this.peer.sendASAPMessage(AppConstant.APP_FORMAT.toString(), AppConstant.SCHEME +
                             messageBuilder.get().getUri(), encryptedMessage);

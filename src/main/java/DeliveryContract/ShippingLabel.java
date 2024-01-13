@@ -1,10 +1,9 @@
 package DeliveryContract;
 
 import HedwigUI.IUserInterface;
-import HedwigUI.UserInputObject;
+import HedwigUI.UserInput;
 import Location.Location;
 import Misc.Utilities;
-import Session.SessionManager;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -17,7 +16,7 @@ import java.util.stream.Stream;
  * their entry. The input is immutable that means it cannot be changed after confimration.
  * That is why there are no set methods in this class.
  */
-public class ShippingLabel extends Observable implements IDeliveryContract, Serializable, IUserInterface {
+public class ShippingLabel extends Observable implements IDeliveryContract, IUserInterface {
 
     private boolean isCreated;
     private UUID packageUUID;
@@ -53,22 +52,20 @@ public class ShippingLabel extends Observable implements IDeliveryContract, Seri
         this.isCreated = false;
     }
 
-    public ShippingLabel() {}
-
     /**
      * Creates a new ShippingLabel object passed from the UserInputBuilder object.
      *
-     * @param object    UserInputBuilder object sent from the user interface.
+     * @param userInput    UserInputBuilder object sent from the user interface.
      */
 
-    public boolean create(UserInputObject object) {
-        if (verifyUserData(object)) {
-            new ShippingLabel(Utilities.createUUID(), object.getSender(), object.getOrigin(), new Location(object.getLatitudeOrigin(), object.getLongitudeOrigin()), object.getRecipient(), object.getDestination(), new Location(object.getLatitudeDest(), object.getLongitudeDest()), object.getPackageWeight());
+    public boolean create(UserInput userInput) {
+        if (verifyUserData(userInput)) {
+            new ShippingLabel(Utilities.createUUID(), userInput.getSender(), userInput.getOrigin(), new Location(userInput.getLatitudeOrigin(), userInput.getLongitudeOrigin()), userInput.getRecipient(), userInput.getDestination(), new Location(userInput.getLatitudeDest(), userInput.getLongitudeDest()), userInput.getPackageWeight());
+            this.isCreated = true;
             setChanged();
-            notifyObservers(this.isCreated = true);
+            notifyObservers();
             return true;
         }
-
         return false;
     }
 
@@ -76,9 +73,9 @@ public class ShippingLabel extends Observable implements IDeliveryContract, Seri
      * Verifies the user input if no attribute has a null value. If only one field is null no schipping
      * label is created.
      *
-     * @param userInput    UserInputBuilder oject this one needs to be checked before the label gets created.
+     * @param userInput    UserInputBuilder object this one needs to be checked before the label gets created.
      */
-    public boolean verifyUserData(UserInputObject userInput) {
+    private boolean verifyUserData(UserInput userInput) {
         return Stream.of(userInput.getSender(), userInput.getOrigin(), userInput.getLatitudeOrigin(), userInput.getLongitudeOrigin(),
                 userInput.getRecipient(), userInput.getDestination(), userInput.getLatitudeDest(), userInput.getLongitudeDest(),
                 userInput.getPackageWeight())
@@ -95,7 +92,7 @@ public class ShippingLabel extends Observable implements IDeliveryContract, Seri
     }
 
     public void setIsCreated(boolean isCreated) {
-        this.isCreated =isCreated;
+        this.isCreated = isCreated;
     }
 
     // Getter methods to get the value of the Object field. No setters because the attriibute values where set

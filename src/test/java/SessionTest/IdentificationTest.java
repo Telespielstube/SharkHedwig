@@ -1,11 +1,11 @@
 package SessionTest;
 
 import Message.Advertisement;
-import Message.Identification.AbstractIdentification;
 import Message.Identification.Challenge;
+import Message.Identification.Response;
 import Message.MessageFlag;
 import Misc.Utilities;
-import Session.Sessions.Identification;
+import Session.Identification;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -17,19 +17,19 @@ import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
-import java.io.ObjectOutput;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.sql.SQLOutput;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,7 +45,7 @@ public class IdentificationTest {
     @BeforeAll
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
 
-        SharkPeer sharkTestPeer = new SharkTestPeerFS(TestConstant.PeerName.getTestConstant(), TestConstant.PeerFolder.getTestConstant() + "/" + TestConstant.PeerName.getTestConstant());
+        SharkPeer sharkTestPeer = new SharkTestPeerFS(TestConstant.PEER_NAME.getTestConstant(), TestConstant.PEER_FOLDER.getTestConstant() + "/" + TestConstant.PEER_NAME.getTestConstant());
         sharkPKIComponent = setupComponent(sharkTestPeer);
 
         sharkTestPeer.start();
@@ -74,6 +74,21 @@ public class IdentificationTest {
     }
 
     @Test
+    public void testIfRandomNumberGetsGenerated() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method random = identification.getClass().getDeclaredMethod("generateRandomNumber");
+        random.setAccessible(true);
+        byte[] secNumber = (byte[]) random.invoke(identification);
+        System.out.println(Arrays.toString(secNumber));
+        byte[] secNumber2 = (byte[]) random.invoke(identification);
+        byte[] secNumber3 = (byte[]) random.invoke(identification);
+        System.out.println(Arrays.toString(secNumber2));
+        System.out.println(Arrays.toString(secNumber3));
+        assertNotEquals(secNumber, secNumber2);
+        assertNotEquals(secNumber2, secNumber3);
+        assertNotEquals(secNumber,secNumber3);
+    }
+
+    @Test
     public void testIfRandomNumberGetsEncryptedAndDecrypted() throws NoSuchAlgorithmException, ASAPSecurityException, NoSuchPaddingException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method random = identification.getClass().getDeclaredMethod("generateRandomNumber");
         random.setAccessible(true);
@@ -89,13 +104,13 @@ public class IdentificationTest {
         Method secNumber = identification.getClass().getDeclaredMethod("generateRandomNumber");
         secNumber.setAccessible(true);
         byte[] randomSecNumber = (byte[]) secNumber.invoke(identification);
-        Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.Challenge, Utilities.createTimestamp(), Utilities.encryptAsymmetric(randomSecNumber, sharkPKIComponent.getPublicKey()));
+        Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.CHALLENGE, Utilities.createTimestamp(), Utilities.encryptAsymmetric(randomSecNumber, sharkPKIComponent.getPublicKey()));
         assertInstanceOf(Challenge.class, challenge);
     }
 
     @Test
     public void responseToAdvertisementIsChallengeMessage() {
-        Advertisement advertisement = new Advertisement(UUID.randomUUID(), MessageFlag.Advertisement, Utilities.createTimestamp(), true);
+        Advertisement advertisement = new Advertisement(UUID.randomUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
         Optional<Object> object = Optional.ofNullable(identification.transferor(advertisement, "Bobby"));
         assertTrue(object.isPresent());
         assertNotNull(object.get());
@@ -106,6 +121,18 @@ public class IdentificationTest {
         Method random = identification.getClass().getDeclaredMethod("generateRandomNumber");
         random.setAccessible(true);
         assertNotNull(random.invoke(identification));
+    }
 
+    @Test
+    public void testIfChallengeGetsResponseMessage() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ASAPSecurityException {
+        Method secNumber = identification.getClass().getDeclaredMethod("generateRandomNumber");
+        Method handleChallenge = identification.getClass().getDeclaredMethod("handleChallenge", Challenge.class);
+        secNumber.setAccessible(true);
+        handleChallenge.setAccessible(true);
+        byte[] randomSecNumber = (byte[]) secNumber.invoke(identification);
+        Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.CHALLENGE, Utilities.createTimestamp(), Utilities.encryptAsymmetric(randomSecNumber, sharkPKIComponent.getPublicKey()));
+        Optional<Response> response = (Optional<Response>) handleChallenge.invoke(identification, challenge);
+        response.ifPresent(Assertions::assertNotNull);
+        assertInstanceOf(Response.class, response.get());
     }
 }

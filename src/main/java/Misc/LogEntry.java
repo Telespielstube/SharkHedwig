@@ -20,7 +20,10 @@ public class LogEntry {
      * @param transferee      Peer with no carriage.
      * @param accepted       set if the request session was successful.
      */
-    public LogEntry(UUID packageUUID, String timestamp, Location pickup, boolean accepted, String transferor, String transferee) {
+    public LogEntry(UUID packageUUID, String timestamp, Location pickup,
+                    boolean accepted, String transferor, String transferee) {
+
+
         this.packageUUID = packageUUID;
         this.timestamp = timestamp;
         this.pickup = pickup;
