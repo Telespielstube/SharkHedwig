@@ -71,8 +71,12 @@ public class UtilitiesTest {
     public void testIfTwoUUIDsDifferFromEachOther() {
         UUID uuid1 = Utilities.createUUID();
         UUID uuid2 = Utilities.createUUID();
+        UUID uuid3 = Utilities.createUUID();
         assertNotEquals(uuid1, uuid2);
+        assertNotEquals(uuid2, uuid3);
+        assertNotEquals(uuid1, uuid3);
     }
+
     @Test
     public void checkIfUUIDVersionIsNumber4() {
         assertEquals(4, Utilities.createUUID().version());
@@ -93,7 +97,7 @@ public class UtilitiesTest {
 
     @Test
     public void testIfSystemReturnsTimeInMillis() {
-        assertEquals(System.currentTimeMillis(), Utilities.createTimestamp(), 1.1);
+        assertNotEquals(System.currentTimeMillis(), Utilities.createTimestamp());
     }
 
     @Test

@@ -24,80 +24,82 @@ public class Contract extends AbstractSession {
     private TransitRecord transitRecord;
     private byte[] signedField;
     private boolean contractState = false;
+    private Optional<Message> optionalMessage;
 
     public Contract(SharkPKIComponent sharkPKIComponent) {
         this.sharkPKIComponent = sharkPKIComponent;
         this.messageList = new TreeMap<>();
         this.contractState = false;
         this.geoSpatial = new GeoSpatial();
+        this.optionalMessage = Optional.empty();
     }
 
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
-        Optional<Message> messageObject = Optional.empty();
+
         // Check object state to make sure to send the contract documents only once.
         if (!this.contractState) {
-            messageObject = Optional.of(createDeliveryContract(sender));
+            createDeliveryContract(sender);
         } else if (this.deliveryContract.getTransitRecord().getListSize() > 1
                 && !this.deliveryContract.getTransitRecord().getLastElement().getTransferor().equals(AppConstant.PEER_NAME)) {
-            messageObject = Optional.of(updateTransitRecord(sender));
+            updateTransitRecord(sender);
         }
 
         switch(message.getMessageFlag()) {
             case CONFIRM:
-                messageObject = Optional.ofNullable(handleConfirm((Confirm) message, sender).orElse(null));
+                handleConfirm((Confirm) message, sender).orElse(null));
                 break;
             case ACK:
-                messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
-                if (messageObject.isPresent()) {
-                    Logger.writeLog(this.deliveryContract.getString(), AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString() +
-                            this.deliveryContract.getShippingLabel().getUUID());
+                handleAckMessage((AckMessage) message);
+                if (this.optionalMessage.isPresent()) {
+                    Logger.writeLog(this.deliveryContract.getString(), AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString()
+                            + this.deliveryContract.getShippingLabel().getUUID());
                 }
                 break;
             case COMPLETE:
-                messageObject = Optional.ofNullable(handleCompleteMessage((Complete) message).orElse(null));
+                handleCompleteMessage((Complete) message);
                 break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
                 clearMessageList();
                 break;
         }
-        if (!messageObject.isPresent()) {
+        if (!this.optionalMessage.isPresent()) {
             clearMessageList();
         } else {
-            addMessageToList(messageObject.get());
+            addMessageToList(this.optionalMessage.get());
         }
-        return Optional.of(messageObject);
+        return Optional.of(this.optionalMessage);
     }
 
     @Override
     public Optional<Object> transferee(IMessage message, String sender) {
-        Optional<Message> messageObject = Optional.empty();
+
         switch(message.getMessageFlag()) {
             case CONTRACT_DOCUMENT:
-                messageObject = Optional.ofNullable(handleContract((ContractDocument) message).orElse(null));
+                handleContract((ContractDocument) message).orElse(null);
                 break;
             case PICK_UP:
-                messageObject = Optional.ofNullable(handlePickUp((PickUp) message, sender).orElse(null));
-                if (messageObject.isPresent()) {
-                    Logger.writeLog(this.deliveryContract.toString(), AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString() +
-                            this.deliveryContract.getShippingLabel().getUUID());
+                handlePickUp((PickUp) message, sender);
+                if (this.optionalMessage.isPresent()) {
+                    Logger.writeLog(this.deliveryContract.toString(), AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString()
+                            + this.deliveryContract.getShippingLabel().getUUID());
                 }
                 break;
             case READY:
-                messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
+                handleAckMessage((AckMessage) message);
                 break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
                 clearMessageList();
                 break;
         }
-        if (!messageObject.isPresent()) {
+        if (!this.optionalMessage.isPresent()) {
             clearMessageList();
         } else {
-            addMessageToList(messageObject.get());
-        }
-        return Optional.of(messageObject);
+            addMessageToList(this.optionalMessage.get());
+        }this.
+        return Optional.of(this.optionalMessage);
     }
 
     /**
@@ -108,11 +110,10 @@ public class Contract extends AbstractSession {
      *
      * @return           new ContractDocument message object.
      */
-    private ContractDocument createDeliveryContract(String receiver) {
+    private void createDeliveryContract(String receiver) {
         this.deliveryContract = new DeliveryContract(receiver, geoSpatial);
         this.contractState = ContractState.CREATED.getState();
-        return new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT,
-                Utilities.createTimestamp(), this.deliveryContract);
+        this.optionalMessage = Optional.of(new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), this.deliveryContract));
     }
 
     /**
@@ -123,7 +124,7 @@ public class Contract extends AbstractSession {
      *
      * @return            ContractDocument.
      */
-    private ContractDocument updateTransitRecord(String receiver) {
+    private void updateTransitRecord(String receiver) {
         TransitEntry update = new TransitEntry(this.deliveryContract.getTransitRecord().countUp(),
                 this.deliveryContract.getShippingLabel().getUUID(),
                 AppConstant.PEER_NAME.toString(),
@@ -132,8 +133,7 @@ public class Contract extends AbstractSession {
                 null,
                 null);
         this.deliveryContract.getTransitRecord().addEntry(update);
-        return new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(),
-               this.deliveryContract);
+        this.optionalMessage = Optional.of(new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), this.deliveryContract));
     }
 
     /**
@@ -142,7 +142,7 @@ public class Contract extends AbstractSession {
      * @param message    Confirm messge object.
      * @return           PickUp message, empty Optional if time or signature is not correct.
      */
-    private Optional<PickUp> handleConfirm(Confirm message, String sender) {
+    private void handleConfirm(Confirm message, String sender) {
         if (compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
             byte[] signedTransfereeField = message.getDeliveryContract().getTransitRecord().getLastElement().getSignatureTransferee();
             byte[] byteTransitEntry = MessageHandler.objectToByteArray(this.transitRecord.getLastElement());
@@ -155,9 +155,8 @@ public class Contract extends AbstractSession {
                 System.err.println("Caught an ASAPSecurityException: " + e);
                 throw new RuntimeException(e);
             }
-            return Optional.of(new PickUp(Utilities.createUUID(), MessageFlag.PICK_UP, Utilities.createTimestamp(), this.transitRecord));
+            this.optionalMessage = Optional.of(new PickUp(Utilities.createUUID(), MessageFlag.PICK_UP, Utilities.createTimestamp(), this.transitRecord));
         }
-        return Optional.empty();
     }
 
     /**
@@ -166,7 +165,7 @@ public class Contract extends AbstractSession {
      * @param message    PickUp message object.
      * @return           An optional if the message passed the timestamp and flag checks or empty if not.
      */
-    private Optional<Confirm> handleContract(ContractDocument message) {
+    private void handleContract(ContractDocument message) {
         if (message.getDeliveryContract() != null) {
             this.transitRecord = message.getDeliveryContract().getTransitRecord();
             this.geoSpatial.setPickUpLocation(this.transitRecord.getLastElement().getPickUpLocation());
@@ -178,9 +177,8 @@ public class Contract extends AbstractSession {
                 throw new RuntimeException(e);
             }
             inMemoDeliveryContract(message.getDeliveryContract());
-            return Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), this.deliveryContract, true));
+            this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), this.deliveryContract, true));
         }
-        return Optional.empty();
     }
 
     /**
@@ -202,7 +200,7 @@ public class Contract extends AbstractSession {
      * @param message    PickUp message object.
      * @return           An optional if the message passed the timestamp and flag checks or empty if not.
      */
-    private Optional<AckMessage> handlePickUp(PickUp message, String sender) {
+    private void handlePickUp(PickUp message, String sender) {
         byte[] signedTransferorField = message.getTransitRecord().getLastElement().getSignatureTransferor();
         byte[] byteTransitEntry = MessageHandler.objectToByteArray(this.transitRecord.getLastElement());
 
@@ -214,9 +212,8 @@ public class Contract extends AbstractSession {
             } catch (ASAPSecurityException e) {
                 throw new RuntimeException(e);
             }
-            return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
+            this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
         }
-        return Optional.empty();
     }
 
     /**
@@ -228,9 +225,8 @@ public class Contract extends AbstractSession {
      */
     private Optional<AckMessage> handleAckMessage(AckMessage nessage)  {
         if (compareTimestamp(nessage.getTimestamp(), timeOffset) && nessage.getIsAck()) {
-            return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY, Utilities.createTimestamp(), true));
+            this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY, Utilities.createTimestamp(), true));
         }
-        return Optional.empty();
     }
 
     /**
@@ -240,16 +236,15 @@ public class Contract extends AbstractSession {
      *
      * @return           Optional object if message is validated correctly, empty if not.
      */
-    private Optional<Complete> handleCompleteMessage(Complete message) {
+    private void handleCompleteMessage(Complete message) {
         timeOffset = 30000;
         if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getComplete()) {
             // Send a message to the owner of the drone that a package is handed over to another drone.
             //notificationService.newMessage(DeliveryContract deliveryContract);
-            return Optional.of(message);
+            this.optionalMessage =  Optional.of(message);
         } else {
             // Send a message to the drone owner that a package is lost
             //notificationService.newMessage(DeliveryContract deliveryContract);
         }
-        return Optional.empty();
     }
 }

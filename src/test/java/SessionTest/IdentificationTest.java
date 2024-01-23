@@ -24,6 +24,7 @@ import org.junit.jupiter.api.function.Executable;
 
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -78,11 +79,8 @@ public class IdentificationTest {
         Method random = identification.getClass().getDeclaredMethod("generateRandomNumber");
         random.setAccessible(true);
         byte[] secNumber = (byte[]) random.invoke(identification);
-        System.out.println(Arrays.toString(secNumber));
         byte[] secNumber2 = (byte[]) random.invoke(identification);
         byte[] secNumber3 = (byte[]) random.invoke(identification);
-        System.out.println(Arrays.toString(secNumber2));
-        System.out.println(Arrays.toString(secNumber3));
         assertNotEquals(secNumber, secNumber2);
         assertNotEquals(secNumber2, secNumber3);
         assertNotEquals(secNumber,secNumber3);
@@ -124,15 +122,17 @@ public class IdentificationTest {
     }
 
     @Test
-    public void testIfChallengeGetsResponseMessage() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ASAPSecurityException {
+    public void testIfChallengeGetsResponseMessage() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ASAPSecurityException, NoSuchFieldException {
         Method secNumber = identification.getClass().getDeclaredMethod("generateRandomNumber");
         Method handleChallenge = identification.getClass().getDeclaredMethod("handleChallenge", Challenge.class);
+        Field optionalMessage = identification.getClass().getDeclaredField("optionalMessage");
         secNumber.setAccessible(true);
         handleChallenge.setAccessible(true);
+        optionalMessage.setAccessible(true);
         byte[] randomSecNumber = (byte[]) secNumber.invoke(identification);
         Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.CHALLENGE, Utilities.createTimestamp(), Utilities.encryptAsymmetric(randomSecNumber, sharkPKIComponent.getPublicKey()));
-        Optional<Response> response = (Optional<Response>) handleChallenge.invoke(identification, challenge);
-        response.ifPresent(Assertions::assertNotNull);
-        assertInstanceOf(Response.class, response.get());
+        handleChallenge.invoke(identification, challenge);
+        Optional<Response> response = (Optional<Response>) optionalMessage.get(identification);
+        assertTrue(response.isPresent());
     }
 }

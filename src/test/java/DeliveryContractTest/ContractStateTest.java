@@ -10,12 +10,7 @@ public class ContractStateTest {
 
     @Test
     public void testCurrentContractState() {
-//        ContractState state = ContractState.CREATED;
-//        if (state.getState()) {
-//            System.out.println("State is true");
-//        } else {
-//            System.out.println("State is false");
-//        }
-//        assertTrue(state.getState());
+        assertTrue(ContractState.CREATED.getState());
+
     }
 }

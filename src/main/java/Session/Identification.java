@@ -38,14 +38,18 @@ public class Identification extends AbstractSession {
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
         switch(message.getMessageFlag()) {
+
+
             case ADVERTISEMENT:
-                this.optionalMessage = Optional.ofNullable((Message) handleAdvertisement((Advertisement) message).orElse(null));
+                handleAdvertisement((Advertisement) message);
                 break;
+
+
             case RESPONSE:
-                this.optionalMessage = Optional.ofNullable((Message) handleResponse((Response) message).orElse(null));
+                handleResponse((Response) message);
                 break;
             case ACK:
-                this.optionalMessage = Optional.ofNullable((Message) handleAckMessage((AckMessage) message).orElse(null));
+                handleAckMessage((AckMessage) message);
                 break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
@@ -64,13 +68,13 @@ public class Identification extends AbstractSession {
     public Optional<Object> transferee(IMessage message, String sender) {
         switch(message.getMessageFlag()) {
             case CHALLENGE:
-                this.optionalMessage = Optional.ofNullable((Message) handleChallenge((Challenge) message).orElse(null));
+                handleChallenge((Challenge) message);
                 break;
             case RESPONSE_REPLY:
-                this.optionalMessage = Optional.ofNullable((Message) handleResponseReply((Response) message).orElse(null));
+                handleResponseReply((Response) message);
                 break;
             case READY:
-                this.optionalMessage = Optional.ofNullable((Message) handleAckMessage((AckMessage) message).orElse(null));
+                handleAckMessage((AckMessage) message);
                 break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
@@ -92,17 +96,19 @@ public class Identification extends AbstractSession {
      *
      * @return           if message was valid a Challenge message, if not an empty Optional.
      */
-    private Optional<Challenge> handleAdvertisement(Advertisement message) {
+    private void handleAdvertisement(Advertisement message) {
         if (message.getAdTag()) {
             try {
+
                 this.secureNumber = generateRandomNumber();
-                return Optional.of(new Challenge(Utilities.createUUID(), MessageFlag.CHALLENGE, Utilities.createTimestamp(),
-                        Utilities.encryptAsymmetric(this.secureNumber, this.sharkPKIComponent.getPublicKey())));
+                this.optionalMessage = Optional.of(new Challenge(Utilities.createUUID(), MessageFlag.CHALLENGE,
+                        Utilities.createTimestamp(), Utilities.encryptAsymmetric(this.secureNumber,
+                        this.sharkPKIComponent.getPublicKey())));
+
             } catch (ASAPSecurityException e) {
                 throw new RuntimeException(e);
             }
         }
-        return Optional.empty();
     }
 
     /**
@@ -112,18 +118,17 @@ public class Identification extends AbstractSession {
      * @param response    Received Response object.
      * @return            Response object.
      */
-    private Optional<Object> handleResponse(Response response) {
-        Response tmp = (Response) this.getLastValueFromList();
+    private void handleResponse(Response response) {
         if ( compareTimestamp(response.getTimestamp(), timeOffset) && compareDecryptedNumber(response.getDecryptedNumber()) ) {
             try{
                 byte[] decryptedNumber = ASAPCryptoAlgorithms.decryptAsymmetric(response.getEncryptedNumber(), this.sharkPKIComponent.getASAPKeyStore());
-                return Optional.of(new Response(Utilities.createUUID(), MessageFlag.RESPONSE_REPLY, Utilities.createTimestamp(), decryptedNumber));
+                this.optionalMessage = Optional.of(new Response(Utilities.createUUID(), MessageFlag.RESPONSE_REPLY,
+                        Utilities.createTimestamp(), decryptedNumber));
             } catch (ASAPSecurityException e) {
                 System.err.println("Caught an ASAPSecurityException: " + e);
                 throw new RuntimeException(e);
             }
         }
-        return Optional.empty();
     }
 
     /**
@@ -134,12 +139,12 @@ public class Identification extends AbstractSession {
      * @return              An Optional AckMessage object if timestamp and ack flag are ok
      *                      or an empty Optional if it's not.
      */
-    private Optional<AckMessage> handleAckMessage(AckMessage message)  {
-        if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getIsAck()) {
-            return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY,
+    private void handleAckMessage(AckMessage message)  {
+        if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getIsAck()
+                && !message.getMessageFlag().equals(MessageFlag.READY)) {
+            this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY,
                     Utilities.createTimestamp(), true));
         }
-        return Optional.empty();
     }
 
     /**
@@ -150,18 +155,18 @@ public class Identification extends AbstractSession {
      * @return           Response message object, or an empty Optional container.
      */
 
-    private Optional<Response> handleChallenge(Challenge message) {
+    private void handleChallenge(Challenge message) {
         if (message.getChallengeNumber().length > 0) {
-
             try {
                 byte[] decryptedNumber = ASAPCryptoAlgorithms.decryptAsymmetric(message.getChallengeNumber(), this.sharkPKIComponent.getASAPKeyStore());
-                return Optional.of(new Response(Utilities.createUUID(), MessageFlag.RESPONSE, Utilities.createTimestamp(), Utilities.encryptAsymmetric(generateRandomNumber(), this.sharkPKIComponent.getPublicKey()), decryptedNumber));
+                this.optionalMessage = Optional.of(new Response(Utilities.createUUID(), MessageFlag.RESPONSE,
+                        Utilities.createTimestamp(), Utilities.encryptAsymmetric(generateRandomNumber(),
+                        this.sharkPKIComponent.getPublicKey()), decryptedNumber));
             } catch (ASAPSecurityException e) {
                 System.err.println("Caught an ASAPSecurityException: " + e);
                 throw new RuntimeException(e);
             }
         }
-        return Optional.empty();
     }
 
     /**
@@ -171,11 +176,10 @@ public class Identification extends AbstractSession {
      *
      * @return                 Optional AckMessage object or empty Optional.
      */
-    private Optional<AckMessage> handleResponseReply(Response responseReply) {
+    private void handleResponseReply(Response responseReply) {
         if ( compareTimestamp(responseReply.getTimestamp(), timeOffset) && compareDecryptedNumber(responseReply.getDecryptedNumber()) ) {
-            return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
+            this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
         }
-        return Optional.empty();
     }
 
     /**
@@ -197,6 +201,7 @@ public class Identification extends AbstractSession {
      * @param decryptedNumber    Received decrypted number. This is the securely generated Number from the Challenge object.
      * @return                   True if decrypted number matches the saved number.
      */
+
     private boolean compareDecryptedNumber(byte[] decryptedNumber) {
         return Arrays.equals(this.secureNumber, decryptedNumber);
     }

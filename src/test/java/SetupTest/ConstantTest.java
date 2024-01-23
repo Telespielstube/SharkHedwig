@@ -9,12 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class ConstantTest {
 
     @Test
-    public void testAllUnitTestInThisClass(){
-        testIfHedwigStringGetsReturnedFromAppConstantsEnumClass();
-        testIfAssertNotEqualsTestIsPassed();
-        testIfAssertNotEqualsTestIsPassedWhenGetterMethodeIsMissing();
-    }
-    @Test
     public void testIfHedwigStringGetsReturnedFromAppConstantsEnumClass() {
         assertEquals("SharkHedwig" , AppConstant.APP_FORMAT.toString());
     }

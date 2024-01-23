@@ -22,72 +22,71 @@ public class Request extends AbstractSession {
     private DeliveryContract deliveryContract;
     private AckMessage ackMessage;
     private LogEntry logEntry;
+    private Optional<Message> optionalMessage;
 
     public Request() {
         this.messageList = new TreeMap<>();
+        this.optionalMessage = Optional.empty();
     }
 
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
-        Optional<Message> optionalMessage = Optional.empty();
         switch(message.getMessageFlag()) {
             case OFFER:
-                optionalMessage = Optional.of(handleOffer((Offer) message).get());
+                handleOffer((Offer) message);
                 break;
             case CONFIRM:
-                optionalMessage = Optional.ofNullable(handleConfirm((Confirm) message).orElse(null));
+                handleConfirm((Confirm) message);
                 break;
             case READY:
-                optionalMessage = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
-                if (optionalMessage.isPresent()) {
-                    this.logEntry = new LogEntry(optionalMessage.get().getUUID(), Utilities.createReadableTimestamp(),
+                handleAckMessage((AckMessage) message);
+                if (this.optionalMessage.isPresent()) {
+                    this.logEntry = new LogEntry(this.optionalMessage.get().getUUID(), Utilities.createReadableTimestamp(),
                             this.deliveryContract.getShippingLabel().getPackageDestination(),true, AppConstant.PEER_NAME.toString(), sender);
                     Logger.writeLog(logEntry.toString(), AppConstant.REQUEST_LOG_PATH.toString() +
-                            optionalMessage.get().getUUID());
+                            this.optionalMessage.get().getUUID());
                 }
                 break;
             default:
                 System.err.println("Missing message flag.");
                 break;
         }
-        if (!optionalMessage.isPresent()) {
+        if (!this.optionalMessage.isPresent()) {
             clearMessageList();
         } else {
-            addMessageToList(optionalMessage.get());
+            addMessageToList(this.optionalMessage.get());
         }
-        return Optional.of(optionalMessage);
+        return Optional.of(this.optionalMessage);
     }
 
     @Override
     public Optional<Object> transferee(IMessage message, String sender) {
-        Optional<Message> messageObject = Optional.empty();
-
         switch(message.getMessageFlag()) {
             case OFFER_REPLY:
-                messageObject = Optional.ofNullable(handleOfferReply((OfferReply) message).orElse(null));
+                handleOfferReply((OfferReply) message);
                 break;
             case CONFIRM:
-                messageObject = Optional.ofNullable(handleConfirm((Confirm) message).orElse(null));
+                handleConfirm((Confirm) message);
                 break;
             case ACK:
-                messageObject = Optional.ofNullable(handleAckMessage((AckMessage) message).orElse(null));
-                if (messageObject.isPresent()) {
-                    this.logEntry = new LogEntry(messageObject.get().getUUID(), Utilities.createReadableTimestamp(),
+                handleAckMessage((AckMessage) message);
+                if (this.optionalMessage.isPresent()) {
+                    this.logEntry = new LogEntry(this.optionalMessage.get().getUUID(), Utilities.createReadableTimestamp(),
                             this.deliveryContract.getShippingLabel().getPackageDestination(), true, AppConstant.PEER_NAME.toString(), sender);
                     Logger.writeLog(logEntry.toString(), AppConstant.REQUEST_LOG_PATH.toString() +
-                            messageObject.get().getUUID());
+                            this.optionalMessage.get().getUUID());
                 }
                 break;
             default:
                 clearMessageList();
                 break;
         }
-        if (!messageObject.isPresent()) {
+        if (!this.optionalMessage.isPresent()) {
             clearMessageList();
         } else {
-            addMessageToList(messageObject.get());
+            addMessageToList(this.optionalMessage.get());
         }
-        return Optional.of(messageObject);
+        return Optional.of(this.optionalMessage);
     }
 
     /**
@@ -96,12 +95,12 @@ public class Request extends AbstractSession {
      * @param message    Offer message object.
      * @return           OfferReply object, or and enpty object if data were not verified.
      */
-    private Optional<OfferReply> handleOffer(Offer message) {
+    private void handleOffer(Offer message) {
         ShippingLabel shippingData = this.deliveryContract.getShippingLabel();
         if (processOfferData(shippingData, message)) {
-           return Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY, Utilities.createTimestamp(), shippingData.getPackageWeight(), shippingData.getPackageDestination()));
+           this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY, Utilities.createTimestamp(), shippingData.getPackageWeight(), shippingData.getPackageDestination()));
         }
-        return Optional.empty();
+       // return Optional.empty();
     }
 
 
@@ -112,11 +111,11 @@ public class Request extends AbstractSession {
      * @param message    OfferReply message object
      * @return           Optional.empty if the calculation did not get verified, or Corfim message if data got verified.
      */
-    private Optional<Confirm> handleOfferReply(OfferReply message) {
+    private void handleOfferReply(OfferReply message) {
         if (compareTimestamp(message.getTimestamp(), timeOffset) && processOfferReplyData(message)) {
-            return Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
+            this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
         }
-        return Optional.empty();
+        //return Optional.empty();
     }
 
     /**
@@ -126,12 +125,12 @@ public class Request extends AbstractSession {
      * @param message    Confirm messge object.
      * @return           An empty optional if a Confirm object is found.
      */
-    private Optional<Confirm> handleConfirm(Confirm message) {
+    private void handleConfirm(Confirm message) {
         Object object = getLastValueFromList();
         if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getConfirmed() && (!(object instanceof Confirm))) {
-            return Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
+            this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
         }
-        return Optional.empty();
+       // return Optional.empty();
     }
 
     /**
@@ -139,12 +138,12 @@ public class Request extends AbstractSession {
      *
      * @return    True if message check was valid. False if not
      */
-    private Optional<AckMessage> handleAckMessage(AckMessage ackMessage)  {
-        boolean isFirstAck = compareTimestamp(ackMessage.getTimestamp(), timeOffset) && ackMessage.getIsAck() && ackMessage.getMessageFlag().equals(MessageFlag.ACK);
-        if (isFirstAck) {
-            return Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY, Utilities.createTimestamp(), true));
+    private void handleAckMessage(AckMessage ackMessage)  {
+        if (compareTimestamp(ackMessage.getTimestamp(), timeOffset) && ackMessage.getIsAck()
+                && !ackMessage.getMessageFlag().equals(MessageFlag.READY)) {
+            this.optionalMessage =  Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY, Utilities.createTimestamp(), true));
         }
-        return Optional.empty();
+        //return Optional.empty();
     }
 
     /**
