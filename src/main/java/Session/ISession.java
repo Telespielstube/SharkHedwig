@@ -48,7 +48,7 @@ public interface ISession {
      * @param message    Message object.
      * @return           true if list is cleared.
      */
-    boolean setSessionComplete(Object message);
+    boolean getSessionComplete(Object message);
 
     /**
      * Adds a message object to the TreeMap.

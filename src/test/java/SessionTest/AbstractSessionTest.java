@@ -88,6 +88,6 @@ public class AbstractSessionTest {
     public void testIfSessionIsSetComplete() {
         AckMessage ack = new AckMessage(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true); // fixed timestamp Saturday, 9:58, 20th 2014
         contract.addMessageToList(ack);
-        contract.setSessionComplete(ack);
+        contract.getSessionComplete(ack);
     }
 }

@@ -122,6 +122,15 @@ public class IdentificationTest {
     }
 
     @Test
+    public void testIfSessionIsComplete() throws NoSuchFieldException, IllegalAccessException {
+        assertFalse(identification.getSessionComplete());
+        Field session = identification.getClass().getSuperclass().getDeclaredField("sessionComplete");
+        session.setAccessible(true);
+        session.set(identification, true);
+        assertTrue(identification.getSessionComplete());
+    }
+
+    @Test
     public void testIfChallengeGetsResponseMessage() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ASAPSecurityException, NoSuchFieldException {
         Method secNumber = identification.getClass().getDeclaredMethod("generateRandomNumber");
         Method handleChallenge = identification.getClass().getDeclaredMethod("handleChallenge", Challenge.class);

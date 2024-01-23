@@ -47,7 +47,7 @@ public class Contract extends AbstractSession {
 
         switch(message.getMessageFlag()) {
             case CONFIRM:
-                handleConfirm((Confirm) message, sender).orElse(null));
+                handleConfirm((Confirm) message, sender);
                 break;
             case ACK:
                 handleAckMessage((AckMessage) message);
@@ -77,7 +77,7 @@ public class Contract extends AbstractSession {
 
         switch(message.getMessageFlag()) {
             case CONTRACT_DOCUMENT:
-                handleContract((ContractDocument) message).orElse(null);
+                handleContract((ContractDocument) message);
                 break;
             case PICK_UP:
                 handlePickUp((PickUp) message, sender);
@@ -98,7 +98,7 @@ public class Contract extends AbstractSession {
             clearMessageList();
         } else {
             addMessageToList(this.optionalMessage.get());
-        }this.
+        }
         return Optional.of(this.optionalMessage);
     }
 
@@ -223,7 +223,7 @@ public class Contract extends AbstractSession {
      * @return              An optional AckMessage object if timestamp and ack flag are ok
      *                      or an empty Optional if its not.
      */
-    private Optional<AckMessage> handleAckMessage(AckMessage nessage)  {
+    private void handleAckMessage(AckMessage nessage)  {
         if (compareTimestamp(nessage.getTimestamp(), timeOffset) && nessage.getIsAck()) {
             this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY, Utilities.createTimestamp(), true));
         }

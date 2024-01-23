@@ -127,8 +127,7 @@ public class SessionManager implements Observer, ISessionManager {
                         .orElse(this.sessionState.resetState())) :
                 Optional.ofNullable(this.identification.transferee(message, this.sender)
                         .orElse(this.sessionState.resetState()));
-        if (this.optionalMessage.isPresent() &&
-                this.identification.setSessionComplete(this.optionalMessage.get())) {
+        if (this.optionalMessage.isPresent() && this.identification.getSessionComplete()) {
             this.identification.clearMessageList();
             this.sessionState = SessionState.IDENTIFICATION.nextState();
         }
@@ -147,7 +146,7 @@ public class SessionManager implements Observer, ISessionManager {
                 Optional.ofNullable(this.request.transferee(message, this.sender)
                         .orElse(this.sessionState.resetState()));
         if (this.optionalMessage.isPresent() &&
-                this.request.setSessionComplete(this.optionalMessage.get())) {
+                this.request.getSessionComplete(this.optionalMessage.get())) {
             this.request.clearMessageList();
             this.sessionState = SessionState.REQUEST.nextState();
         }
@@ -166,7 +165,7 @@ public class SessionManager implements Observer, ISessionManager {
                 Optional.ofNullable(this.contract.transferee(message, this.sender)
                         .orElse(this.sessionState.resetState()));
         if (this.optionalMessage.isPresent() &&
-                this.contract.setSessionComplete(this.optionalMessage.get())) {
+                this.contract.getSessionComplete(this.optionalMessage.get())) {
             changeProtocolState();
             resetAll();
         }
@@ -193,9 +192,9 @@ public class SessionManager implements Observer, ISessionManager {
      */
     private void resetAll() {
         this.noSession = true;
-        this.identification.setSessionComplete(false);
-        this.request.setSessionComplete(false);
-        this.contract.setSessionComplete(false);
+        this.identification.getSessionComplete(false);
+        this.request.getSessionComplete(false);
+        this.contract.getSessionComplete(false);
         this.identification.clearMessageList();
         this.request.clearMessageList();
         this.contract.clearMessageList();

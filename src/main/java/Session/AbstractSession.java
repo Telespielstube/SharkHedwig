@@ -10,7 +10,7 @@ import java.util.SortedMap;
 public abstract class AbstractSession implements ISession {
 
     protected SortedMap<Long, Object> messageList;
-    private boolean sessionComplete = false;
+    protected boolean sessionComplete = false;
     protected int timeOffset = 5000;
 
     public abstract Optional<Object> transferor(IMessage message, String sender);
@@ -25,13 +25,8 @@ public abstract class AbstractSession implements ISession {
         return this.messageList.get(this.messageList.lastKey());
     }
 
-    public boolean setSessionComplete(Object message) {
-        if (!this.messageList.isEmpty() && message.equals(getLastValueFromList() instanceof AckMessage ||
-                !this.messageList.isEmpty() && message.equals(getLastValueFromList() instanceof Complete))) {
-            this.sessionComplete = true;
-            return true;
-        }
-        return false;
+    public boolean getSessionComplete(Object message) {
+        return this.sessionComplete;
     }
 
     public void addMessageToList(IMessage message) {

@@ -38,13 +38,9 @@ public class Identification extends AbstractSession {
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
         switch(message.getMessageFlag()) {
-
-
             case ADVERTISEMENT:
                 handleAdvertisement((Advertisement) message);
                 break;
-
-
             case RESPONSE:
                 handleResponse((Response) message);
                 break;
@@ -140,10 +136,13 @@ public class Identification extends AbstractSession {
      *                      or an empty Optional if it's not.
      */
     private void handleAckMessage(AckMessage message)  {
-        if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getIsAck()
-                && !message.getMessageFlag().equals(MessageFlag.READY)) {
-            this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY,
-                    Utilities.createTimestamp(), true));
+        if (compareTimestamp(message.getTimestamp(), timeOffset)) {
+            if (message.getIsAck()) {
+                this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY,
+                        Utilities.createTimestamp(), true));
+            } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
+                this.sessionComplete = true;
+            }
         }
     }
 
