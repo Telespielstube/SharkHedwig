@@ -52,8 +52,9 @@ public class Contract extends AbstractSession {
             case ACK:
                 handleAckMessage((AckMessage) message);
                 if (this.optionalMessage.isPresent()) {
-                    Logger.writeLog(this.deliveryContract.getString(), AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString()
-                            + this.deliveryContract.getShippingLabel().getUUID());
+                    String saveFile = AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString()
+                            + this.deliveryContract.getShippingLabel().getUUID();
+                    Logger.writeLog(this.deliveryContract.toString(), saveFile);
                 }
                 break;
             case COMPLETE:
@@ -82,8 +83,9 @@ public class Contract extends AbstractSession {
             case PICK_UP:
                 handlePickUp((PickUp) message, sender);
                 if (this.optionalMessage.isPresent()) {
-                    Logger.writeLog(this.deliveryContract.toString(), AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString()
-                            + this.deliveryContract.getShippingLabel().getUUID());
+                    String saveFile = AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString()
+                            + this.deliveryContract.getShippingLabel().getUUID();
+                    Logger.writeLog(this.deliveryContract.toString(), saveFile);
                 }
                 break;
             case READY:
@@ -217,15 +219,24 @@ public class Contract extends AbstractSession {
     }
 
     /**
-     * An Acknowledgment message to signal that the PickUpMessage was received.
+     * An Acknowledgment massage to signal that the second secure code was decrypted successfully. It compares the timestamp
+     * checks the flag and checks if the last TreeMap entry equals Ack.
      *
-     * @param nessage    The received AckMessage object.
-     * @return              An optional AckMessage object if timestamp and ack flag are ok
-     *                      or an empty Optional if its not.
+     * @param message    The received AckMessage object.
+     * @return              An Optional AckMessage object if timestamp and ack flag are ok
+     *                      or an empty Optional if it's not.
      */
-    private void handleAckMessage(AckMessage nessage)  {
-        if (compareTimestamp(nessage.getTimestamp(), timeOffset) && nessage.getIsAck()) {
-            this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY, Utilities.createTimestamp(), true));
+    private void handleAckMessage(AckMessage message)  {
+        if (compareTimestamp(message.getTimestamp(), timeOffset)) {
+            if (message.getIsAck()) {
+                this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY,
+                        Utilities.createTimestamp(), true));
+                this.sessionComplete = true;
+            } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
+                this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.COMPLETE,
+                        Utilities.createTimestamp(), true));
+                this.sessionComplete = true;
+            }
         }
     }
 
@@ -241,7 +252,7 @@ public class Contract extends AbstractSession {
         if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getComplete()) {
             // Send a message to the owner of the drone that a package is handed over to another drone.
             //notificationService.newMessage(DeliveryContract deliveryContract);
-            this.optionalMessage =  Optional.of(message);
+            this.sessionComplete = true;
         } else {
             // Send a message to the drone owner that a package is lost
             //notificationService.newMessage(DeliveryContract deliveryContract);

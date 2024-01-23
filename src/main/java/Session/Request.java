@@ -134,16 +134,23 @@ public class Request extends AbstractSession {
     }
 
     /**
-     * The message sends an AckMessage signal the session is passed.
+     * An Acknowledgment massage to signal that the second secure code was decrypted successfully. It compares the timestamp
+     * checks the flag and checks if the last TreeMap entry equals Ack.
      *
-     * @return    True if message check was valid. False if not
+     * @param message    The received AckMessage object.
+     * @return              An Optional AckMessage object if timestamp and ack flag are ok
+     *                      or an empty Optional if it's not.
      */
-    private void handleAckMessage(AckMessage ackMessage)  {
-        if (compareTimestamp(ackMessage.getTimestamp(), timeOffset) && ackMessage.getIsAck()
-                && !ackMessage.getMessageFlag().equals(MessageFlag.READY)) {
-            this.optionalMessage =  Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY, Utilities.createTimestamp(), true));
+    private void handleAckMessage(AckMessage message)  {
+        if (compareTimestamp(message.getTimestamp(), timeOffset)) {
+            if (message.getIsAck()) {
+                this.optionalMessage = Optional.of(new Message.Identification.AckMessage(Utilities.createUUID(), MessageFlag.READY,
+                        Utilities.createTimestamp(), true));
+                this.sessionComplete = true;
+            } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
+                this.sessionComplete = true;
+            }
         }
-        //return Optional.empty();
     }
 
     /**

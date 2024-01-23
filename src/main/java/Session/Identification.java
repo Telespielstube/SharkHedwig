@@ -140,6 +140,7 @@ public class Identification extends AbstractSession {
             if (message.getIsAck()) {
                 this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY,
                         Utilities.createTimestamp(), true));
+                this.sessionComplete = true;
             } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
                 this.sessionComplete = true;
             }

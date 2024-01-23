@@ -123,10 +123,8 @@ public class SessionManager implements Observer, ISessionManager {
      */
     private void processIdentification(IMessage message) {
         this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR) ?
-                Optional.ofNullable(this.identification.transferor(message, this.sender)
-                        .orElse(this.sessionState.resetState())) :
-                Optional.ofNullable(this.identification.transferee(message, this.sender)
-                        .orElse(this.sessionState.resetState()));
+                Optional.ofNullable(this.identification.transferor(message, this.sender).orElse(this.sessionState.resetState())) :
+                Optional.ofNullable(this.identification.transferee(message, this.sender).orElse(this.sessionState.resetState()));
         if (this.optionalMessage.isPresent() && this.identification.getSessionComplete()) {
             this.identification.clearMessageList();
             this.sessionState = SessionState.IDENTIFICATION.nextState();
@@ -141,12 +139,9 @@ public class SessionManager implements Observer, ISessionManager {
      */
     private void processRequest(IMessage message) {
         this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR) ?
-                Optional.ofNullable(this.request.transferor(message, this.sender)
-                        .orElse(this.sessionState.resetState())) :
-                Optional.ofNullable(this.request.transferee(message, this.sender)
-                        .orElse(this.sessionState.resetState()));
-        if (this.optionalMessage.isPresent() &&
-                this.request.getSessionComplete(this.optionalMessage.get())) {
+                Optional.ofNullable(this.request.transferor(message, this.sender).orElse(this.sessionState.resetState())) :
+                Optional.ofNullable(this.request.transferee(message, this.sender).orElse(this.sessionState.resetState()));
+        if (this.optionalMessage.isPresent() && this.request.getSessionComplete()) {
             this.request.clearMessageList();
             this.sessionState = SessionState.REQUEST.nextState();
         }
@@ -160,12 +155,9 @@ public class SessionManager implements Observer, ISessionManager {
      */
     private void processContract(IMessage message) {
         this.optionalMessage = protocolState.equals(ProtocolState.TRANSFEROR) ?
-                Optional.ofNullable(this.contract.transferor(message, this.sender)
-                        .orElse(this.sessionState.resetState())) :
-                Optional.ofNullable(this.contract.transferee(message, this.sender)
-                        .orElse(this.sessionState.resetState()));
-        if (this.optionalMessage.isPresent() &&
-                this.contract.getSessionComplete(this.optionalMessage.get())) {
+                Optional.ofNullable(this.contract.transferor(message, this.sender).orElse(this.sessionState.resetState())) :
+                Optional.ofNullable(this.contract.transferee(message, this.sender).orElse(this.sessionState.resetState()));
+        if (this.optionalMessage.isPresent() && this.contract.getSessionComplete()) {
             changeProtocolState();
             resetAll();
         }
