@@ -30,7 +30,7 @@ public class Utilities {
      *
      * @return    timestamp as human readable String object.
      */
-    public static String createReadableTimestamp() {
+    public static String formattedTimestamp() {
         Date date = new Date();
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(date);
     }

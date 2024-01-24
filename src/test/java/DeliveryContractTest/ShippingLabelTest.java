@@ -17,9 +17,9 @@ public class ShippingLabelTest {
 
     private static ShippingLabel shippingLabel = new ShippingLabel(null,null,null, null,
             null, null, null, 0.0);
-    private static UserInput userInputBuilder = new UserInput("Alice", "HTW-Berlin",
+    private static final UserInput userInputBuilder = new UserInput("Alice", "HTW-Berlin",
             52.456931, 13.526444, "Bob", "Ostbahnhof", 52.5105, 13.4346, 1.2);
-    private static UserInput nullUserInputBuilder = new UserInput(null, null, null, null, null, null, null, null, null);
+    private static final UserInput nullUserInputBuilder = new UserInput(null, null, null, null, null, null, null, null, null);
 
     @Test
     public void testIfCreateReturnsFalseWhenPassedObjectHasNullValue() {

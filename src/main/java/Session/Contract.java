@@ -38,15 +38,6 @@ public class Contract extends AbstractSession {
 
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
-
-        // Check object state to make sure to send the contract documents only once.
-        if (!this.contractState) {
-            createDeliveryContract(sender);
-        } else if (this.deliveryContract.getTransitRecord().getListSize() > 1
-                && !this.deliveryContract.getTransitRecord().getLastElement().getTransferor().equals(AppConstant.PEER_NAME)) {
-            updateTransitRecord(sender);
-        }
-
         switch(message.getMessageFlag()) {
             case CONFIRM:
                 handleConfirm((Confirm) message, sender);
@@ -107,14 +98,29 @@ public class Contract extends AbstractSession {
     }
 
     /**
+     * Checks the state of the contract. This method is called from the request session. To initiate the contract session
+     * and sending the correct contract.
+     *
+     * @return    Optional message ContractDocument containing the DeliveryContract.
+     */
+    public Optional<Message> checkContractState(String sender) {
+        // Check object state to make sure to send the contract documents only once.
+        if (!this.contractState) {
+            createDeliveryContract(sender);
+        } else if (this.deliveryContract.getTransitRecord().getListSize() > 1
+                && !this.deliveryContract.getTransitRecord().getLastElement().getTransferor().equals(AppConstant.PEER_NAME)) {
+            updateTransitRecord(sender);
+        }
+        return this.optionalMessage;
+    }
+
+    /**
      * Creates the contract document object. The ShippingLabel object is already in memory and the TransitRecord object
      * gets created now.
      *
-     * @param receiver   The sender of the message is the receiver of the newly created DeliveryContract object.
-     *
-     * @return           new ContractDocument message object.
+     * @param receiver The sender of the message is the receiver of the newly created DeliveryContract object.
      */
-    public void createDeliveryContract(String receiver) {
+    private void createDeliveryContract(String receiver) {
         this.deliveryContract = new DeliveryContract(receiver, geoSpatial);
         this.contractState = ContractState.CREATED.getState();
         this.optionalMessage = Optional.of(new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), this.deliveryContract));
@@ -125,8 +131,6 @@ public class Contract extends AbstractSession {
      * to send the DeliveryContract to the next Transferee device.
      *
      * @param receiver    The receiver of the updated TransitRecord object.
-     *
-     * @return            ContractDocument.
      */
     private void updateTransitRecord(String receiver) {
         TransitEntry update = new TransitEntry(this.deliveryContract.getTransitRecord().countUp(),
@@ -144,7 +148,6 @@ public class Contract extends AbstractSession {
      * Validates the received Confirm message object and verifies the signed transferee field.
      *
      * @param message    Confirm messge object.
-     * @return           PickUp message, empty Optional if time or signature is not correct.
      */
     private void handleConfirm(Confirm message, String sender) {
         if (compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
@@ -167,7 +170,6 @@ public class Contract extends AbstractSession {
      * Handles all things data processing after receiving contract documents.
      *
      * @param message    PickUp message object.
-     * @return           An optional if the message passed the timestamp and flag checks or empty if not.
      */
     private void handleContract(ContractDocument message) {
         if (message.getDeliveryContract() != null) {
@@ -202,7 +204,6 @@ public class Contract extends AbstractSession {
      * The PickUp message is sent when the package is ready to pickup.
      *
      * @param message    PickUp message object.
-     * @return           An optional if the message passed the timestamp and flag checks or empty if not.
      */
     private void handlePickUp(PickUp message, String sender) {
         byte[] signedTransferorField = message.getTransitRecord().getLastElement().getSignatureTransferor();
@@ -225,8 +226,6 @@ public class Contract extends AbstractSession {
      * checks the flag and checks if the last TreeMap entry equals Ack.
      *
      * @param message    The received AckMessage object.
-     * @return              An Optional AckMessage object if timestamp and ack flag are ok
-     *                      or an empty Optional if it's not.
      */
     private void handleAckMessage(Ack message)  {
         if (compareTimestamp(message.getTimestamp(), timeOffset)) {
@@ -246,8 +245,6 @@ public class Contract extends AbstractSession {
      * The Complete message is sent by the transferee and marks the completion of the transaction.
      *
      * @param message    Complete message object.
-     *
-     * @return           Optional object if message is validated correctly, empty if not.
      */
     private void handleCompleteMessage(Complete message) {
         timeOffset = 30000;

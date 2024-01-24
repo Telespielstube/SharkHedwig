@@ -48,12 +48,7 @@ public class Request extends AbstractSession {
                 break;
             case READY:
                 handleAck((Ack) message);
-                if (this.optionalMessage.isPresent()) {
-                    this.logEntry = new LogEntry(this.optionalMessage.get().getUUID(), Utilities.createReadableTimestamp(),
-                            this.deliveryContract.getShippingLabel().getPackageDestination(),true, AppConstant.PEER_NAME.toString(), sender);
-                    Logger.writeLog(logEntry.toString(), AppConstant.REQUEST_LOG_PATH.toString() +
-                            this.optionalMessage.get().getUUID());
-                }
+                saveData();
                 break;
             default:
                 System.err.println("Missing message flag.");
@@ -73,17 +68,9 @@ public class Request extends AbstractSession {
             case OFFER_REPLY:
                 handleOfferReply((OfferReply) message);
                 break;
-            case CONFIRM:
-                handleConfirm((Confirm) message);
-                break;
             case ACK:
                 handleAck((Ack) message);
-                if (this.optionalMessage.isPresent()) {
-                    this.logEntry = new LogEntry(this.optionalMessage.get().getUUID(), Utilities.createReadableTimestamp(),
-                            this.deliveryContract.getShippingLabel().getPackageDestination(), true, AppConstant.PEER_NAME.toString(), sender);
-                    Logger.writeLog(logEntry.toString(), AppConstant.REQUEST_LOG_PATH.toString() +
-                            this.optionalMessage.get().getUUID());
-                }
+                saveData();
                 break;
             default:
                 clearMessageList();
@@ -126,8 +113,7 @@ public class Request extends AbstractSession {
     }
 
     /**
-     * Validates the received Confirm message object and if no Confirm object is already saved
-     * a new Confirm object gets created.
+     * Validates the received Confirm message object.
      *
      * @param message    Confirm messge object.
      * @return           An empty optional if a Confirm object is found.
@@ -143,8 +129,8 @@ public class Request extends AbstractSession {
      * checks the flag and checks if the last TreeMap entry equals Ack.
      *
      * @param message    The received AckMessage object.
-     * @return              An Optional AckMessage object if timestamp and ack flag are ok
-     *                      or an empty Optional if it's not.
+     * @return           An Optional AckMessage object if timestamp and ack flag are ok
+     *                   or an empty Optional if it's not.
      */
     private void handleAck(Ack message) {
         if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getIsAck()) {
@@ -153,7 +139,7 @@ public class Request extends AbstractSession {
                         Utilities.createTimestamp(), true));
                 this.sessionComplete = true;
             } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
-                this.contract.createDeliveryContract(this.sender);
+                this.optionalMessage = this.contract.checkContractState(this.sender);
                 this.sessionComplete = true;
             }
         }
@@ -196,5 +182,18 @@ public class Request extends AbstractSession {
         return Stream.of(message.getUUID(), message.getMessageFlag(), message.getTimestamp(),
                 message.getFlightRange(), message.getMaxFreightWeight(),
                 message.getCurrentLocation()).anyMatch(Objects::nonNull);
+    }
+
+    /**
+     * Saves the important session data to the give path constant.
+     */
+    private void saveData() {
+        if (this.optionalMessage.isPresent()) {
+            this.logEntry = new LogEntry(this.optionalMessage.get().getUUID(), Utilities.formattedTimestamp(),
+                    this.deliveryContract.getShippingLabel().getPackageDestination(), true,
+                    AppConstant.PEER_NAME.toString(), sender);
+            Logger.writeLog(logEntry.toString(), AppConstant.REQUEST_LOG_PATH.toString() +
+                    this.optionalMessage.get().getUUID());
+        }
     }
 }

@@ -31,7 +31,7 @@ public class LoggerTest {
 
     @Test
     public void testIfAckMessageGetsSavedInRequestDirectory() throws IOException {
-        LogEntry logEntry = new LogEntry(Utilities.createUUID(), Utilities.createReadableTimestamp(), null ,
+        LogEntry logEntry = new LogEntry(Utilities.createUUID(), Utilities.formattedTimestamp(), null ,
                 true, PEER_NAME.getTestConstant(), "Bobby");
         boolean written = Logger.writeLog(logEntry.toString(), "TestLogFile.txt");
         assertTrue(written);
@@ -40,7 +40,7 @@ public class LoggerTest {
     @Test
     public void printOutLogEntry() {
         Ack ack = new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true);
-        LogEntry logEntry = new LogEntry(ack.getUUID(), Utilities.createReadableTimestamp(), null , true, PEER_NAME.getTestConstant(), "Bobby");
+        LogEntry logEntry = new LogEntry(ack.getUUID(), Utilities.formattedTimestamp(), null , true, PEER_NAME.getTestConstant(), "Bobby");
         System.out.println(logEntry);
     }
 

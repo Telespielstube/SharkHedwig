@@ -90,7 +90,7 @@ public class UtilitiesTest {
 
     @Test
     public void testIfIDReadableTimestampIsReturned() {
-        String timestamp = Utilities.createReadableTimestamp();
+        String timestamp = Utilities.formattedTimestamp();
         System.out.println(timestamp);
         assertNotNull(timestamp);
     }
