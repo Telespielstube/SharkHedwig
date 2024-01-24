@@ -5,11 +5,11 @@ import Message.MessageFlag;
 
 import java.util.UUID;
 
-public class AckMessage extends Message {
+public class Ack extends Message {
 
     private boolean isAck = false;
 
-    public AckMessage(UUID uuid, MessageFlag messageFlag, long timestamp, boolean isAck) {
+    public Ack(UUID uuid, MessageFlag messageFlag, long timestamp, boolean isAck) {
         super(uuid, messageFlag, timestamp);
         this.isAck = isAck;
     }

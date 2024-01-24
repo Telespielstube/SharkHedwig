@@ -29,4 +29,8 @@ public class Offer extends Message {
     public double getMaxFreightWeight() {
         return this.maxFreightWeight;
     }
+
+    public Location getCurrentLocation() {
+        return this.currentLocation;
+    }
 }

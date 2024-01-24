@@ -5,22 +5,29 @@ import java.security.SecureRandom;
 import java.util.*;
 import javax.crypto.NoSuchPaddingException;
 
+import Battery.*;
+import Location.GeoSpatial;
+import Location.IGeoSpatial;
 import Message.Message;
-import Message.Identification.AckMessage;
+import Message.Identification.Ack;
 import Message.Advertisement;
 import Message.IMessage;
 import Message.Identification.*;
+import Message.Request.Offer;
 import Misc.Utilities;
 import Message.MessageFlag;
+import Setup.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;
 
 public class Identification extends AbstractSession {
 
+    private IBattery battery;
     private SharkPKIComponent sharkPKIComponent;
     private byte[] secureNumber;
     private Optional<Message> optionalMessage;
+    private IGeoSpatial geoSpatial;
 
     public Identification(){}
     /**
@@ -33,6 +40,8 @@ public class Identification extends AbstractSession {
         this.sharkPKIComponent = sharkPKIComponent;
         this.messageList = new TreeMap<>(); // A HashMap to store sent and Received Messages with their timestamps as key and the Message as value.
         this.optionalMessage = Optional.empty();
+        this.geoSpatial = new GeoSpatial();
+        this.battery = new Battery();
     }
 
     @Override
@@ -45,11 +54,10 @@ public class Identification extends AbstractSession {
                 handleResponse((Response) message);
                 break;
             case ACK:
-                handleAckMessage((AckMessage) message);
+                handleAckMessage((Ack) message);
                 break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
-                clearMessageList();
                 break;
         }
         if (!this.optionalMessage.isPresent()) {
@@ -70,7 +78,7 @@ public class Identification extends AbstractSession {
                 handleResponseReply((Response) message);
                 break;
             case READY:
-                handleAckMessage((AckMessage) message);
+                handleAckMessage((Ack) message);
                 break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
@@ -95,7 +103,6 @@ public class Identification extends AbstractSession {
     private void handleAdvertisement(Advertisement message) {
         if (message.getAdTag()) {
             try {
-
                 this.secureNumber = generateRandomNumber();
                 this.optionalMessage = Optional.of(new Challenge(Utilities.createUUID(), MessageFlag.CHALLENGE,
                         Utilities.createTimestamp(), Utilities.encryptAsymmetric(this.secureNumber,
@@ -135,14 +142,16 @@ public class Identification extends AbstractSession {
      * @return              An Optional AckMessage object if timestamp and ack flag are ok
      *                      or an empty Optional if it's not.
      */
-    private void handleAckMessage(AckMessage message)  {
-        if (compareTimestamp(message.getTimestamp(), timeOffset)) {
-            if (message.getIsAck()) {
-                this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY,
+    private void handleAckMessage(Ack message) {
+        if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getIsAck()) {
+            if (message.getMessageFlag().equals(MessageFlag.ACK)) {
+                this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.READY,
                         Utilities.createTimestamp(), true));
                 this.sessionComplete = true;
             } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
                 this.sessionComplete = true;
+                this.optionalMessage = Optional.of(new Offer(Utilities.createUUID(), MessageFlag.OFFER,
+                        Utilities.createTimestamp(), battery.maxFlightRange(), AppConstant.APP_FORMAT.getInt(), this.geoSpatial.getCurrentLocation() ));
             }
         }
     }
@@ -178,7 +187,7 @@ public class Identification extends AbstractSession {
      */
     private void handleResponseReply(Response responseReply) {
         if ( compareTimestamp(responseReply.getTimestamp(), timeOffset) && compareDecryptedNumber(responseReply.getDecryptedNumber()) ) {
-            this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
+            this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
         }
     }
 

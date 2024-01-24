@@ -18,13 +18,15 @@ import java.util.*;
 
 public class Contract extends AbstractSession {
 
-    private final SharkPKIComponent sharkPKIComponent;
+    private SharkPKIComponent sharkPKIComponent;
     private DeliveryContract deliveryContract;
-    private final IGeoSpatial geoSpatial;
+    private IGeoSpatial geoSpatial;
     private TransitRecord transitRecord;
     private byte[] signedField;
     private boolean contractState = false;
     private Optional<Message> optionalMessage;
+
+    public Contract() {}
 
     public Contract(SharkPKIComponent sharkPKIComponent) {
         this.sharkPKIComponent = sharkPKIComponent;
@@ -50,7 +52,7 @@ public class Contract extends AbstractSession {
                 handleConfirm((Confirm) message, sender);
                 break;
             case ACK:
-                handleAckMessage((AckMessage) message);
+                handleAckMessage((Ack) message);
                 if (this.optionalMessage.isPresent()) {
                     String saveFile = AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString()
                             + this.deliveryContract.getShippingLabel().getUUID();
@@ -89,7 +91,7 @@ public class Contract extends AbstractSession {
                 }
                 break;
             case READY:
-                handleAckMessage((AckMessage) message);
+                handleAckMessage((Ack) message);
                 break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
@@ -112,7 +114,7 @@ public class Contract extends AbstractSession {
      *
      * @return           new ContractDocument message object.
      */
-    private void createDeliveryContract(String receiver) {
+    public void createDeliveryContract(String receiver) {
         this.deliveryContract = new DeliveryContract(receiver, geoSpatial);
         this.contractState = ContractState.CREATED.getState();
         this.optionalMessage = Optional.of(new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), this.deliveryContract));
@@ -214,7 +216,7 @@ public class Contract extends AbstractSession {
             } catch (ASAPSecurityException e) {
                 throw new RuntimeException(e);
             }
-            this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
+            this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
         }
     }
 
@@ -226,14 +228,14 @@ public class Contract extends AbstractSession {
      * @return              An Optional AckMessage object if timestamp and ack flag are ok
      *                      or an empty Optional if it's not.
      */
-    private void handleAckMessage(AckMessage message)  {
+    private void handleAckMessage(Ack message)  {
         if (compareTimestamp(message.getTimestamp(), timeOffset)) {
             if (message.getIsAck()) {
-                this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.READY,
+                this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.READY,
                         Utilities.createTimestamp(), true));
                 this.sessionComplete = true;
             } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
-                this.optionalMessage = Optional.of(new AckMessage(Utilities.createUUID(), MessageFlag.COMPLETE,
+                this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.COMPLETE,
                         Utilities.createTimestamp(), true));
                 this.sessionComplete = true;
             }

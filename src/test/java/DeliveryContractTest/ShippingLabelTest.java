@@ -4,6 +4,12 @@ import DeliveryContract.*;
 import HedwigUI.UserInput;
 import Location.Location;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,5 +46,12 @@ public class ShippingLabelTest {
         ShippingLabel shippingLabel = new ShippingLabel(null, "Alice", "HTW-Berlin",
                 new Location(52.456931, 13.526444), "Bob", "Ostbahnhof", new Location(52.5105, 13.4346), 1.2);
         System.out.println(shippingLabel.toString());
+    }
+
+    @Test
+    public void testIfUserInputIsVerified() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method verify = shippingLabel.getClass().getDeclaredMethod("verifyUserData", UserInput.class);
+        verify.setAccessible(true);
+        assertTrue((Boolean) verify.invoke(shippingLabel, userInputBuilder));
     }
 }

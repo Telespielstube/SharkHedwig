@@ -32,8 +32,9 @@ public class SessionManager implements Observer, ISessionManager {
         this.protocolState = protocolState;
         this.sessionState = sessionState;
         this.identification = new Identification(sharkPKIComponent);
-        this.request = new Request();
         this.contract = new Contract(sharkPKIComponent);
+        this.request = new Request((Contract) this.contract);
+
         this.optionalMessage = Optional.empty();
         this.contractCreated = false;
         this.sender = "";
@@ -89,9 +90,9 @@ public class SessionManager implements Observer, ISessionManager {
                 break;
 
             case REQUEST:
-                if (!this.noSession && this.identification.getSessionComplete()) {
+                if (!this.noSession && !this.identification.getSessionComplete()) {
                     this.optionalMessage = Optional.empty();
-                } else {this.
+                } else {
                     processRequest(message);
                 }
                 this.optionalMessage.ifPresent(object -> this.messageBuilder = new MessageBuilder(object, Channel.REQUEST.getChannel(), this.sender));
@@ -122,9 +123,9 @@ public class SessionManager implements Observer, ISessionManager {
      * @param message    Received identification message
      */
     private void processIdentification(IMessage message) {
-        this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR) ?
-                Optional.ofNullable(this.identification.transferor(message, this.sender).orElse(this.sessionState.resetState())) :
-                Optional.ofNullable(this.identification.transferee(message, this.sender).orElse(this.sessionState.resetState()));
+        this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR)
+                ? Optional.ofNullable(this.identification.transferor(message, this.sender).orElse(this.sessionState.resetState()))
+                : Optional.ofNullable(this.identification.transferee(message, this.sender).orElse(this.sessionState.resetState()));
         if (this.optionalMessage.isPresent() && this.identification.getSessionComplete()) {
             this.identification.clearMessageList();
             this.sessionState = SessionState.IDENTIFICATION.nextState();
@@ -138,9 +139,9 @@ public class SessionManager implements Observer, ISessionManager {
      * @param message    Received request message
      */
     private void processRequest(IMessage message) {
-        this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR) ?
-                Optional.ofNullable(this.request.transferor(message, this.sender).orElse(this.sessionState.resetState())) :
-                Optional.ofNullable(this.request.transferee(message, this.sender).orElse(this.sessionState.resetState()));
+        this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR)
+                ? Optional.ofNullable(this.request.transferor(message, this.sender).orElse(this.sessionState.resetState()))
+                : Optional.ofNullable(this.request.transferee(message, this.sender).orElse(this.sessionState.resetState()));
         if (this.optionalMessage.isPresent() && this.request.getSessionComplete()) {
             this.request.clearMessageList();
             this.sessionState = SessionState.REQUEST.nextState();

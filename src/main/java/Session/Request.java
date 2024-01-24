@@ -10,27 +10,35 @@ import Misc.LogEntry;
 import Misc.Logger;
 import Misc.Utilities;
 import Setup.AppConstant;
+import Location.Location;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 public class Request extends AbstractSession {
 
+    private String sender;
     private Offer offer;
     private OfferReply offerReply;
     private Confirm confirm;
     private DeliveryContract deliveryContract;
-    private AckMessage ackMessage;
+    private Ack ack;
+    private final Contract contract;
     private LogEntry logEntry;
     private Optional<Message> optionalMessage;
 
-    public Request() {
+    public Request(Contract contract) {
         this.messageList = new TreeMap<>();
         this.optionalMessage = Optional.empty();
+        this.contract = contract;
+        this.sender = "";
     }
 
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
+        this.sender = sender;
         switch(message.getMessageFlag()) {
             case OFFER:
                 handleOffer((Offer) message);
@@ -39,7 +47,7 @@ public class Request extends AbstractSession {
                 handleConfirm((Confirm) message);
                 break;
             case READY:
-                handleAckMessage((AckMessage) message);
+                handleAck((Ack) message);
                 if (this.optionalMessage.isPresent()) {
                     this.logEntry = new LogEntry(this.optionalMessage.get().getUUID(), Utilities.createReadableTimestamp(),
                             this.deliveryContract.getShippingLabel().getPackageDestination(),true, AppConstant.PEER_NAME.toString(), sender);
@@ -69,7 +77,7 @@ public class Request extends AbstractSession {
                 handleConfirm((Confirm) message);
                 break;
             case ACK:
-                handleAckMessage((AckMessage) message);
+                handleAck((Ack) message);
                 if (this.optionalMessage.isPresent()) {
                     this.logEntry = new LogEntry(this.optionalMessage.get().getUUID(), Utilities.createReadableTimestamp(),
                             this.deliveryContract.getShippingLabel().getPackageDestination(), true, AppConstant.PEER_NAME.toString(), sender);
@@ -96,13 +104,13 @@ public class Request extends AbstractSession {
      * @return           OfferReply object, or and enpty object if data were not verified.
      */
     private void handleOffer(Offer message) {
-        ShippingLabel shippingData = this.deliveryContract.getShippingLabel();
-        if (processOfferData(shippingData, message)) {
-           this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY, Utilities.createTimestamp(), shippingData.getPackageWeight(), shippingData.getPackageDestination()));
+        if (verifyOfferData(message)) {
+            ShippingLabel shippingData = this.deliveryContract.getShippingLabel();
+            if (processOfferData(shippingData, message)) {
+                this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY, Utilities.createTimestamp(), shippingData.getPackageWeight(), shippingData.getPackageDestination()));
+            }
         }
-       // return Optional.empty();
     }
-
 
     /**
      * The recipient of the OfferRepy message has to process the received data sa well. Just to double
@@ -115,7 +123,6 @@ public class Request extends AbstractSession {
         if (compareTimestamp(message.getTimestamp(), timeOffset) && processOfferReplyData(message)) {
             this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
         }
-        //return Optional.empty();
     }
 
     /**
@@ -126,11 +133,9 @@ public class Request extends AbstractSession {
      * @return           An empty optional if a Confirm object is found.
      */
     private void handleConfirm(Confirm message) {
-        Object object = getLastValueFromList();
-        if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getConfirmed() && (!(object instanceof Confirm))) {
-            this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
+        if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getConfirmed()) {
+            this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
         }
-       // return Optional.empty();
     }
 
     /**
@@ -141,13 +146,14 @@ public class Request extends AbstractSession {
      * @return              An Optional AckMessage object if timestamp and ack flag are ok
      *                      or an empty Optional if it's not.
      */
-    private void handleAckMessage(AckMessage message)  {
-        if (compareTimestamp(message.getTimestamp(), timeOffset)) {
-            if (message.getIsAck()) {
-                this.optionalMessage = Optional.of(new Message.Identification.AckMessage(Utilities.createUUID(), MessageFlag.READY,
+    private void handleAck(Ack message) {
+        if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getIsAck()) {
+            if (message.getMessageFlag().equals(MessageFlag.ACK)) {
+                this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.READY,
                         Utilities.createTimestamp(), true));
                 this.sessionComplete = true;
             } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
+                this.contract.createDeliveryContract(this.sender);
                 this.sessionComplete = true;
             }
         }
@@ -160,7 +166,9 @@ public class Request extends AbstractSession {
      * @return           True if the transferee is able to deliver, false if not.
      */
     private boolean processOfferReplyData(OfferReply message) {
-
+        double packageWeight = message.getPackageWeight();
+        Location packageDestination = message.getPackageDestination();
+        // Code to process the received data.
         return true;
     }
 
@@ -175,5 +183,18 @@ public class Request extends AbstractSession {
         double flight = message.getFlightRange();
         // This need to be done when the battery and location component is implemented.
         return true;
+    }
+
+    /**
+     * The Offer message has no message to compare the timestamp to, Therefore the message content gets verified.
+     *
+     * @param message    Message content.
+     * @return           true if verified, false if not.
+     */
+
+    private boolean verifyOfferData(Offer message) {
+        return Stream.of(message.getUUID(), message.getMessageFlag(), message.getTimestamp(),
+                message.getFlightRange(), message.getMaxFreightWeight(),
+                message.getCurrentLocation()).anyMatch(Objects::nonNull);
     }
 }

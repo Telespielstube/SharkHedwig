@@ -23,4 +23,11 @@ public interface IBattery {
      * @return    true if delivery is possible false if not.
      */
     public boolean isDeliveryPossible();
+
+    /**
+     * Returns the maximum flight range of the device.
+     *
+     * @return    Distance in km.
+     */
+    public long maxFlightRange();
 }

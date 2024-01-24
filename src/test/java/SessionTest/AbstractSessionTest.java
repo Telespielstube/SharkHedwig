@@ -3,7 +3,7 @@ package SessionTest;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import DeliveryContract.TransitRecord;
-import Message.Contract.AckMessage;
+import Message.Contract.Ack;
 import Message.Contract.ContractDocument;
 import Message.MessageFlag;
 import Misc.Utilities;
@@ -72,21 +72,21 @@ public class AbstractSessionTest {
 
     @Test
     public void compareIfTimestampISOutOFRange() {
-        AckMessage ack = new AckMessage(Utilities.createUUID(), MessageFlag.ACK, 1705740810, true); // fixed timestamp Saturday, 9:58, 20th 2014
+        Ack ack = new Ack(Utilities.createUUID(), MessageFlag.ACK, 1705740810, true); // fixed timestamp Saturday, 9:58, 20th 2014
         contract.addMessageToList(ack);
         assertTrue(contract.compareTimestamp(1705741000, 300));
     }
 
     @Test
     public void compareIfTimestampIsInRange() {
-        AckMessage ack = new AckMessage(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true); // fixed timestamp Saturday, 9:58, 20th 2014
+        Ack ack = new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true); // fixed timestamp Saturday, 9:58, 20th 2014
         contract.addMessageToList(ack);
         assertTrue(contract.compareTimestamp(Utilities.createTimestamp(), 3000));
     }
 
     @Test
     public void testIfSessionIsSetComplete() {
-        AckMessage ack = new AckMessage(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true); // fixed timestamp Saturday, 9:58, 20th 2014
+        Ack ack = new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true); // fixed timestamp Saturday, 9:58, 20th 2014
         contract.addMessageToList(ack);
         contract.getSessionComplete(ack);
     }
