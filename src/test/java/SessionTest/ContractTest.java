@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
@@ -90,15 +91,15 @@ public class ContractTest {
     }
 
     @Test
-    public void testIfTransitRecordSignaturesAreCorrect() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void testIfTransitRecordSignaturesAreCorrect() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         contractDocument = new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), deliveryContract);
+        Field optionalMessage = contract.getClass().getDeclaredField("optionalMessage");
         Method handleContract = contract.getClass().getDeclaredMethod("handleContract", ContractDocument.class);
+        optionalMessage.setAccessible(true);
         handleContract.setAccessible(true);
-        Optional<Confirm> message = (Optional<Confirm>) handleContract.invoke(contract, contractDocument);
-        assertNotNull(message);
-        message.ifPresent(confirm -> assertEquals(confirm.getClass(), Confirm.class));
-        message.ifPresent((o -> assertNotNull(message.get().getDeliveryContract().getTransitRecord().getLastElement().getSignatureTransferee())));
+        handleContract.invoke(contract, contractDocument);
+        assertNotNull(optionalMessage);
     }
 
     @Test

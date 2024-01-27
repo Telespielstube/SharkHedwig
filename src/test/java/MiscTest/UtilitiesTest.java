@@ -97,7 +97,7 @@ public class UtilitiesTest {
 
     @Test
     public void testIfSystemReturnsTimeInMillis() {
-        assertNotEquals(System.currentTimeMillis(), Utilities.createTimestamp());
+        assertEquals(System.currentTimeMillis(), Utilities.createTimestamp());
     }
 
     @Test

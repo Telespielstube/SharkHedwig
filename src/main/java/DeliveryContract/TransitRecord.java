@@ -1,8 +1,6 @@
 package DeliveryContract;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -10,8 +8,7 @@ import java.util.List;
  */
 public class TransitRecord implements IDeliveryContract {
 
-    private TransitEntry transitEntry;
-    private List<TransitEntry> entryList = null;
+    private final List<TransitEntry> entryList;
     private boolean isCreated = false;
     private int serialNumber = 0;
 
@@ -21,7 +18,7 @@ public class TransitRecord implements IDeliveryContract {
      */
 
     public TransitRecord() {
-        this.entryList = Collections.synchronizedList(new ArrayList<TransitEntry>());
+        this.entryList = new ArrayList<>();
         this.isCreated = true;
     }
 
