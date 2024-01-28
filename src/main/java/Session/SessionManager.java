@@ -31,7 +31,7 @@ public class SessionManager implements Observer, ISessionManager {
     public SessionManager(SessionState sessionState, ProtocolState protocolState, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.protocolState = protocolState;
         this.sessionState = sessionState;
-        this.identification = new Identification(sharkPKIComponent);
+        this.identification = new Authentication(sharkPKIComponent);
         this.contract = new Contract(sharkPKIComponent);
         this.request = new Request((Contract) this.contract);
 
@@ -86,7 +86,7 @@ public class SessionManager implements Observer, ISessionManager {
                 } else {
                     processIdentification(message);
                 }
-                this.optionalMessage.ifPresent(object -> this.messageBuilder = new MessageBuilder(this.optionalMessage, Channel.IDENTIFICATION.getChannel(), this.sender));
+                this.optionalMessage.ifPresent(object -> this.messageBuilder = new MessageBuilder(this.optionalMessage, Channel.AUTHENTICATION.getChannel(), this.sender));
                 break;
 
             case REQUEST:

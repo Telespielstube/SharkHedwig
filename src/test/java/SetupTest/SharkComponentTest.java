@@ -3,7 +3,7 @@ package SetupTest;
 import DeliveryContract.ShippingLabel;
 import Message.Identification.Response;
 import Session.SessionManager;
-import Session.Identification;
+import Session.Authentication;
 import Setup.Channel;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -34,7 +34,7 @@ public class SharkComponentTest {
     private static ASAPKeyStore asapKeyStore;
     private static String francisID;
     private static PublicKey publicKeyFrancis;
-    private static Identification identification;
+    private static Authentication authentication;
     private static ShippingLabel shippingLabel;
 
 
@@ -47,7 +47,7 @@ public class SharkComponentTest {
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
-        identification = new Identification(sharkPKIComponent);
+        authentication = new Authentication(sharkPKIComponent);
     }
 
     private static SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException, NoSuchPaddingException, NoSuchAlgorithmException {

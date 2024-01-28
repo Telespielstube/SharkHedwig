@@ -21,7 +21,7 @@ import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;
 
-public class Identification extends AbstractSession {
+public class Authentication extends AbstractSession {
 
     private IBattery battery;
     private SharkPKIComponent sharkPKIComponent;
@@ -29,14 +29,14 @@ public class Identification extends AbstractSession {
     private Optional<Message> optionalMessage;
     private IGeoSpatial geoSpatial;
 
-    public Identification(){}
+    public Authentication(){}
     /**
      * Identification constructor
      *
      * @throws NoSuchPaddingException
      * @throws NoSuchAlgorithmException
      */
-    public Identification(SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public Authentication(SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.sharkPKIComponent = sharkPKIComponent;
         this.messageList = new TreeMap<>(); // A HashMap to store sent and Received Messages with their timestamps as key and the Message as value.
         this.optionalMessage = Optional.empty();

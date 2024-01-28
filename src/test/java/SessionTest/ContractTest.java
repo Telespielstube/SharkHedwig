@@ -2,13 +2,12 @@ package SessionTest;
 
 import DeliveryContract.*;
 import Location.Location;
-import Message.Contract.Confirm;
 import Message.Contract.ContractDocument;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import Misc.Utilities;
 import Session.Contract;
-import Session.Identification;
+import Session.Authentication;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -27,7 +26,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,7 +53,7 @@ public class ContractTest {
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         PublicKey publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
-        Identification identification = new Identification(sharkPKIComponent);
+        Authentication authentication = new Authentication(sharkPKIComponent);
         MessageHandler messageHandler = new MessageHandler();
         contract = new Contract(sharkPKIComponent);
         shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",

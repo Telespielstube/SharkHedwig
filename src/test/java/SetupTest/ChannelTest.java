@@ -17,6 +17,6 @@ public class ChannelTest {
 
     @Test
     public void testIfChannelIsNotOfTypeChannel() {
-        assertNotEquals(Channel.IDENTIFICATION.getChannel(), Channel.IDENTIFICATION);
+        assertNotEquals(Channel.AUTHENTICATION.getChannel(), Channel.AUTHENTICATION);
     }
 }

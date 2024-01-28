@@ -149,7 +149,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
         CharSequence uri = messages.getURI();
         if ( uri.equals(Channel.ADVERTISEMENT.getChannel()) ) {
             processMessages(messages, senderE2E);
-        } else if ( (uri.equals(Channel.IDENTIFICATION.getChannel()))) {
+        } else if ( (uri.equals(Channel.AUTHENTICATION.getChannel()))) {
             processMessages(messages, senderE2E);
         } else if (uri.equals(Channel.REQUEST.toString()))  {
             processMessages(messages, senderE2E);
