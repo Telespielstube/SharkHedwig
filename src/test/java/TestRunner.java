@@ -11,8 +11,3 @@ import org.junit.platform.suite.api.Suite;
 @SelectPackages({"DeliveryContractTest","LocationTest","MessageTest", "MiscTest",
         "SessionTest", "SetupTest"})
 public class TestRunner {}
-
-
-
-
-

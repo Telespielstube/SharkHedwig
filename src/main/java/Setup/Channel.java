@@ -20,10 +20,10 @@ public enum Channel {
             return (AppConstant.SCHEME.toString() + ADVERTISEMENT).toLowerCase();
         }
     },
-    IDENTIFICATION {
+    AUTHENTIFICATION {
         @Override
         public String getChannel() {
-            return (AppConstant.SCHEME.toString() + IDENTIFICATION).toLowerCase();
+            return (AppConstant.SCHEME.toString() + AUTHENTIFICATION).toLowerCase();
         }
     },
     REQUEST {

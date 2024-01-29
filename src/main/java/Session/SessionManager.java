@@ -86,7 +86,7 @@ public class SessionManager implements Observer, ISessionManager {
                 } else {
                     processIdentification(message);
                 }
-                this.optionalMessage.ifPresent(object -> this.messageBuilder = new MessageBuilder(this.optionalMessage, Channel.AUTHENTICATION.getChannel(), this.sender));
+                this.optionalMessage.ifPresent(object -> this.messageBuilder = new MessageBuilder(this.optionalMessage, Channel.AUTHENTIFICATION.getChannel(), this.sender));
                 break;
 
             case REQUEST:
