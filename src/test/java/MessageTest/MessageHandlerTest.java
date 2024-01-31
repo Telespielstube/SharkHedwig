@@ -1,6 +1,6 @@
 package MessageTest;
 
-import Message.Identification.Challenge;
+import Message.Authentication.Challenge;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import SetupTest.TestConstant;
@@ -9,7 +9,6 @@ import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeer;
 import net.sharksystem.SharkTestPeerFS;
 import net.sharksystem.asap.ASAPSecurityException;
-import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;

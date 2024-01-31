@@ -1,4 +1,4 @@
-package Message.Identification;
+package Message.Authentication;
 
 import Message.Message;
 import Message.MessageFlag;
@@ -7,24 +7,24 @@ import java.util.UUID;
 
 public class Response extends Message {
 
-    private byte[] encryptedNumber;
+    private byte[] challengeNumber;
     private byte[] decryptedNumber;
 
     /**
      * Constructor for a response to a challenge message.
      *
      * @param uuid
-     * @param encryptedNumber
+     * @param challengeNumber
      * @param decryptedNumber
      * @param messageFlag
      * @param timestamp
      */
-    public Response(UUID uuid, MessageFlag messageFlag, long timestamp, byte[] encryptedNumber, byte[] decryptedNumber) {
+    public Response(UUID uuid, MessageFlag messageFlag, long timestamp, byte[] challengeNumber, byte[] decryptedNumber) {
         super(uuid, messageFlag, timestamp);
         this.uuid = uuid;
         this.messageFlag = messageFlag;
         this.timestamp = timestamp;
-        this.encryptedNumber = encryptedNumber;
+        this.challengeNumber = challengeNumber;
         this.decryptedNumber = decryptedNumber;
     }
 
@@ -45,8 +45,8 @@ public class Response extends Message {
         this.decryptedNumber = decryptedNumber;
     }
 
-    public byte[] getEncryptedNumber() {
-        return this.encryptedNumber;
+    public byte[] getChallengeNumber() {
+        return this.challengeNumber;
     }
 
     public byte[] getDecryptedNumber() {

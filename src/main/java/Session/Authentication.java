@@ -9,10 +9,10 @@ import Battery.*;
 import Location.GeoSpatial;
 import Location.IGeoSpatial;
 import Message.Message;
-import Message.Identification.Ack;
+import Message.Authentication.Ack;
 import Message.Advertisement;
 import Message.IMessage;
-import Message.Identification.*;
+import Message.Authentication.*;
 import Message.Request.Offer;
 import Misc.Utilities;
 import Message.MessageFlag;
@@ -42,6 +42,7 @@ public class Authentication extends AbstractSession {
         this.optionalMessage = Optional.empty();
         this.geoSpatial = new GeoSpatial();
         this.battery = new Battery();
+        this.secureNumber = new byte[0];
     }
 
     @Override
@@ -54,7 +55,7 @@ public class Authentication extends AbstractSession {
                 handleResponse((Response) message);
                 break;
             case ACK:
-                handleAckMessage((Ack) message);
+                handleAck((Ack) message);
                 break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
@@ -78,7 +79,7 @@ public class Authentication extends AbstractSession {
                 handleResponseReply((Response) message);
                 break;
             case READY:
-                handleAckMessage((Ack) message);
+                handleAck((Ack) message);
                 break;
             default:
                 System.err.println("Message flag was incorrect: " + message.getMessageFlag());
@@ -124,7 +125,7 @@ public class Authentication extends AbstractSession {
     private void handleResponse(Response response) {
         if ( compareTimestamp(response.getTimestamp(), timeOffset) && compareDecryptedNumber(response.getDecryptedNumber()) ) {
             try{
-                byte[] decryptedNumber = ASAPCryptoAlgorithms.decryptAsymmetric(response.getEncryptedNumber(), this.sharkPKIComponent.getASAPKeyStore());
+                byte[] decryptedNumber = ASAPCryptoAlgorithms.decryptAsymmetric(response.getChallengeNumber(), this.sharkPKIComponent.getASAPKeyStore());
                 this.optionalMessage = Optional.of(new Response(Utilities.createUUID(), MessageFlag.RESPONSE_REPLY,
                         Utilities.createTimestamp(), decryptedNumber));
             } catch (ASAPSecurityException e) {
@@ -142,13 +143,13 @@ public class Authentication extends AbstractSession {
      * @return              An Optional AckMessage object if timestamp and ack flag are ok
      *                      or an empty Optional if it's not.
      */
-    private void handleAckMessage(Ack message) {
+    private void handleAck(Ack message) {
         if (compareTimestamp(message.getTimestamp(), timeOffset) && message.getIsAck()) {
             if (message.getMessageFlag().equals(MessageFlag.ACK)) {
                 this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.READY,
                         Utilities.createTimestamp(), true));
                 this.sessionComplete = true;
-            } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
+            } else if (message.getMessageFlag().equals(MessageFlag.READY)) {
                 this.sessionComplete = true;
                 this.optionalMessage = Optional.of(new Offer(Utilities.createUUID(), MessageFlag.OFFER,
                         Utilities.createTimestamp(), battery.maxFlightRange(), AppConstant.APP_FORMAT.getInt(), this.geoSpatial.getCurrentLocation() ));
@@ -185,8 +186,8 @@ public class Authentication extends AbstractSession {
      *
      * @return                 Optional AckMessage object or empty Optional.
      */
-    private void handleResponseReply(Response responseReply) {
-        if ( compareTimestamp(responseReply.getTimestamp(), timeOffset) && compareDecryptedNumber(responseReply.getDecryptedNumber()) ) {
+    private void handleResponseReply(Response message) {
+        if ( compareTimestamp(message.getTimestamp(), timeOffset) && compareDecryptedNumber(message.getDecryptedNumber()) ) {
             this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
         }
     }

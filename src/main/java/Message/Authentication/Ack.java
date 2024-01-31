@@ -1,4 +1,4 @@
-package Message.Identification;
+package Message.Authentication;
 
 import Message.Message;
 import Message.MessageFlag;

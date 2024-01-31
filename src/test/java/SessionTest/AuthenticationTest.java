@@ -1,9 +1,12 @@
 package SessionTest;
 
 import Message.Advertisement;
-import Message.Identification.Challenge;
-import Message.Identification.Response;
+import Message.Authentication.Ack;
+import Message.Authentication.Challenge;
+import Message.Authentication.Response;
+import Message.Message;
 import Message.MessageFlag;
+import Message.Request.Offer;
 import Misc.Utilities;
 import Session.Authentication;
 import SetupTest.TestConstant;
@@ -80,7 +83,7 @@ public class AuthenticationTest {
         byte[] secNumber3 = (byte[]) random.invoke(authentication);
         assertNotEquals(secNumber, secNumber2);
         assertNotEquals(secNumber2, secNumber3);
-        assertNotEquals(secNumber,secNumber3);
+        assertNotEquals(secNumber, secNumber3);
     }
 
     @Test
@@ -128,7 +131,7 @@ public class AuthenticationTest {
     }
 
     @Test
-    public void testIfChallengeGetsResponseMessage() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ASAPSecurityException, NoSuchFieldException {
+    public void testIfChallengeReturnsResponse() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ASAPSecurityException, NoSuchFieldException {
         Method secNumber = authentication.getClass().getDeclaredMethod("generateRandomNumber");
         Method handleChallenge = authentication.getClass().getDeclaredMethod("handleChallenge", Challenge.class);
         Field optionalMessage = authentication.getClass().getDeclaredField("optionalMessage");
@@ -138,7 +141,67 @@ public class AuthenticationTest {
         byte[] randomSecNumber = (byte[]) secNumber.invoke(authentication);
         Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.CHALLENGE, Utilities.createTimestamp(), Utilities.encryptAsymmetric(randomSecNumber, sharkPKIComponent.getPublicKey()));
         handleChallenge.invoke(authentication, challenge);
-        Optional<Response> response = (Optional<Response>) optionalMessage.get(authentication);
-        assertTrue(response.isPresent());
+        Optional<Response> optionalResponse = (Optional<Response>) optionalMessage.get(authentication);
+        assertEquals(optionalResponse.get().getClass(), Response.class);
+        assertTrue(optionalResponse.isPresent());
+    }
+
+    @Test
+    public void testIfResponseReturnsResponseReply() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ASAPSecurityException, NoSuchFieldException {
+        Method generateRandomNumberNumber = authentication.getClass().getDeclaredMethod("generateRandomNumber");
+        Field optionalMessage = authentication.getClass().getDeclaredField("optionalMessage");
+        Field savedRandomNumber = authentication.getClass().getDeclaredField("secureNumber");
+        generateRandomNumberNumber.setAccessible(true);
+        savedRandomNumber.setAccessible(true);
+        optionalMessage.setAccessible(true);
+        byte[] randomSecNumber = (byte[]) generateRandomNumberNumber.invoke(authentication);
+        savedRandomNumber.set(authentication, "12345".getBytes());
+        Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.CHALLENGE, Utilities.createTimestamp(), Utilities.encryptAsymmetric(randomSecNumber, sharkPKIComponent.getPublicKey()));
+        authentication.addMessageToList(challenge);
+        Response response = new Response(Utilities.createUUID(), MessageFlag.RESPONSE, Utilities.createTimestamp(), Utilities.encryptAsymmetric(randomSecNumber, sharkPKIComponent.getPublicKey()), "12345".getBytes());
+        Method handleResponse = authentication.getClass().getDeclaredMethod("handleResponse", Response.class);
+        handleResponse.setAccessible(true);
+        handleResponse.invoke(authentication, response);
+        Optional<Response> optionalResponseReply = (Optional<Response>) optionalMessage.get(authentication);
+        assertEquals(optionalResponseReply.get().getClass(), Response.class);
+        assertTrue(optionalResponseReply.isPresent());
+    }
+
+    @Test
+    public void testIfResponseReplyReturnsAck() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ASAPSecurityException, NoSuchFieldException {
+        Field optionalMessage = authentication.getClass().getDeclaredField("optionalMessage");
+        Field savedRandomNumber = authentication.getClass().getDeclaredField("secureNumber");
+        savedRandomNumber.setAccessible(true);
+        optionalMessage.setAccessible(true);
+        savedRandomNumber.set(authentication, "12345".getBytes());
+        Response response = new Response(Utilities.createUUID(), MessageFlag.RESPONSE, Utilities.createTimestamp(), "12345".getBytes());
+        authentication.addMessageToList(response);
+        Method handleResponseReply = authentication.getClass().getDeclaredMethod("handleResponseReply", Response.class);
+        handleResponseReply.setAccessible(true);
+        handleResponseReply.invoke(authentication, response);
+        Optional<Ack> optionalAck = (Optional<Ack>) optionalMessage.get(authentication);
+        assertEquals(optionalAck.get().getClass(), Ack.class);
+        assertTrue(optionalAck.isPresent());
+    }
+
+    @Test
+    public void testIfAckReturnsReadyAndReadyReturnsOffer() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, NoSuchFieldException {
+        Field optionalMessage = authentication.getClass().getDeclaredField("optionalMessage");
+        optionalMessage.setAccessible(true);
+        Ack ack = new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true);
+        authentication.addMessageToList(ack);
+        Method handleAck = authentication.getClass().getDeclaredMethod("handleAck", Ack.class);
+        handleAck.setAccessible(true);
+        handleAck.invoke(authentication, ack);
+        Optional<Ack> optionalAck = (Optional<Ack>) optionalMessage.get(authentication);
+        assertTrue(optionalAck.isPresent());
+
+        Ack ackReady = new Ack(Utilities.createUUID(), MessageFlag.READY, Utilities.createTimestamp(), true);
+        Method handleAckReady = authentication.getClass().getDeclaredMethod("handleAck", Ack.class);
+        handleAckReady.setAccessible(true);
+        handleAckReady.invoke(authentication, ackReady);
+        Optional<Offer> optionalOffer = (Optional<Offer>) optionalMessage.get(authentication);
+        assertEquals(optionalOffer.get().getClass(), Offer.class);
+        assertTrue(optionalOffer.isPresent());
     }
 }
