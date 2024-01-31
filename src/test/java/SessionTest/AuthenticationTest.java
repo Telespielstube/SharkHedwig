@@ -4,7 +4,6 @@ import Message.Advertisement;
 import Message.Authentication.Ack;
 import Message.Authentication.Challenge;
 import Message.Authentication.Response;
-import Message.Message;
 import Message.MessageFlag;
 import Message.Request.Offer;
 import Misc.Utilities;

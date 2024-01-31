@@ -1,13 +1,15 @@
 package Session;
 
+import DeliveryContract.ShippingLabel;
 import Message.IMessage;
 
 import java.util.Optional;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 public abstract class AbstractSession implements ISession {
 
-    protected SortedMap<Long, Object> messageList;
+    protected SortedMap<Long, Object> messageList = new TreeMap<>(); // A TreeMap to store sent and Received Messages with their timestamps as key and the Message as value.
     protected boolean sessionComplete = false;
     protected int timeOffset = 5000;
 
@@ -32,7 +34,9 @@ public abstract class AbstractSession implements ISession {
     }
 
     public void clearMessageList() {
-        this.messageList.clear();
+        if (!messageList.isEmpty()) {
+            this.messageList.clear();
+        }
     }
 
     public boolean getSessionComplete() {

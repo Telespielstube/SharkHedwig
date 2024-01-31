@@ -10,7 +10,7 @@ public class AuthenticationStateTest {
     @Test
     public void testIfStateVariableProceedsToNextState() {
         SessionState state = SessionState.NO_SESSION.resetState();
-        assertEquals("IDENTIFICATION", state.nextState().toString());
+        assertEquals("AUTHENTIFICATION", state.nextState().toString());
     }
     @Test
     public void testIfNoStateIsActive() {
@@ -19,9 +19,9 @@ public class AuthenticationStateTest {
     }
 
     @Test
-    public void checkIfNextStateAfterNoStateIsIdentificationState() {
+    public void checkIfNextStateAfterNoStateIAuthentificationState() {
         SessionState state = SessionState.NO_SESSION.nextState();
-        assertEquals(SessionState.IDENTIFICATION, state);
+        assertEquals(SessionState.AUTHENTIFICATION, state);
     }
 
     @Test

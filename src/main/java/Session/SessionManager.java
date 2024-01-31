@@ -3,7 +3,6 @@ package Session;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import Misc.Utilities;
-import Setup.Channel;
 import Setup.ProtocolState;
 import Message.*;
 import net.sharksystem.pki.SharkPKIComponent;
@@ -12,16 +11,18 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
+import Setup.Channel;
 
 public class SessionManager implements Observer, ISessionManager {
 
     private SessionState sessionState;
     private ProtocolState protocolState;
-    private AbstractSession identification;
+    private AbstractSession authentification;
     private AbstractSession request;
     private AbstractSession contract;
     private MessageBuilder messageBuilder;
     private DeliveryContract deliveryContract;
+    private ShippingLabel shippingLabel;
     private Optional<Object> optionalMessage;
     private boolean contractCreated;
     private boolean labelCreated;
@@ -31,10 +32,10 @@ public class SessionManager implements Observer, ISessionManager {
     public SessionManager(SessionState sessionState, ProtocolState protocolState, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.protocolState = protocolState;
         this.sessionState = sessionState;
-        this.identification = new Authentication(sharkPKIComponent);
+        this.authentification = new Authentication(sharkPKIComponent);
         this.contract = new Contract(sharkPKIComponent);
         this.request = new Request((Contract) this.contract);
-
+        this.shippingLabel = null;
         this.optionalMessage = Optional.empty();
         this.contractCreated = false;
         this.sender = "";
@@ -54,6 +55,7 @@ public class SessionManager implements Observer, ISessionManager {
         if (o instanceof ShippingLabel ) {
             this.protocolState = ProtocolState.TRANSFEROR;
             this.labelCreated = ((ShippingLabel) o).getIsCreated();
+            this.shippingLabel = ((ShippingLabel) o).get();
         }
         if (o instanceof DeliveryContract) {
             this.contractCreated = ((DeliveryContract) o).getIsCreated();
@@ -67,7 +69,7 @@ public class SessionManager implements Observer, ISessionManager {
         switch (this.sessionState) {
             case NO_SESSION:
                 if (this.protocolState.equals(ProtocolState.TRANSFEROR) && this.labelCreated) {
-                    this.optionalMessage = Optional.ofNullable(this.identification.transferor(message,
+                    this.optionalMessage = Optional.ofNullable(this.authentification.transferor(message,
                             this.sender).orElse(this.sessionState.resetState()));
                 }
                 // Only the NoSession combined with Transferee state creates an Advertisement message.
@@ -80,17 +82,17 @@ public class SessionManager implements Observer, ISessionManager {
                 });
                 break;
 
-            case IDENTIFICATION:
+            case AUTHENTIFICATION:
                 if (!this.noSession) {
                     this.optionalMessage = Optional.empty();
                 } else {
-                    processIdentification(message);
+                    processAuthentification(message);
                 }
                 this.optionalMessage.ifPresent(object -> this.messageBuilder = new MessageBuilder(this.optionalMessage, Channel.AUTHENTIFICATION.getChannel(), this.sender));
                 break;
 
             case REQUEST:
-                if (!this.noSession && !this.identification.getSessionComplete()) {
+                if (!this.noSession && !this.authentification.getSessionComplete()) {
                     this.optionalMessage = Optional.empty();
                 } else {
                     processRequest(message);
@@ -99,7 +101,7 @@ public class SessionManager implements Observer, ISessionManager {
                 break;
 
             case CONTRACT:
-                if (!this.noSession && this.identification.getSessionComplete() && this.request.getSessionComplete()) {
+                if (!this.noSession && this.authentification.getSessionComplete() && this.request.getSessionComplete()) {
                     this.optionalMessage = Optional.empty();
                 } else {
                     processContract(message);
@@ -122,13 +124,13 @@ public class SessionManager implements Observer, ISessionManager {
      *
      * @param message    Received identification message
      */
-    private void processIdentification(IMessage message) {
+    private void processAuthentification(IMessage message) {
         this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR)
-                ? Optional.ofNullable(this.identification.transferor(message, this.sender).orElse(this.sessionState.resetState()))
-                : Optional.ofNullable(this.identification.transferee(message, this.sender).orElse(this.sessionState.resetState()));
-        if (this.optionalMessage.isPresent() && this.identification.getSessionComplete()) {
-            this.identification.clearMessageList();
-            this.sessionState = SessionState.IDENTIFICATION.nextState();
+                ? Optional.ofNullable(this.authentification.transferor(message, this.sender).orElse(this.sessionState.resetState()))
+                : Optional.ofNullable(this.authentification.transferee(message, this.sender).orElse(this.sessionState.resetState()));
+        if (this.optionalMessage.isPresent() && this.authentification.getSessionComplete()) {
+            this.authentification.clearMessageList();
+            this.sessionState = SessionState.AUTHENTIFICATION.nextState();
         }
         this.optionalMessage = Optional.empty();
     }
@@ -185,10 +187,10 @@ public class SessionManager implements Observer, ISessionManager {
      */
     private void resetAll() {
         this.noSession = true;
-        this.identification.getSessionComplete(false);
+        this.authentification.getSessionComplete(false);
         this.request.getSessionComplete(false);
         this.contract.getSessionComplete(false);
-        this.identification.clearMessageList();
+        this.authentification.clearMessageList();
         this.request.clearMessageList();
         this.contract.clearMessageList();
         this.sessionState.resetState();

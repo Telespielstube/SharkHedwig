@@ -26,11 +26,10 @@ public class Contract extends AbstractSession {
     private boolean contractState = false;
     private Optional<Message> optionalMessage;
 
-    public Contract() {}
+    //public Contract() {}
 
     public Contract(SharkPKIComponent sharkPKIComponent) {
         this.sharkPKIComponent = sharkPKIComponent;
-        this.messageList = new TreeMap<>();
         this.contractState = false;
         this.geoSpatial = new GeoSpatial();
         this.optionalMessage = Optional.empty();
@@ -44,11 +43,7 @@ public class Contract extends AbstractSession {
                 break;
             case ACK:
                 handleAckMessage((Ack) message);
-                if (this.optionalMessage.isPresent()) {
-                    String saveFile = AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString()
-                            + this.deliveryContract.getShippingLabel().getUUID();
-                    Logger.writeLog(this.deliveryContract.toString(), saveFile);
-                }
+                saveData();
                 break;
             case COMPLETE:
                 handleCompleteMessage((Complete) message);
@@ -75,11 +70,7 @@ public class Contract extends AbstractSession {
                 break;
             case PICK_UP:
                 handlePickUp((PickUp) message, sender);
-                if (this.optionalMessage.isPresent()) {
-                    String saveFile = AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString()
-                            + this.deliveryContract.getShippingLabel().getUUID();
-                    Logger.writeLog(this.deliveryContract.toString(), saveFile);
-                }
+                saveData();
                 break;
             case READY:
                 handleAckMessage((Ack) message);
@@ -145,7 +136,8 @@ public class Contract extends AbstractSession {
     }
 
     /**
-     * Validates the received Confirm message object and verifies the signed transferee field.
+     * Validates the received Confirm message object verifies the signed transferee field and fills in the last field
+     * by signing the element.
      *
      * @param message    Confirm messge object.
      */
@@ -255,6 +247,17 @@ public class Contract extends AbstractSession {
         } else {
             // Send a message to the drone owner that a package is lost
             //notificationService.newMessage(DeliveryContract deliveryContract);
+        }
+    }
+
+    /**
+     * Saves the important session data to the give path constant.
+     */
+    private void saveData() {
+        if (this.optionalMessage.isPresent()) {
+            String saveFile = AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString()
+                    + this.deliveryContract.getShippingLabel().getUUID();
+            Logger.writeLog(this.deliveryContract.toString(), saveFile);
         }
     }
 }

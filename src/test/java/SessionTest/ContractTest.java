@@ -2,9 +2,11 @@ package SessionTest;
 
 import DeliveryContract.*;
 import Location.Location;
+import Message.Authentication.Ack;
 import Message.Contract.ContractDocument;
 import Message.MessageFlag;
 import Message.MessageHandler;
+import Message.Contract.Confirm;
 import Misc.Utilities;
 import Session.Contract;
 import Session.Authentication;
@@ -26,6 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,11 +48,9 @@ public class ContractTest {
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
         SharkTestPeerFS testSharkPeer = new SharkTestPeerFS(TestConstant.PEER_NAME.getTestConstant(), TestConstant.PEER_FOLDER.getTestConstant());
         sharkPKIComponent = setupComponent(testSharkPeer);
-
         testSharkPeer.start();
 
         String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
-
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         PublicKey publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
@@ -80,10 +81,8 @@ public class ContractTest {
         } catch (SharkException e) {
             throw new RuntimeException(e);
         }
-
         // get component instance
         SharkComponent component = sharkPeer.getComponent(SharkPKIComponent.class);
-
         // project "clean code" :) we only use interfaces - unfortunately casting is unavoidable
         return (SharkPKIComponent) component;
     }
@@ -116,5 +115,40 @@ public class ContractTest {
         assertEquals("Bruce", entry.getTransferee());
     }
 
+    @Test
+    public void testIfContractReturnsConfirm() throws NoSuchFieldException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Field optionalMessage = contract.getClass().getDeclaredField("optionalMessage");
+        optionalMessage.setAccessible(true);
+        Method handleContract = contract.getClass().getDeclaredMethod("handleContract", ContractDocument.class);
+        handleContract.setAccessible(true);
+        contractDocument = new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), deliveryContract);
+        handleContract.invoke(contract, contractDocument);
+        Optional<Confirm> optionalConfirm = (Optional<Confirm>) optionalMessage.get(contract);
+        assertEquals(optionalConfirm.get().getClass(), Confirm.class);
+        assertTrue(optionalConfirm.isPresent());
+    }
 
+    // Cannot get the verification process to work
+//    @Test
+//    public void testIfConfirmReturnPickUp() throws NoSuchFieldException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+//        transitRecord.addEntry(new TransitEntry(4, null, TestConstant.PEER_NAME.name(), "Bob", new Location
+//                (55.5654645, 76.345345), 54566456, "Marta".getBytes(), null));
+//        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
+//        contractDocument = new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), deliveryContract);
+//
+//        Field transitRecordField = contract.getClass().getDeclaredField("transitRecord");
+//        Field optionalMessage = contract.getClass().getDeclaredField("optionalMessage");
+//        Method handleConfirm = contract.getClass().getDeclaredMethod("handleConfirm", Confirm.class, String.class);
+//        transitRecordField.setAccessible(true);
+//        optionalMessage.setAccessible(true);
+//        handleConfirm.setAccessible(true);
+//        transitRecordField.set(contract, transitRecord);
+//        Confirm confirm = new Confirm(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), deliveryContract, true);
+//
+//        contract.addMessageToList(contractDocument);
+//        handleConfirm.invoke(contract, confirm, "Marta");
+//        Optional<Confirm> optionalConfirm = (Optional<Confirm>) optionalMessage.get(contract);
+//        assertEquals(optionalConfirm.get().getClass(), Confirm.class);
+//        assertTrue(optionalConfirm.isPresent());
+//    }
 }

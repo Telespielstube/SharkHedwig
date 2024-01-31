@@ -5,8 +5,6 @@ import HedwigUI.UserInput;
 import Location.Location;
 import Misc.Utilities;
 
-import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Observable;
 import java.util.UUID;
@@ -84,7 +82,7 @@ public class ShippingLabel extends Observable implements IDeliveryContract, IUse
     }
 
     @Override
-    public Object get() {
+    public ShippingLabel get() {
         return this;
     }
 

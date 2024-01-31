@@ -19,18 +19,20 @@ import java.util.stream.Stream;
 
 public class Request extends AbstractSession {
 
+    private Contract contract;
     private String sender;
     private Offer offer;
     private OfferReply offerReply;
     private Confirm confirm;
     private DeliveryContract deliveryContract;
     private Ack ack;
-    private final Contract contract;
+    private ShippingLabel shippingLabel;
     private LogEntry logEntry;
     private Optional<Message> optionalMessage;
 
+    public  Request(){}
+
     public Request(Contract contract) {
-        this.messageList = new TreeMap<>();
         this.optionalMessage = Optional.empty();
         this.contract = contract;
         this.sender = "";
@@ -39,6 +41,7 @@ public class Request extends AbstractSession {
     @Override
     public Optional<Object> transferor(IMessage message, String sender) {
         this.sender = sender;
+        this.shippingLabel = shippingLabel;
         switch(message.getMessageFlag()) {
             case OFFER:
                 handleOffer((Offer) message);
@@ -91,11 +94,9 @@ public class Request extends AbstractSession {
      * @return           OfferReply object, or and enpty object if data were not verified.
      */
     private void handleOffer(Offer message) {
-        if (verifyOfferData(message)) {
-            ShippingLabel shippingData = this.deliveryContract.getShippingLabel();
-            if (processOfferData(shippingData, message)) {
-                this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY, Utilities.createTimestamp(), shippingData.getPackageWeight(), shippingData.getPackageDestination()));
-            }
+        if (verifyOfferData(message) && processOfferData(message)) {
+            this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY,
+                    Utilities.createTimestamp(), shippingLabel.get().getPackageWeight(), shippingLabel.get().getPackageDestination()));
         }
     }
 
@@ -164,7 +165,7 @@ public class Request extends AbstractSession {
      *
      * @return    True if all data is valid and package can be delivered to destination.
      */
-    private boolean processOfferData(ShippingLabel label, Offer message) {
+    private boolean processOfferData(Offer message) {
         double freightWeight = message.getMaxFreightWeight();
         double flight = message.getFlightRange();
         // This need to be done when the battery and location component is implemented.

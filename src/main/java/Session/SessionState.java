@@ -17,11 +17,11 @@ public enum SessionState {
         }
 
         public SessionState nextState() {
-            return IDENTIFICATION;
+            return AUTHENTIFICATION;
         }
     },
 
-    IDENTIFICATION {
+    AUTHENTIFICATION {
         @Override
         public SessionState resetState() { return NO_SESSION; }
         @Override
