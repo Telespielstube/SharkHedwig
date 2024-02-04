@@ -3,7 +3,6 @@ import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.asap.crypto.InMemoASAPKeyStore;
 import net.sharksystem.asap.persons.ASAPCertificateStore;
 import net.sharksystem.asap.persons.ASAPCertificateStoreImpl;
-import net.sharksystem.asap.pki.ASAPCertificate;
 import net.sharksystem.asap.pki.ASAPCertificateStorage;
 import net.sharksystem.asap.pki.CredentialMessageInMemo;
 import net.sharksystem.asap.pki.InMemoAbstractCertificateStore;
@@ -12,6 +11,10 @@ import net.sharksystem.pki.SharkPKIComponent;
 import java.io.IOException;
 import java.util.Random;
 
+/**
+ * This is an imported test class from the SharkPKI project which is part of the ASAP/Shark Framework
+ * link: https://github.com/SharedKnowledge. This helper class provides example data to use test the public key infrastructure.
+ */
 public class HelperPKITests {
     public static final CharSequence FRANCIS_NAME = "Francis";
     public static String getPeerID(String idStart, CharSequence peerName) {

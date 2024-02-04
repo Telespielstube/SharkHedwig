@@ -2,17 +2,17 @@ package Setup;
 
 public enum AppConstant {
     // Component related constants
-    APP_FORMAT("SharkHedwig"),
-    PEER_FOLDER("HedwigStorage"),
+    APP_FORMAT("sharkHedwig"),
+    PEER_FOLDER("hedwigStorage"),
     PEER_NAME("hedwig123"),
     MAX_FREIGHT_WEIGHT(3000),
     CA_ID("certificateAuthority"),
     SCHEME("sn2://"),
 
     // Constants for the log files. */
-    REQUEST_LOG_PATH("HedwigStorage/Log/Request/"),
-    DELIVERY_CONTRACT_LOG_PATH("HedwigStorage/Log/DeliveryContract/"),
-    ERROR_LOG_PATH("HedwigStorage/Log/ErrorLog.txt");
+    REQUEST_LOG_PATH("hedwigStorage/log/request/"),
+    DELIVERY_CONTRACT_LOG_PATH("hedwigStorage/log/deliveryContract/"),
+    ERROR_LOG_PATH("hedwigStorage/log/errorLog.txt");
 
     private String name;
     private int grams;

@@ -10,7 +10,12 @@ public class ConstantTest {
 
     @Test
     public void testIfHedwigStringGetsReturnedFromAppConstantsEnumClass() {
-        assertEquals("SharkHedwig" , AppConstant.APP_FORMAT.toString());
+        assertEquals("sharkHedwig" , AppConstant.APP_FORMAT.toString());
+    }
+
+    @Test
+    public void checkIfHedwigStorageIsReturned() {
+        assertEquals("hedwigStorage", AppConstant.PEER_FOLDER.toString());
     }
 
     @Test
