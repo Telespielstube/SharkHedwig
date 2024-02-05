@@ -27,7 +27,6 @@ public class Request extends AbstractSession {
     private DeliveryContract deliveryContract;
     private Ack ack;
     private ShippingLabel shippingLabel;
-    private LogEntry logEntry;
     private Optional<Message> optionalMessage;
 
     public  Request(){}
@@ -178,7 +177,6 @@ public class Request extends AbstractSession {
      * @param message    Message content.
      * @return           true if verified, false if not.
      */
-
     private boolean verifyOfferData(Offer message) {
         return Stream.of(message.getUUID(), message.getMessageFlag(), message.getTimestamp(),
                 message.getFlightRange(), message.getMaxFreightWeight(),
@@ -190,9 +188,7 @@ public class Request extends AbstractSession {
      */
     private void saveData() {
         if (this.optionalMessage.isPresent()) {
-            this.logEntry = new LogEntry(this.optionalMessage.get().getUUID(), Utilities.formattedTimestamp(),
-                    this.deliveryContract.getShippingLabel().getPackageDestination(), true,
-                    AppConstant.PEER_NAME.toString(), sender);
+            LogEntry logEntry = new LogEntry(this.optionalMessage.get().getUUID(), Utilities.formattedTimestamp(), this.deliveryContract.getShippingLabel().getPackageDestination(), true, AppConstant.PEER_NAME.toString(), sender);
             Logger.writeLog(logEntry.toString(), AppConstant.REQUEST_LOG_PATH.toString() +
                     this.optionalMessage.get().getUUID());
         }

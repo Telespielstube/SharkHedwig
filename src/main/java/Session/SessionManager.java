@@ -41,15 +41,6 @@ public class SessionManager implements Observer, ISessionManager {
         this.sender = "";
     }
 
-    /**
-     * A small message just to advertise a delivery service. Does not belong to a session.
-     *
-     * @return    Advertisement message object.
-     */
-    private Advertisement createAdvertisement() {
-        return new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
-    }
-
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof ShippingLabel ) {
@@ -117,6 +108,15 @@ public class SessionManager implements Observer, ISessionManager {
 
         return Optional.ofNullable(this.messageBuilder);
 
+    }
+
+    /**
+     * A small message just to advertise a delivery service. Does not belong to a session.
+     *
+     * @return    Advertisement message object.
+     */
+    private Advertisement createAdvertisement() {
+        return new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
     }
 
     /**
