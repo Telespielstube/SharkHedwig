@@ -8,7 +8,6 @@ import Message.MessageHandler;
 import Message.Contract.Confirm;
 import Misc.Utilities;
 import Session.Contract;
-import Session.Authentication;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;

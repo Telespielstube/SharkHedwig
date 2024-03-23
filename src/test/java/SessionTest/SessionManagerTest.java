@@ -7,7 +7,6 @@ import Message.*;
 import Misc.Utilities;
 import Session.SessionManager;
 import Session.SessionState;
-import Session.Authentication;
 import Setup.ProtocolState;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
@@ -40,12 +39,10 @@ public class SessionManagerTest {
 
     private SessionManager sessionManager;
     private DeliveryContract deliveryContract;
-    private Response response;
     private SharkPKIComponent sharkPKIComponent;
     private static ASAPKeyStore asapKeyStore;
     private static String francisID;
     private static PublicKey publicKeyFrancis;
-    private static Authentication authentication;
     private static ShippingLabel shippingLabel;
 
     public SessionManagerTest() throws NoSuchPaddingException, NoSuchAlgorithmException {
@@ -60,7 +57,6 @@ public class SessionManagerTest {
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
-        authentication = new Authentication(sharkPKIComponent);
     }
 
     private static SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException, NoSuchPaddingException, NoSuchAlgorithmException {
@@ -138,7 +134,8 @@ public class SessionManagerTest {
     }
 
     @Test
-    public void testIfChallengeMessageGetsRejectedWithoutAdvertisement() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
+    // Need to rewrite the test with Offer!!!
+    public void testIfOfferMessageGetsRejectedWithoutAdvertisement() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
         sessionManager = new SessionManager(SessionState.AUTHENTIFICATION, ProtocolState.TRANSFEROR, sharkPKIComponent);
         byte[] encryptedNumber = Utilities.encryptAsymmetric("4634563456".getBytes(), asapKeyStore.getPublicKey());
         Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.CHALLENGE, System.currentTimeMillis(), encryptedNumber );

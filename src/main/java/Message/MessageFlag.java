@@ -2,9 +2,6 @@ package Message;
 
 public enum MessageFlag {
     ADVERTISEMENT(0),
-    CHALLENGE(1),
-    RESPONSE(2),
-    RESPONSE_REPLY(3),
     OFFER(4),
     OFFER_REPLY(5),
     CONFIRM(6),

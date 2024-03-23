@@ -17,7 +17,6 @@ public class SessionManager implements Observer, ISessionManager {
 
     private SessionState sessionState;
     private ProtocolState protocolState;
-    private AbstractSession authentification;
     private AbstractSession request;
     private AbstractSession contract;
     private MessageBuilder messageBuilder;
@@ -32,7 +31,6 @@ public class SessionManager implements Observer, ISessionManager {
     public SessionManager(SessionState sessionState, ProtocolState protocolState, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.protocolState = protocolState;
         this.sessionState = sessionState;
-        this.authentification = new Authentication(sharkPKIComponent);
         this.contract = new Contract(sharkPKIComponent);
         this.request = new Request((Contract) this.contract);
         this.shippingLabel = null;
@@ -60,7 +58,7 @@ public class SessionManager implements Observer, ISessionManager {
         switch (this.sessionState) {
             case NO_SESSION:
                 if (this.protocolState.equals(ProtocolState.TRANSFEROR) && this.labelCreated) {
-                    this.optionalMessage = Optional.ofNullable(this.authentification.transferor(message,
+                    this.optionalMessage = Optional.ofNullable(this.request.transferor(message,
                             this.sender).orElse(this.sessionState.resetState()));
                 }
                 // Only the NoSession combined with Transferee state creates an Advertisement message.
@@ -74,7 +72,7 @@ public class SessionManager implements Observer, ISessionManager {
                 break;
 
             case REQUEST:
-                if (!this.noSession && !this.authentification.getSessionComplete()) {
+                if (!this.noSession) {
                     this.optionalMessage = Optional.empty();
                 } else {
                     processRequest(message);
@@ -83,7 +81,7 @@ public class SessionManager implements Observer, ISessionManager {
                 break;
 
             case CONTRACT:
-                if (!this.noSession && this.authentification.getSessionComplete() && this.request.getSessionComplete()) {
+                if (!this.noSession && this.request.getSessionComplete()) {
                     this.optionalMessage = Optional.empty();
                 } else {
                     processContract(message);
@@ -108,22 +106,6 @@ public class SessionManager implements Observer, ISessionManager {
      */
     private Advertisement createAdvertisement() {
         return new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
-    }
-
-    /**
-     * If the previous session is completed the received identification message gets processed.
-     *
-     * @param message    Received identification message
-     */
-    private void processAuthentification(IMessage message) {
-        this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR)
-                ? Optional.ofNullable(this.authentification.transferor(message, this.sender).orElse(this.sessionState.resetState()))
-                : Optional.ofNullable(this.authentification.transferee(message, this.sender).orElse(this.sessionState.resetState()));
-        if (this.optionalMessage.isPresent() && this.authentification.getSessionComplete()) {
-            this.authentification.clearMessageList();
-            this.sessionState = SessionState.AUTHENTIFICATION.nextState();
-        }
-        this.optionalMessage = Optional.empty();
     }
 
     /**
@@ -178,10 +160,8 @@ public class SessionManager implements Observer, ISessionManager {
      */
     private void resetAll() {
         this.noSession = true;
-        this.authentification.getSessionComplete(false);
         this.request.getSessionComplete(false);
         this.contract.getSessionComplete(false);
-        this.authentification.clearMessageList();
         this.request.clearMessageList();
         this.contract.clearMessageList();
         this.sessionState.resetState();

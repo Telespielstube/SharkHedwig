@@ -2,6 +2,7 @@ package Setup;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
+import net.sharksystem.SharkComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeerFS;
@@ -27,7 +28,7 @@ import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 
 
-public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageReceivedListener {
+public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkComponent {
 
     private ASAPPeer peer;
     private SharkPKIComponent sharkPKIComponent;
@@ -73,7 +74,7 @@ public class SharkHedwigComponent implements ISharkHedwigComponent, ASAPMessageR
             this.sharkPKIComponent = (SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class);
             sharkHedwigComponentFactory = new SharkHedwigComponentFactory((SharkPKIComponent)
                     sharkPeerFS.getComponent(SharkPKIComponent.class));
-            sharkPeerFS.addComponent(sharkHedwigComponentFactory, ISharkHedwigComponent.class);
+            sharkPeerFS.addComponent(sharkHedwigComponentFactory, SharkComponent.class);
 
             this.sharkPeerFS.start();
         } catch (SharkException e) {

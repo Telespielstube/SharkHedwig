@@ -16,20 +16,6 @@ public class Advertisement extends Message {
         this.adTag = adTag;
     }
 
-    @Override
-    public UUID getUUID() {
-        return this.uuid;
-    }
-
-    @Override
-    public MessageFlag getMessageFlag() {
-        return this.messageFlag;
-    }
-    @Override
-    public long getTimestamp() {
-        return this.timestamp;
-    }
-
     /**
      * Returns the advertisment tag.
      *

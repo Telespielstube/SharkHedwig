@@ -2,7 +2,6 @@ package SetupTest;
 
 import DeliveryContract.ShippingLabel;
 import Session.SessionManager;
-import Session.Authentication;
 import Setup.Channel;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
