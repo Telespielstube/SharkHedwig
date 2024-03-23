@@ -27,12 +27,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SharkComponentTest {
 
     private SessionManager sessionManager;
-    private Response response;
     private SharkPKIComponent sharkPKIComponent;
     private static ASAPKeyStore asapKeyStore;
     private static String francisID;
     private static PublicKey publicKeyFrancis;
-    private static Authentication authentication;
     private static ShippingLabel shippingLabel;
 
 
@@ -45,7 +43,6 @@ public class SharkComponentTest {
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
-        authentication = new Authentication(sharkPKIComponent);
     }
 
     private static SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException, NoSuchPaddingException, NoSuchAlgorithmException {

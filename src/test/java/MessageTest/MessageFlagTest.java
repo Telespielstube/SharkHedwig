@@ -15,7 +15,7 @@ public class MessageFlagTest {
 
     @Test
     public void testIfMessageFlagIsCorrect() {
-        assertEquals(1, MessageFlag.CHALLENGE.getFlag());
+        assertEquals(4, MessageFlag.OFFER.getFlag());
     }
 
     @Test

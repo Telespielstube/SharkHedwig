@@ -52,7 +52,6 @@ public class ContractTest {
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         PublicKey publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
-        Authentication authentication = new Authentication(sharkPKIComponent);
         MessageHandler messageHandler = new MessageHandler();
         contract = new Contract(sharkPKIComponent);
         shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
