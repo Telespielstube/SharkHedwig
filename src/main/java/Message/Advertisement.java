@@ -6,17 +6,13 @@ import java.util.UUID;
 /**
  * The advertisement messages is a small message that only has the task of offering the recipient a service.
  */
-public class Advertisement implements IMessage {
+public class Advertisement extends Message {
 
-    private UUID uuid;
+
     private boolean adTag;
-    private MessageFlag messageFlag;
-    private long timestamp;
 
     public Advertisement(UUID uuid, MessageFlag messageFlag, long timestamp, boolean adTag) {
-        this.uuid = uuid;
-        this.messageFlag = messageFlag;
-        this.timestamp = timestamp;
+        super(uuid, messageFlag, timestamp);
         this.adTag = adTag;
     }
 

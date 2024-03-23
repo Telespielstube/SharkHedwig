@@ -4,8 +4,6 @@ import DeliveryContract.*;
 import HedwigUI.UserInput;
 import Location.Location;
 import Message.*;
-import Message.Authentication.Challenge;
-import Message.Authentication.Response;
 import Misc.Utilities;
 import Session.SessionManager;
 import Session.SessionState;

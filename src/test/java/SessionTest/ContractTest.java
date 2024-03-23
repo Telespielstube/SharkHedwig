@@ -2,7 +2,6 @@ package SessionTest;
 
 import DeliveryContract.*;
 import Location.Location;
-import Message.Authentication.Ack;
 import Message.Contract.ContractDocument;
 import Message.MessageFlag;
 import Message.MessageHandler;

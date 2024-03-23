@@ -1,6 +1,5 @@
 package MessageTest;
 
-import Message.Authentication.Challenge;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import SetupTest.TestConstant;

@@ -73,15 +73,6 @@ public class SessionManager implements Observer, ISessionManager {
                 });
                 break;
 
-            case AUTHENTIFICATION:
-                if (!this.noSession) {
-                    this.optionalMessage = Optional.empty();
-                } else {
-                    processAuthentification(message);
-                }
-                this.optionalMessage.ifPresent(object -> this.messageBuilder = new MessageBuilder(this.optionalMessage, Channel.AUTHENTIFICATION.getChannel(), this.sender));
-                break;
-
             case REQUEST:
                 if (!this.noSession && !this.authentification.getSessionComplete()) {
                     this.optionalMessage = Optional.empty();

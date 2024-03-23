@@ -1,7 +1,6 @@
 package SetupTest;
 
 import DeliveryContract.ShippingLabel;
-import Message.Authentication.Response;
 import Session.SessionManager;
 import Session.Authentication;
 import Setup.Channel;

@@ -24,6 +24,7 @@ public enum AppConstant {
     AppConstant(int grams) {
         this.grams = grams;
     }
+
     public String toString() {
         return name;
     }
