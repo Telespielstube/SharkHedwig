@@ -17,15 +17,8 @@ public enum SessionState {
         }
 
         public SessionState nextState() {
-            return AUTHENTIFICATION;
+            return REQUEST;
         }
-    },
-
-    AUTHENTIFICATION {
-        @Override
-        public SessionState resetState() { return NO_SESSION; }
-        @Override
-        public SessionState nextState() { return REQUEST; }
     },
 
     REQUEST {

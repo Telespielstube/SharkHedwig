@@ -8,14 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class SessionStateTest {
 
-    @Test
-    public void testIfNextSessionIsAuthentification() {
-        assertEquals(SessionState.AUTHENTIFICATION, SessionState.NO_SESSION.nextState());
-    }
 
     @Test
     public void testIfNexSessioneIsRequest() {
-        assertEquals(SessionState.REQUEST, SessionState.AUTHENTIFICATION.nextState());
+        assertEquals(SessionState.REQUEST, SessionState.NO_SESSION.nextState());
     }
 
     @Test
@@ -34,7 +30,7 @@ public class SessionStateTest {
     }
 
     @Test
-    public void testIResetContractSessionIsNotAuthentificationnSession() {
-        assertNotEquals(SessionState.AUTHENTIFICATION, SessionState.CONTRACT.resetState());
+    public void testIfResetContractSessionIsNotAuthentificationnSession() {
+        assertNotEquals(SessionState.REQUEST, SessionState.CONTRACT.resetState());
     }
 }

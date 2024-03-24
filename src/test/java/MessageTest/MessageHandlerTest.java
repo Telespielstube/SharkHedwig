@@ -1,7 +1,9 @@
 package MessageTest;
 
+import Location.Location;
 import Message.MessageFlag;
 import Message.MessageHandler;
+import Message.Request.Offer;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -26,9 +28,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MessageHandlerTest {
 
-    private final Challenge challenge = new Challenge(UUID.randomUUID(), MessageFlag.CHALLENGE, System.currentTimeMillis(), "342532452345".getBytes());
     private final MessageHandler messageHandler = new MessageHandler();
     private static SharkPKIComponent sharkPKIComponent;
+    private static Offer offer;
     private static String francisID;
     static PublicKey publicKeyFrancis;
 
@@ -37,14 +39,12 @@ public class MessageHandlerTest {
 
         SharkPeer sharkTestPeer = new SharkTestPeerFS(TestConstant.PEER_NAME.getTestConstant(), TestConstant.PEER_FOLDER.getTestConstant() + "/" + TestConstant.PEER_NAME.getTestConstant());
         sharkPKIComponent = setupComponent(sharkTestPeer);
-
         sharkTestPeer.start();
-
         String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
-
         ASAPKeyStore asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
+        offer = new Offer(UUID.randomUUID(), MessageFlag.OFFER, System.currentTimeMillis(), 1.0, 10.0, new Location("HTW-Berlin", 52.456931, 13.526444));
     }
 
     private static SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException {
@@ -64,13 +64,13 @@ public class MessageHandlerTest {
 
     @Test
     public void testIfMessageGetsBuildForSending() {
-        byte[] outgoingMessage = messageHandler.buildOutgoingMessage(challenge, MessageFlag.CHALLENGE.toString(), francisID, sharkPKIComponent);
-        assertNotEquals(Arrays.toString(outgoingMessage), challenge.toString());
+        byte[] outgoingMessage = messageHandler.buildOutgoingMessage(offer, MessageFlag.OFFER.toString(), francisID, sharkPKIComponent);
+        assertNotEquals(Arrays.toString(outgoingMessage), offer.toString());
     }
 
     @Test
     public void testIfMessageGetsSigned() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        byte[] byteMessage = MessageHandler.objectToByteArray(challenge);
+        byte[] byteMessage = MessageHandler.objectToByteArray(offer);
         Method composeSignature = messageHandler.getClass().getDeclaredMethod("composeSignedMessage", byte[].class, SharkPKIComponent.class);
         composeSignature.setAccessible(true);
         byte[] signedMessage = (byte[]) composeSignature.invoke(messageHandler, byteMessage, sharkPKIComponent);
@@ -80,7 +80,7 @@ public class MessageHandlerTest {
 
     @Test
     public void verifySignedMessage() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        byte[] byteMessage = MessageHandler.objectToByteArray(challenge);
+        byte[] byteMessage = MessageHandler.objectToByteArray(offer);
         Method composeSignature = messageHandler.getClass().getDeclaredMethod("composeSignedMessage", byte[].class, SharkPKIComponent.class);
         composeSignature.setAccessible(true);
         byte[] signedMessage = (byte[]) composeSignature.invoke(messageHandler, byteMessage, sharkPKIComponent);
@@ -93,18 +93,17 @@ public class MessageHandlerTest {
     // There is something wrong decrypting a incoming message!!
     @Test
     public void testIfByteMessageGetsParsedToMessageObject() throws ASAPSecurityException {
-//        Challenge challenge = new Challenge(UUID.randomUUID(), MessageFlag.CHALLENGE, System.currentTimeMillis(), ASAPCryptoAlgorithms.sign("342532452345".getBytes(), sharkPKIComponent.getASAPKeyStore()));
-//        byte[] outgoingMessage = messageHandler.buildOutgoingMessage(challenge, String.valueOf(MessageFlag.CHALLENGE), francisID, sharkPKIComponent);
-//        System.out.println(outgoingMessage);
-//        Object object = messageHandler.parseIncomingMessage(outgoingMessage, francisID, sharkPKIComponent);
-//        assertEquals(object.getClass(), challenge.getClass());
+        byte[] outgoingMessage = messageHandler.buildOutgoingMessage(offer, String.valueOf(MessageFlag.OFFER), francisID, sharkPKIComponent);
+        System.out.println(outgoingMessage);
+        Object object = messageHandler.parseIncomingMessage(outgoingMessage, francisID, sharkPKIComponent);
+        assertEquals(object.getClass(), offer.getClass());
     }
 
     @Test
     public void testIfObjectGetsConvertedToByteArrayAndBackToObject() {
-        byte[] byteMessage = MessageHandler.objectToByteArray(challenge);
+        byte[] byteMessage = MessageHandler.objectToByteArray(offer);
         Object object = MessageHandler.byteArrayToObject(byteMessage);
-        assertEquals(object.getClass(), challenge.getClass());
+        assertEquals(object.getClass(), offer.getClass());
     }
 }
 

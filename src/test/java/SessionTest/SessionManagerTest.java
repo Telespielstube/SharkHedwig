@@ -4,6 +4,7 @@ import DeliveryContract.*;
 import HedwigUI.UserInput;
 import Location.Location;
 import Message.*;
+import Message.Request.Offer;
 import Misc.Utilities;
 import Session.SessionManager;
 import Session.SessionState;
@@ -74,10 +75,10 @@ public class SessionManagerTest {
     }
 
     @Test
-    public void testIfDeviceTransferorIsUnchangedWhenShippingLabelIsCreatedButEmpty() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public void testIfTransferorIsUnchangedWhenShippingLabelIsCreatedButEmpty() throws NoSuchPaddingException, NoSuchAlgorithmException {
         ShippingLabel shippingLabel = new ShippingLabel(null,null,null, null,
                 null, null, null, 0.0);
-        sessionManager = new SessionManager(SessionState.AUTHENTIFICATION, ProtocolState.TRANSFEREE, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState.REQUEST, ProtocolState.TRANSFEREE, sharkPKIComponent);
         assertFalse(shippingLabel.getIsCreated());
         assertNotEquals(ProtocolState.TRANSFEROR, ProtocolState.TRANSFEREE);
     }
@@ -95,10 +96,10 @@ public class SessionManagerTest {
     }
 
     @Test
-    public void transfereeStateChangesWhenCreateIsCalled() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public void transfereeStateChangesWhenCreateShippingLabelIsCalled() throws NoSuchPaddingException, NoSuchAlgorithmException {
         shippingLabel = new ShippingLabel(null,null,null, null,
                 null, null, null, 0.0);
-        sessionManager = new SessionManager(SessionState.AUTHENTIFICATION, ProtocolState.TRANSFEREE,  sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState.REQUEST, ProtocolState.TRANSFEREE,  sharkPKIComponent);
         UserInput userInput = new UserInput("Alice", "HTW-Berlin", 52.456931, 13.526444,
                 "Bob", "Ostbahnhof", 52.5105, 13.4346, 1.2);
         shippingLabel.create(userInput);
@@ -108,10 +109,9 @@ public class SessionManagerTest {
     @Test
     public void testIfMessageIsUnhandledWhenSessionDiffers() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
         sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEROR, sharkPKIComponent);
-        byte[] encryptedNumber = Utilities.encryptAsymmetric("3345".getBytes(), asapKeyStore.getPublicKey());
-        Challenge challenge = new Challenge(UUID.randomUUID(), MessageFlag.CHALLENGE, System.currentTimeMillis(), encryptedNumber );
-        Optional<Optional<MessageBuilder>> messageBuilder = Optional.ofNullable(sessionManager.sessionHandling(challenge, "Marta"));
-        assertThrows(NoSuchElementException.class, () -> sessionManager.sessionHandling(challenge, "Marta"));
+        Offer offer = new Offer(UUID.randomUUID(), MessageFlag.OFFER, System.currentTimeMillis(), 1.0, 10.0, new Location("HTW-Berlin", 52.456931, 13.526444) );
+        Optional<Optional<MessageBuilder>> messageBuilder = Optional.ofNullable(sessionManager.sessionHandling(offer, "Marta"));
+        assertThrows(NoSuchElementException.class, () -> sessionManager.sessionHandling(offer, "Marta"));
     }
 
     @Test
@@ -136,10 +136,9 @@ public class SessionManagerTest {
     @Test
     // Need to rewrite the test with Offer!!!
     public void testIfOfferMessageGetsRejectedWithoutAdvertisement() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
-        sessionManager = new SessionManager(SessionState.AUTHENTIFICATION, ProtocolState.TRANSFEROR, sharkPKIComponent);
-        byte[] encryptedNumber = Utilities.encryptAsymmetric("4634563456".getBytes(), asapKeyStore.getPublicKey());
-        Challenge challenge = new Challenge(Utilities.createUUID(), MessageFlag.CHALLENGE, System.currentTimeMillis(), encryptedNumber );
-        Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(challenge, "Marta");
+        sessionManager = new SessionManager(SessionState.REQUEST, ProtocolState.TRANSFEROR, sharkPKIComponent);
+        Offer offer = new Offer(UUID.randomUUID(), MessageFlag.OFFER, System.currentTimeMillis(), 1.0, 10.0, new Location("HTW-Berlin", 52.456931, 13.526444) );
+        Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(offer, "Marta");
         assertFalse(messageBuilder.isPresent());
     }
 
@@ -165,8 +164,8 @@ public class SessionManagerTest {
     }
 
     @Test
-    public void testIfProtocolStatesGetSwitched() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        sessionManager = new SessionManager(SessionState.AUTHENTIFICATION, ProtocolState.TRANSFEROR, sharkPKIComponent);
+    public void testIfProtocolStatesGetChanged() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        sessionManager = new SessionManager(SessionState.REQUEST, ProtocolState.TRANSFEROR, sharkPKIComponent);
         Method protocolState = sessionManager.getClass().getDeclaredMethod("changeProtocolState");
         Field labelCreated = sessionManager.getClass().getDeclaredField("labelCreated");
         Field deliveryContract = sessionManager.getClass().getDeclaredField("deliveryContract");
@@ -181,7 +180,7 @@ public class SessionManagerTest {
 
     @Test
     public void testIfResetWorks() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        sessionManager = new SessionManager(SessionState.AUTHENTIFICATION, ProtocolState.TRANSFEROR, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState.REQUEST, ProtocolState.TRANSFEROR, sharkPKIComponent);
         Method reset = sessionManager.getClass().getDeclaredMethod("resetAll");
         reset.setAccessible(true);
         reset.invoke(sessionManager, null);
