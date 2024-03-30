@@ -27,7 +27,6 @@ import javax.crypto.NoSuchPaddingException;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 
-
 public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkComponent {
 
     private ASAPPeer peer;
@@ -39,6 +38,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     private ShippingLabel shippingLabel = new ShippingLabel(null,null,null, null,
             null, null, null, 0.0);
     private DeliveryContract deliveryContract = new DeliveryContract();
+    private ReceivedMessageList receivedMessageList = new ReceivedMessageList();
 
     /**
      * The component implements a decentralized protocol that allows drones to transport a physical package from a
@@ -103,7 +103,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         }
         new PKIManager(sharkPKIComponent);
         try {
-            this.sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEREE, this.sharkPKIComponent);
+            this.sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEREE, this.receivedMessageList, this.sharkPKIComponent);
             shippingLabel.addObserver((Observer) this.sessionManager);
             deliveryContract.addObserver((Observer) this.sessionManager);
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {

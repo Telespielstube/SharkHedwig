@@ -43,25 +43,4 @@ public class Utilities {
     public static long createTimestamp() {
         return System.currentTimeMillis();
     }
-
-    /**
-     * Encrypts a byte[] data type to create a digital signed document.
-     *
-     * @param unencrypted    unencrypted document.
-     * @param publicKey      Public key to encrypt.
-     *
-     * @return    Encrypted challenge number.
-     */
-    public static byte[] encryptAsymmetric(byte[] unencrypted, Key publicKey) {
-        byte[] encrypted = new byte[0];
-        try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-            encrypted = cipher.doFinal(unencrypted);
-        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException |
-                 BadPaddingException e) {
-            System.err.println("Caught an encryption exception: " + e);
-        }
-        return encrypted;
-    }
 }

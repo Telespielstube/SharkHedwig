@@ -17,25 +17,28 @@ public class SessionManager implements Observer, ISessionManager {
 
     private SessionState sessionState;
     private ProtocolState protocolState;
+    private ReceivedMessageList receivedMessageList;
     private AbstractSession request;
     private AbstractSession contract;
     private MessageBuilder messageBuilder;
     private DeliveryContract deliveryContract;
     private ShippingLabel shippingLabel;
     private Optional<Object> optionalMessage;
-    private boolean contractCreated;
-    private boolean labelCreated;
+    private boolean deliveryContractCreated;
+    private boolean shippingLabelCreated;
     private boolean noSession = false; // attribute because NoSession has no Session Object.
     private String sender;
 
-    public SessionManager(SessionState sessionState, ProtocolState protocolState, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
-        this.protocolState = protocolState;
+    public SessionManager(SessionState sessionState, ProtocolState protocolState, ReceivedMessageList receivedMessageList, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
+
         this.sessionState = sessionState;
-        this.contract = new Contract(sharkPKIComponent);
-        this.request = new Request((Contract) this.contract);
+        this.protocolState = protocolState;
+        this.receivedMessageList = receivedMessageList;
+        this.contract = new Contract(sharkPKIComponent, this.receivedMessageList);
+        this.request = new Request((Contract) this.contract, this.receivedMessageList);
         this.shippingLabel = null;
         this.optionalMessage = Optional.empty();
-        this.contractCreated = false;
+        this.deliveryContractCreated = false;
         this.sender = "";
     }
 
@@ -43,11 +46,11 @@ public class SessionManager implements Observer, ISessionManager {
     public void update(Observable o, Object arg) {
         if (o instanceof ShippingLabel ) {
             this.protocolState = ProtocolState.TRANSFEROR;
-            this.labelCreated = ((ShippingLabel) o).getIsCreated();
+            this.shippingLabelCreated = ((ShippingLabel) o).getIsCreated();
             this.shippingLabel = ((ShippingLabel) o).get();
         }
         if (o instanceof DeliveryContract) {
-            this.contractCreated = ((DeliveryContract) o).getIsCreated();
+            this.deliveryContractCreated = ((DeliveryContract) o).getIsCreated();
             this.deliveryContract = ((DeliveryContract) o).get();
         }
     }
@@ -57,14 +60,9 @@ public class SessionManager implements Observer, ISessionManager {
         this.sender = sender;
         switch (this.sessionState) {
             case NO_SESSION:
-                if (this.protocolState.equals(ProtocolState.TRANSFEROR) && this.labelCreated) {
-                    this.optionalMessage = Optional.ofNullable(this.request.transferor(message,
-                            this.sender).orElse(this.sessionState.resetState()));
-                }
-                // Only the NoSession combined with Transferee state creates an Advertisement message.
-                this.noSession = true;
-                this.optionalMessage = Optional.of(new MessageBuilder(createAdvertisement(),
-                        Channel.ADVERTISEMENT.getChannel(), this.sender));
+                this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR) && this.shippingLabelCreated
+                        ? Optional.ofNullable(this.request.transferor(message, this.sender).orElse(this.sessionState.resetState()))
+                        : Optional.of(new MessageBuilder(createAdvertisement(), Channel.ADVERTISEMENT.getChannel(), this.sender));
                 this.optionalMessage.ifPresent(object -> {
                     this.sessionState = SessionState.NO_SESSION.nextState();
                     this.noSession = true;
@@ -72,20 +70,12 @@ public class SessionManager implements Observer, ISessionManager {
                 break;
 
             case REQUEST:
-                if (!this.noSession) {
-                    this.optionalMessage = Optional.empty();
-                } else {
-                    processRequest(message);
-                }
+                this.optionalMessage = !this.noSession ? Optional.empty() : processRequest(message);
                 this.optionalMessage.ifPresent(object -> this.messageBuilder = new MessageBuilder(object, Channel.REQUEST.getChannel(), this.sender));
                 break;
 
             case CONTRACT:
-                if (!this.noSession && this.request.getSessionComplete()) {
-                    this.optionalMessage = Optional.empty();
-                } else {
-                    processContract(message);
-                }
+                this.optionalMessage = !this.noSession && this.request.getSessionComplete() ? Optional.empty() : processContract(message);
                 this.optionalMessage.ifPresent(object -> this.messageBuilder = new MessageBuilder(object, Channel.CONTRACT.getChannel(), this.sender));
                 break;
 
@@ -94,7 +84,6 @@ public class SessionManager implements Observer, ISessionManager {
                 resetAll();
                 break;
         }
-
         return Optional.ofNullable(this.messageBuilder);
 
     }
@@ -113,15 +102,15 @@ public class SessionManager implements Observer, ISessionManager {
      *
      * @param message    Received request message
      */
-    private void processRequest(IMessage message) {
+    private Optional<Object> processRequest(IMessage message) {
         this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR)
                 ? Optional.ofNullable(this.request.transferor(message, this.sender).orElse(this.sessionState.resetState()))
                 : Optional.ofNullable(this.request.transferee(message, this.sender).orElse(this.sessionState.resetState()));
         if (this.optionalMessage.isPresent() && this.request.getSessionComplete()) {
-            this.request.clearMessageList();
+         //   this.request.clearMessageList();
             this.sessionState = SessionState.REQUEST.nextState();
         }
-        this.optionalMessage = Optional.empty();
+        return Optional.empty();
     }
 
     /**
@@ -129,7 +118,7 @@ public class SessionManager implements Observer, ISessionManager {
      *
      * @param message    Received contract message
      */
-    private void processContract(IMessage message) {
+    private Optional<Object> processContract(IMessage message) {
         this.optionalMessage = protocolState.equals(ProtocolState.TRANSFEROR) ?
                 Optional.ofNullable(this.contract.transferor(message, this.sender).orElse(this.sessionState.resetState())) :
                 Optional.ofNullable(this.contract.transferee(message, this.sender).orElse(this.sessionState.resetState()));
@@ -137,7 +126,7 @@ public class SessionManager implements Observer, ISessionManager {
             changeProtocolState();
             resetAll();
         }
-        this.optionalMessage = Optional.empty();
+        return Optional.empty();
     }
 
     /**
@@ -148,10 +137,10 @@ public class SessionManager implements Observer, ISessionManager {
         if (protocolState.equals(ProtocolState.TRANSFEROR)) {
             protocolState = ProtocolState.TRANSFEREE;
             this.deliveryContract.resetContractState();
-            this.labelCreated = false;
+            this.shippingLabelCreated = false;
         } else {
             protocolState = ProtocolState.TRANSFEROR;
-            this.contractCreated = true;
+            this.deliveryContractCreated = true;
         }
     }
 
@@ -162,8 +151,8 @@ public class SessionManager implements Observer, ISessionManager {
         this.noSession = true;
         this.request.getSessionComplete(false);
         this.contract.getSessionComplete(false);
-        this.request.clearMessageList();
-        this.contract.clearMessageList();
+//        this.request.clearMessageList();
+//        this.contract.clearMessageList();
         this.sessionState.resetState();
     }
 }

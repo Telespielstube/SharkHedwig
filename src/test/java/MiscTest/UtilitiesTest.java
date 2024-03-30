@@ -99,11 +99,4 @@ public class UtilitiesTest {
     public void testIfSystemReturnsTimeInMillis() {
         assertEquals(System.currentTimeMillis(), Utilities.createTimestamp());
     }
-
-    @Test
-    public void testIfRandomNumberGetsEncryptedAndDecrypted() throws ASAPSecurityException {
-        byte[] encrypted = Utilities.encryptAsymmetric("3452345345".getBytes(), asapKeyStore.getPublicKey());
-        byte[] decrypted = ASAPCryptoAlgorithms.decryptAsymmetric(encrypted, asapKeyStore);
-        assertArrayEquals("3452345345".getBytes(), decrypted);
-    }
 }
