@@ -33,8 +33,7 @@ public class MessageHandler implements IMessageHandler {
         byte[] decryptedMessage;
         try {
             this.encryptedMessagePackage = ASAPCryptoAlgorithms.parseEncryptedMessagePackage(message);
-            decryptedMessage = ASAPCryptoAlgorithms.decryptPackage(this.encryptedMessagePackage,
-                    sharkPKIComponent.getASAPKeyStore());
+            decryptedMessage = ASAPCryptoAlgorithms.decryptPackage(this.encryptedMessagePackage, sharkPKIComponent.getASAPKeyStore());
             verifiedMessage = verifySignedMessage(decryptedMessage, senderE2E, sharkPKIComponent);
             object = byteArrayToObject(verifiedMessage);
         } catch (ASAPException | IOException e) {

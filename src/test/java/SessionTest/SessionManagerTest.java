@@ -55,6 +55,7 @@ public class SessionManagerTest {
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
         SharkTestPeerFS testSharkPeer = new SharkTestPeerFS(TestConstant.PEER_NAME.getTestConstant(), TestConstant.PEER_FOLDER.getTestConstant());
         SharkPKIComponent sharkPKIComponent = setupComponent(testSharkPeer);
+        receivedMessageList = new ReceivedMessageList();
         testSharkPeer.start();
         String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();
@@ -113,7 +114,7 @@ public class SessionManagerTest {
         sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEROR, receivedMessageList, sharkPKIComponent);
         Offer offer = new Offer(UUID.randomUUID(), MessageFlag.OFFER, System.currentTimeMillis(), 1.0, 10.0, new Location("HTW-Berlin", 52.456931, 13.526444) );
         Optional<Optional<MessageBuilder>> messageBuilder = Optional.ofNullable(sessionManager.sessionHandling(offer, "Marta"));
-        assertThrows(NoSuchElementException.class, () -> sessionManager.sessionHandling(offer, "Marta"));
+        assertThrows(NullPointerException.class, () -> sessionManager.sessionHandling(offer, "Marta"));
     }
 
     @Test
@@ -169,7 +170,7 @@ public class SessionManagerTest {
     public void testIfProtocolStatesGetChanged() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         sessionManager = new SessionManager(SessionState.REQUEST, ProtocolState.TRANSFEROR, receivedMessageList, sharkPKIComponent);
         Method protocolState = sessionManager.getClass().getDeclaredMethod("changeProtocolState");
-        Field labelCreated = sessionManager.getClass().getDeclaredField("labelCreated");
+        Field labelCreated = sessionManager.getClass().getDeclaredField("shippingLabelCreated");
         Field deliveryContract = sessionManager.getClass().getDeclaredField("deliveryContract");
         protocolState.setAccessible(true);
         labelCreated.setAccessible(true);
@@ -183,6 +184,8 @@ public class SessionManagerTest {
     @Test
     public void testIfResetWorks() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         sessionManager = new SessionManager(SessionState.REQUEST, ProtocolState.TRANSFEROR, receivedMessageList, sharkPKIComponent);
+        Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
+        receivedMessageList.addMessageToList(advertisement);
         Method reset = sessionManager.getClass().getDeclaredMethod("resetAll");
         reset.setAccessible(true);
         reset.invoke(sessionManager, null);

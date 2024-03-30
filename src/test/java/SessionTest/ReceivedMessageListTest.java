@@ -28,7 +28,7 @@ import java.security.PublicKey;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AbstractSessionTest {
+public class ReceivedMessageListTest {
 
     private static Contract contract;
     private static ContractDocument contractDocument;
@@ -44,7 +44,7 @@ public class AbstractSessionTest {
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
         SharkTestPeerFS testSharkPeer = new SharkTestPeerFS(TestConstant.PEER_NAME.getTestConstant(), TestConstant.PEER_FOLDER.getTestConstant());
         sharkPKIComponent = setupComponent(testSharkPeer);
-
+        receivedMessageList = new ReceivedMessageList();
         testSharkPeer.start();
 
         String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
