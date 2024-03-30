@@ -27,11 +27,18 @@ public interface ISession {
     Optional<Object> transferee(IMessage message, String sender);
 
     /**
+     * Returns the current state of the session.
+     *
+     * @return  boolean value of the session state.
+     */
+    boolean getSessionComplete();
+
+    /**
      * If all messages of a session are exchanged the list needs to be checked if
      * all messages are cleared out.
      *
      * @param message    Message object.
      * @return           true if list is cleared.
      */
-    boolean getSessionComplete(Object message);
+    void setSessionComplete(boolean complete);
 }

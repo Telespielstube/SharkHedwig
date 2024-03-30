@@ -145,14 +145,14 @@ public class SessionManager implements Observer, ISessionManager {
     }
 
     /**
-     * Method to reset every list and current state, but not the ShippingLabel state!!!
+     * Method to reset everything to default!!! Resets the session state to no session, clears the received message list
+     * and sets the session to incomplete.
      */
     private void resetAll() {
         this.noSession = true;
-        this.request.getSessionComplete(false);
-        this.contract.getSessionComplete(false);
-//        this.request.clearMessageList();
-//        this.contract.clearMessageList();
+        this.request.setSessionComplete(false);
+        this.contract.setSessionComplete(false);
+        this.receivedMessageList.clearMessageList();
         this.sessionState.resetState();
     }
 }

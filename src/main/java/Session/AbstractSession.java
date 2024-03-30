@@ -2,8 +2,6 @@ package Session;
 
 import Message.IMessage;
 import java.util.Optional;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public abstract class AbstractSession implements ISession {
 
@@ -14,8 +12,11 @@ public abstract class AbstractSession implements ISession {
 
     public abstract Optional<Object> transferee(IMessage message, String sender);
 
-    public boolean getSessionComplete(Object message) {
+    public boolean getSessionComplete() {
         return this.sessionComplete;
     }
 
+    public void setSessionComplete(boolean complete) {
+        this.sessionComplete = complete;
+    }
 }

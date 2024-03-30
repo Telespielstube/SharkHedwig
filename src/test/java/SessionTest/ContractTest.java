@@ -8,6 +8,7 @@ import Message.MessageHandler;
 import Message.Contract.Confirm;
 import Misc.Utilities;
 import Session.Contract;
+import Session.ReceivedMessageList;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -41,6 +42,7 @@ public class ContractTest {
     private static String francisID;
     private static SharkPKIComponent sharkPKIComponent;
     private static ASAPKeyStore asapKeyStore;
+    private static ReceivedMessageList receivedMessageList;
 
     @BeforeAll
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
@@ -53,7 +55,7 @@ public class ContractTest {
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         PublicKey publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
         MessageHandler messageHandler = new MessageHandler();
-        contract = new Contract(sharkPKIComponent);
+        contract = new Contract(sharkPKIComponent, receivedMessageList);
         shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",
                 new Location(52.5105, 13.4346), 1.2);
