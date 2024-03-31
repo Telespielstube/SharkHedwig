@@ -148,9 +148,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
 
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list)      throws IOException {
         CharSequence uri = messages.getURI();
-        if ( uri.equals(Channel.ADVERTISEMENT.getChannel()) ) {
-            processMessages(messages, senderE2E);
-        } else if ( (uri.equals(Channel.AUTHENTIFICATION.getChannel()))) {
+        if ( uri.equals(Channel.NO_SESSION.getChannel()) ) {
             processMessages(messages, senderE2E);
         } else if (uri.equals(Channel.REQUEST.toString()))  {
             processMessages(messages, senderE2E);
@@ -163,7 +161,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     /**
  * The methode parses the byte[] message to a Message object and passes it to the SEssionManager class.
      *
-     * @param messages    received message as byte[] data type..
+     * @param messages    received message as byte[] data type.
      * @param senderE2E   The device which sent the received message.
      * @return
      * @throws IOException
@@ -177,19 +175,18 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
                 IMessage message = (IMessage) this.messageHandler.parseIncomingMessage(it.next(), senderE2E, sharkPKIComponent);
 
                 Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(message, senderE2E);
-                if (!messageBuilder.isPresent()) {
-                    continue;
-                }
-                byte[] encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.get().getMessage(),
-                        messageBuilder.get().getUri(), messageBuilder.get().getSender(), sharkPKIComponent);
+                messageBuilder.ifPresent(object -> {
+                    byte[] encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.get().getMessage(),
+                            messageBuilder.get().getUri(), messageBuilder.get().getSender(), sharkPKIComponent);
 
-                try {
-                    this.peer.sendASAPMessage(AppConstant.APP_FORMAT.toString(), AppConstant.SCHEME +
-                            messageBuilder.get().getUri(), encryptedMessage);
-                } catch (ASAPException e) {
-                    System.err.println("Caught an Exception: " + e);
-                    throw new RuntimeException(e);
-                }
+                    try {
+                        this.peer.sendASAPMessage(AppConstant.APP_FORMAT.toString(), AppConstant.SCHEME +
+                                messageBuilder.get().getUri(), encryptedMessage);
+                    } catch (ASAPException e) {
+                        System.err.println("Caught an Exception: " + e);
+                        throw new RuntimeException(e);
+                    }
+                });
             }
         } catch (IOException e) {
             System.err.println("Caught an IOException: " + e.getMessage());

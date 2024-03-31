@@ -1,5 +1,7 @@
 package Session;
 
+import Message.Message;
+
 /**
  * This is an enum class to handle the multiple states of the protocol (State machine pattern). This is a clean methode to avoid
  * global variables, which are difficult to handle and which we want to avoid with a primary focus on a secure protocol.

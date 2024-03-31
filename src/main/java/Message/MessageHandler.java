@@ -29,8 +29,7 @@ public class MessageHandler implements IMessageHandler {
 
     public Object parseIncomingMessage(byte[] message, String senderE2E, SharkPKIComponent sharkPKIComponent) {
         Object object;
-        byte[] verifiedMessage;
-        byte[] decryptedMessage;
+        byte[] verifiedMessage, decryptedMessage;
         try {
             this.encryptedMessagePackage = ASAPCryptoAlgorithms.parseEncryptedMessagePackage(message);
             decryptedMessage = ASAPCryptoAlgorithms.decryptPackage(this.encryptedMessagePackage, sharkPKIComponent.getASAPKeyStore());
@@ -51,8 +50,7 @@ public class MessageHandler implements IMessageHandler {
      */
     private byte[] verifySignedMessage(byte[] decryptedSignedMessage, String senderE2E, SharkPKIComponent sharkPKIComponent) {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(decryptedSignedMessage);
-        byte[] byteMessage;
-        byte[] signedMessage;
+        byte[] byteMessage, signedMessage;
         try {
             byteMessage = ASAPSerialization.readByteArray(inputStream);
             signedMessage = ASAPSerialization.readByteArray(inputStream);

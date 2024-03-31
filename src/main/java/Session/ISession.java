@@ -1,6 +1,7 @@
 package Session;
 
 import Message.IMessage;
+import Message.Message;
 
 import java.util.Optional;
 
@@ -15,7 +16,7 @@ public interface ISession {
      *
      * @return
      */
-    Optional<Object> transferor(IMessage message, String sender);
+    Optional<Message> transferor(IMessage message, String sender);
 
     /**
      * If protocol is in transferee state.
@@ -24,7 +25,7 @@ public interface ISession {
      *
      * @return
      */
-    Optional<Object> transferee(IMessage message, String sender);
+    Optional<Message> transferee(IMessage message, String sender);
 
     /**
      * Returns the current state of the session.

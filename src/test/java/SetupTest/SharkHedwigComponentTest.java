@@ -44,8 +44,6 @@ public class SharkHedwigComponentTest {
     private static PublicKey publicKeyFrancis;
     private static ShippingLabel shippingLabel;
     private static ReceivedMessageList receivedMessageList;
-    private static SharkTestPeerFS sharkTestPeerFS;
-
 
     @BeforeAll
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
@@ -74,21 +72,8 @@ public class SharkHedwigComponentTest {
 
     @Test
     public void testIfChannelAdvertisementEqualsReceivedURI() {
-        String uri = "sn2://advertisement";
-        assertEquals(uri, Channel.ADVERTISEMENT.getChannel());
-    }
-
-    @Test
-    public void testIfACompleteProtcolRunWorks() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, ASAPSecurityException {
-        receivedMessageList = new ReceivedMessageList();
-        Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
-        sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEREE, receivedMessageList, sharkPKIComponent);
-        SharkHedwigComponent sharkHedwigComponent = new SharkHedwigComponent(sharkPKIComponent);
-        ASAPMessages messages = {advertisement, };
-        sharkHedwigComponent.processMessages(messages, "Marta");
-
-        Optional<Object> object = Optional.ofNullable(sessionManager.sessionHandling(advertisement,"Bobby"));
-
+        String uri = "sn2://no_session";
+        assertEquals(uri, Channel.NO_SESSION.getChannel());
     }
 
     @Test

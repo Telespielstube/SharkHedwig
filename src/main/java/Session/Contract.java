@@ -36,7 +36,7 @@ public class Contract extends AbstractSession {
     }
 
     @Override
-    public Optional<Object> transferor(IMessage message, String sender) {
+    public Optional<Message> transferor(IMessage message, String sender) {
         switch(message.getMessageFlag()) {
             case CONFIRM:
                 handleConfirm((Confirm) message, sender);
@@ -58,11 +58,11 @@ public class Contract extends AbstractSession {
         } else {
             this.receivedMessageList.addMessageToList(this.optionalMessage.get());
         }
-        return Optional.of(this.optionalMessage);
+        return Optional.of(this.optionalMessage.get());
     }
 
     @Override
-    public Optional<Object> transferee(IMessage message, String sender) {
+    public Optional<Message> transferee(IMessage message, String sender) {
 
         switch(message.getMessageFlag()) {
             case CONTRACT_DOCUMENT:
@@ -85,7 +85,7 @@ public class Contract extends AbstractSession {
         } else {
             this.receivedMessageList.addMessageToList(this.optionalMessage.get());
         }
-        return Optional.of(this.optionalMessage);
+        return Optional.of(this.optionalMessage.get());
     }
 
     /**

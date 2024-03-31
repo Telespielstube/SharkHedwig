@@ -14,7 +14,6 @@ import Location.Location;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.TreeMap;
 import java.util.stream.Stream;
 
 public class Request extends AbstractSession {
@@ -40,7 +39,7 @@ public class Request extends AbstractSession {
     }
 
     @Override
-    public Optional<Object> transferor(IMessage message, String sender) {
+    public Optional<Message> transferor(IMessage message, String sender) {
         this.sender = sender;
         switch(message.getMessageFlag()) {
             case OFFER:
@@ -63,12 +62,15 @@ public class Request extends AbstractSession {
         } else {
             this.receivedMessageList.addMessageToList(this.optionalMessage.get());
         }
-        return Optional.of(this.optionalMessage);
+        return Optional.of(this.optionalMessage.get());
     }
 
     @Override
-    public Optional<Object> transferee(IMessage message, String sender) {
+    public Optional<Message> transferee(IMessage message, String sender) {
         switch(message.getMessageFlag()) {
+            case SOLICITATION:
+               // handleSolicitation((Solicitation) message);
+                break;
             case OFFER_REPLY:
                 handleOfferReply((OfferReply) message);
                 break;
@@ -86,7 +88,7 @@ public class Request extends AbstractSession {
         } else {
             this.receivedMessageList.addMessageToList(this.optionalMessage.get());
         }
-        return Optional.of(this.optionalMessage);
+        return Optional.of(this.optionalMessage.get());
     }
 
     /**
@@ -96,10 +98,12 @@ public class Request extends AbstractSession {
      * @return           OfferReply object, or and enpty object if data were not verified.
      */
     private void handleOffer(Offer message) {
-        if (verifyOfferData(message) && processOfferData(message)) {
-            this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY,
+        if (verifyOfferData(message)) {
+            if (processOfferData(message)) {
+                this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY,
                     Utilities.createTimestamp(), shippingLabel.get().getPackageWeight(), shippingLabel.get().getPackageDestination()));
-        }
+            }
+            }
     }
 
     /**
@@ -107,7 +111,7 @@ public class Request extends AbstractSession {
      * check all received data are verified with the local data set. This needs to be done!!!
      *
      * @param message    OfferReply message object
-     * @return           Optional.empty if the calculation did not get verified, or Corfim message if data got verified.
+     * @return           Optional.empty if the calculation did not get verified, or Confirm message if data got verified.
      */
     private void handleOfferReply(OfferReply message) {
         if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset) && processOfferReplyData(message)) {
@@ -147,6 +151,16 @@ public class Request extends AbstractSession {
             }
         }
     }
+
+    /**
+     * The incoming solicitation message gives the signal to the transferee to create and send out the offer message to the
+     * transeror drone.
+     *
+     * @param message    The received Solicitation message.
+     */
+//    private void handleSolicitation(Solicitation message) {
+//
+//    }
 
     /**
      * Processes the received OfferReply attributes. This serves as a double check of the necessary delivery data.

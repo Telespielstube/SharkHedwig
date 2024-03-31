@@ -14,16 +14,10 @@ package Setup;
  *
  */
 public enum Channel {
-    ADVERTISEMENT {
+    NO_SESSION {
         @Override
         public String getChannel() {
-            return (AppConstant.SCHEME.toString() + ADVERTISEMENT).toLowerCase();
-        }
-    },
-    AUTHENTIFICATION {
-        @Override
-        public String getChannel() {
-            return (AppConstant.SCHEME.toString() + AUTHENTIFICATION).toLowerCase();
+            return (AppConstant.SCHEME.toString() + NO_SESSION).toLowerCase();
         }
     },
     REQUEST {

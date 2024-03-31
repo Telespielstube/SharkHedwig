@@ -10,6 +10,7 @@ import Session.ReceivedMessageList;
 import Session.SessionManager;
 import Session.SessionState;
 import Setup.ProtocolState;
+import Setup.SharkHedwigComponent;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -75,6 +76,17 @@ public class SessionManagerTest {
         SharkComponent component = sharkPeer.getComponent(SharkPKIComponent.class);
         // project "clean code" :) we only use interfaces - unfortunately casting is unavoidable
         return (SharkPKIComponent) component;
+    }
+
+    @Test
+    public void testIfACompleteProtocolRunWorks() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, ASAPSecurityException, NoSuchFieldException, IllegalAccessException {
+        sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEROR, receivedMessageList, sharkPKIComponent);
+        Field shippingLabelCreatedField = sessionManager.getClass().getDeclaredField("shippingLabelCreated");
+        shippingLabelCreatedField.setAccessible(true);
+        shippingLabelCreatedField.set(sessionManager, true);
+        Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
+        Optional<Object> object = Optional.ofNullable(sessionManager.sessionHandling(advertisement,"Bobby"));
+
     }
 
     @Test

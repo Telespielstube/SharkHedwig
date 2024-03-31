@@ -65,6 +65,7 @@ public class MessageHandlerTest {
     @Test
     public void testIfMessageGetsBuildForSending() {
         byte[] outgoingMessage = messageHandler.buildOutgoingMessage(offer, MessageFlag.OFFER.toString(), francisID, sharkPKIComponent);
+        System.out.println(Arrays.toString(outgoingMessage));
         assertNotEquals(Arrays.toString(outgoingMessage), offer.toString());
     }
 
@@ -95,7 +96,6 @@ public class MessageHandlerTest {
 //    @Test
 //    public void testIfByteMessageGetsParsedToMessageObject() throws ASAPSecurityException {
 //        byte[] byteMessage = messageHandler.buildOutgoingMessage(offer, String.valueOf(MessageFlag.OFFER), francisID, sharkPKIComponent);
-//        System.out.println(byteMessage);
 //        Object object = messageHandler.parseIncomingMessage(byteMessage, francisID, sharkPKIComponent);
 //        assertEquals(object.getClass(), offer.getClass());
 //    }

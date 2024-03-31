@@ -1,6 +1,8 @@
 package Session;
 
 import Message.IMessage;
+import Message.Message;
+
 import java.util.Optional;
 
 public abstract class AbstractSession implements ISession {
@@ -8,9 +10,9 @@ public abstract class AbstractSession implements ISession {
     protected boolean sessionComplete = false;
     protected int timeOffset = 5000;
 
-    public abstract Optional<Object> transferor(IMessage message, String sender);
+    public abstract Optional<Message> transferor(IMessage message, String sender);
 
-    public abstract Optional<Object> transferee(IMessage message, String sender);
+    public abstract Optional<Message> transferee(IMessage message, String sender);
 
     public boolean getSessionComplete() {
         return this.sessionComplete;

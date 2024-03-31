@@ -1,6 +1,5 @@
 package Message;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 /**
