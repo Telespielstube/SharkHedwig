@@ -61,7 +61,8 @@ public class SessionManager implements Observer, ISessionManager {
         this.sender = sender;
         switch (this.sessionState) {
             case NO_SESSION:
-                processNoSession();;
+                processNoSession();
+                this.messageBuilder = new MessageBuilder(this.optionalMessage, Channel.NO_SESSION.getChannel(), this.sender);
                 break;
             case REQUEST:
                 if (this.noSession) {
@@ -96,12 +97,10 @@ public class SessionManager implements Observer, ISessionManager {
         } else {
             this.optionalMessage = Optional.of(new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true));
         }
-        this.optionalMessage.ifPresent(object -> {
-            this.messageBuilder = new MessageBuilder(object, Channel.NO_SESSION.getChannel(), this.sender);
-            this.receivedMessageList.addMessageToList(object);
-            this.sessionState = SessionState.NO_SESSION.nextState();
-            this.noSession = true;
-        });
+        this.receivedMessageList.addMessageToList(this.optionalMessage.get()); // get() without isPresent() is possible because auf the Optional.of(new ...)
+        this.sessionState = SessionState.NO_SESSION.nextState();
+        this.noSession = true;
+
     }
     /**
      * If the previous session is completed the received request message gets processed.
@@ -112,16 +111,13 @@ public class SessionManager implements Observer, ISessionManager {
         this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR)
                 ? this.request.transferor(message, this.sender)
                 : this.request.transferee(message, this.sender);
-        this.optionalMessage.ifPresent(object -> {
+        if (this.optionalMessage.isPresent()) {
             if (this.request.getSessionComplete()) {
                 this.sessionState = SessionState.REQUEST.nextState();
             }
-        });
-//        if (this.optionalMessage.isPresent() && this.request.getSessionComplete()) {
-//            this.sessionState = SessionState.REQUEST.nextState();
-//        } else {
-//            this.sessionState.resetState();
-//        }
+        } else {
+            this.sessionState.resetState();
+        }
     }
 
     /**
@@ -131,11 +127,13 @@ public class SessionManager implements Observer, ISessionManager {
      */
     private void processContract(IMessage message) {
         this.optionalMessage = protocolState.equals(ProtocolState.TRANSFEROR)
-                ? Optional.of(this.contract.transferor(message, this.sender).get())
-                : Optional.of(this.contract.transferee(message, this.sender).get());
-        if (this.optionalMessage.isPresent() && this.contract.getSessionComplete()) {
-            changeProtocolState();
-            resetAll();
+                ? this.contract.transferor(message, this.sender)
+                : this.contract.transferee(message, this.sender);
+        if (this.optionalMessage.isPresent()) {
+            if (this.contract.getSessionComplete()) {
+                changeProtocolState();
+                resetAll();
+            }
         } else {
             this.sessionState.resetState();
         }

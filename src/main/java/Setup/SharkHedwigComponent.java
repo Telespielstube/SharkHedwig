@@ -176,12 +176,11 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
 
                 Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(message, senderE2E);
                 messageBuilder.ifPresent(object -> {
-                    byte[] encryptedMessage = messageHandler.buildOutgoingMessage(messageBuilder.get().getMessage(),
-                            messageBuilder.get().getUri(), messageBuilder.get().getSender(), sharkPKIComponent);
-
+                    byte[] encryptedMessage = messageHandler.buildOutgoingMessage(object.getMessage(), object.getUri(),
+                            object.getSender(), sharkPKIComponent);
                     try {
                         this.peer.sendASAPMessage(AppConstant.APP_FORMAT.toString(), AppConstant.SCHEME +
-                                messageBuilder.get().getUri(), encryptedMessage);
+                                object.getUri(), encryptedMessage);
                     } catch (ASAPException e) {
                         System.err.println("Caught an Exception: " + e);
                         throw new RuntimeException(e);

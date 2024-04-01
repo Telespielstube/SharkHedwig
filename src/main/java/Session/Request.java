@@ -62,7 +62,7 @@ public class Request extends AbstractSession {
         } else {
             this.receivedMessageList.addMessageToList(this.optionalMessage.get());
         }
-        return Optional.of(this.optionalMessage.get());
+        return this.optionalMessage;
     }
 
     @Override
@@ -88,7 +88,7 @@ public class Request extends AbstractSession {
         } else {
             this.receivedMessageList.addMessageToList(this.optionalMessage.get());
         }
-        return Optional.of(this.optionalMessage.get());
+        return this.optionalMessage;
     }
 
     /**

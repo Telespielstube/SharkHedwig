@@ -1,6 +1,6 @@
 package Session;
 
-import Message.IMessage;
+import Message.Message;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -32,7 +32,7 @@ public class ReceivedMessageList {
     /**
      * Adds a message object to the TreeMap.
      */
-    public void addMessageToList(IMessage message) {
+    public void addMessageToList(Message message) {
         this.messageList.put(message.getTimestamp(), message);
     }
 

@@ -79,14 +79,13 @@ public class SessionManagerTest {
     }
 
     @Test
-    public void testIfACompleteProtocolRunWorks() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, ASAPSecurityException, NoSuchFieldException, IllegalAccessException {
+    public void testIfATransferorNoSessionRunWorks() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, ASAPSecurityException, NoSuchFieldException, IllegalAccessException {
         sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEROR, receivedMessageList, sharkPKIComponent);
         Field shippingLabelCreatedField = sessionManager.getClass().getDeclaredField("shippingLabelCreated");
         shippingLabelCreatedField.setAccessible(true);
         shippingLabelCreatedField.set(sessionManager, true);
         Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
         Optional<Object> object = Optional.ofNullable(sessionManager.sessionHandling(advertisement,"Bobby"));
-
     }
 
     @Test
