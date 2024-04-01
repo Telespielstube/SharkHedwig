@@ -87,39 +87,21 @@ public class SessionManager implements Observer, ISessionManager {
     }
 
     /**
-     * A message just to advertise a delivery service. Does not belong to a session.
-     *
-     * @return    Advertisement message object.
-     */
-    private Advertisement createAdvertisement() {
-        return new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
-    }
-
-    /**
-     * A response message to signal the advertisment sender that the message was processed.
-     *
-     * @return    Solicitation message object.
-     */
-    private Solicitation createSolicitation() {
-        return new Solicitation(Utilities.createUUID(), MessageFlag.SOLICITATION, Utilities.createTimestamp(), true);
-    }
-
-    /**
      * This represents the default state of every drone. It handles the creation of advertisment and solicitation
      * messages.
      */
     private void processNoSession() {
         if (this.protocolState.equals(ProtocolState.TRANSFEROR) && this.shippingLabelCreated) {
-            this.optionalMessage = Optional.of(createSolicitation());
+            this.optionalMessage = Optional.of(new Solicitation(Utilities.createUUID(), MessageFlag.SOLICITATION, Utilities.createTimestamp(), true));
         } else {
-            this.optionalMessage = Optional.of(createAdvertisement());
+            this.optionalMessage = Optional.of(new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true));
         }
-       this.optionalMessage.ifPresent(object -> {
+        this.optionalMessage.ifPresent(object -> {
             this.messageBuilder = new MessageBuilder(object, Channel.NO_SESSION.getChannel(), this.sender);
-            this.receivedMessageList.addMessageToList(this.optionalMessage.get());
+            this.receivedMessageList.addMessageToList(object);
             this.sessionState = SessionState.NO_SESSION.nextState();
             this.noSession = true;
-       });
+        });
     }
     /**
      * If the previous session is completed the received request message gets processed.
@@ -128,10 +110,8 @@ public class SessionManager implements Observer, ISessionManager {
      */
     private void processRequest(IMessage message) {
         this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR)
-                ? Optional.of(this.request.transferor(message, this.sender).get())
-                : Optional.of(this.request.transferee(message, this.sender).get());
-
-
+                ? this.request.transferor(message, this.sender)
+                : this.request.transferee(message, this.sender);
         this.optionalMessage.ifPresent(object -> {
             if (this.request.getSessionComplete()) {
                 this.sessionState = SessionState.REQUEST.nextState();
