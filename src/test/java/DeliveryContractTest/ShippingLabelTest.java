@@ -31,6 +31,7 @@ public class ShippingLabelTest {
     @Test
     public void testIfCreateReturnsTrueWhenPassedUserDataObjectHasValues() {
         assertTrue(shippingLabel.create(userInputBuilder));
+        System.out.println(shippingLabel.get().getUUID());
         assertTrue(shippingLabel.getIsCreated());
     }
 

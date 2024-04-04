@@ -12,6 +12,7 @@ public interface ISessionManager {
      * This methode handles the transferor role.
      *
      * @param message    Incoming generic type Message object.
+     * @return           An Optional MessageBuilder object, which can be null if the optionalMessage container is empty.
      */
      Optional<MessageBuilder> sessionHandling(IMessage message, String sender);
 

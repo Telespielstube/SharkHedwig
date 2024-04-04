@@ -1,5 +1,6 @@
 package Misc;
 
+import javax.rmi.CORBA.Util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -10,6 +11,7 @@ import java.util.UUID;
  */
 public class Utilities {
 
+    private Utilities() {}
     /**
      * Creates a Version 4 (randomly generated) UUID which is an identifier that is
      * unique across both space and time

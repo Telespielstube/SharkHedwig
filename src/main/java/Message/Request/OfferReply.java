@@ -13,9 +13,6 @@ public class OfferReply extends Message {
 
     public OfferReply(UUID uuid, MessageFlag messageFlag, long timestamp, double packageWeight, Location packageDestination ) {
         super(uuid, messageFlag, timestamp);
-        this.uuid = uuid;
-        this.messageFlag = messageFlag;
-        this.timestamp = timestamp;
         this.packageWeight = packageWeight;
         this.packageDestination = packageDestination;
     }

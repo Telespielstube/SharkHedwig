@@ -11,9 +11,6 @@ public class Confirm extends Message {
 
     public Confirm(UUID uuid, MessageFlag messageFlag, long timestamp, boolean isConfirm) {
         super(uuid, messageFlag, timestamp);
-        this.uuid = uuid;
-        this.messageFlag = messageFlag;
-        this.timestamp = timestamp;
         this.isConfirmed = isConfirm;
     }
 

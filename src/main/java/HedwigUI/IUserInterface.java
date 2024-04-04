@@ -1,5 +1,7 @@
 package HedwigUI;
 
+import DeliveryContract.ShippingLabel;
+
 /** Functional interface for user generated cshipping label.
  *
  */

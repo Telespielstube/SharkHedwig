@@ -1,23 +1,31 @@
 package Battery;
 
 public class Battery implements IBattery{
+
+    private int batteryLevel = 100;
+    private int maxFlightRange = 100;
+    private boolean deliveryPossible = false;
+    private int expectedbatteryConsuption = 0;
+
+    public Battery() {}
+
     @Override
-    public int getBatteryLevel() {
-        return 0;
+    public int getCurrentBatteryLevel() {
+        return this.batteryLevel;
     }
 
     @Override
     public int expectedConsumptionToDestination() {
-        return 0;
+        return this.expectedbatteryConsuption;
     }
 
     @Override
     public boolean isDeliveryPossible() {
-        return false;
+        return this.deliveryPossible;
     }
 
     @Override
-    public long maxFlightRange() {
-        return 0;
+    public int maxFlightRange() {
+        return this.maxFlightRange;
     }
 }

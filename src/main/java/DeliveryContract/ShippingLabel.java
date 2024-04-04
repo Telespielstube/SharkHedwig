@@ -18,14 +18,14 @@ import java.util.stream.Stream;
 public class ShippingLabel extends Observable implements IDeliveryContract, IUserInterface {
 
     private boolean isCreated;
-    private UUID packageUUID;
-    private String sender = null;
-    private String origin = null;
-    private String recipient = null;
-    private Double packageWeight = null;
-    private String destination = null;
-    private Location locationOrigin = null;
-    private Location locationDestination = null;
+    private final UUID packageUUID;
+    private final String sender;
+    private String origin;
+    private String recipient;
+    private Double packageWeight;
+    private String destination;
+    private Location locationOrigin;
+    private Location locationDestination;
 
 
     /**
@@ -59,7 +59,10 @@ public class ShippingLabel extends Observable implements IDeliveryContract, IUse
 
     public boolean create(UserInput userInput) {
         if (verifyUserData(userInput)) {
-            new ShippingLabel(Utilities.createUUID(), userInput.getSender(), userInput.getOrigin(), new Location(userInput.getLatitudeOrigin(), userInput.getLongitudeOrigin()), userInput.getRecipient(), userInput.getDestination(), new Location(userInput.getLatitudeDest(), userInput.getLongitudeDest()), userInput.getPackageWeight());
+            ShippingLabel label = new ShippingLabel(Utilities.createUUID(), userInput.getSender(), userInput.getOrigin(),
+                    new Location(userInput.getLatitudeOrigin(), userInput.getLongitudeOrigin()), userInput.getRecipient(),
+                    userInput.getDestination(), new Location(userInput.getLatitudeDest(), userInput.getLongitudeDest()),
+                    userInput.getPackageWeight());
             this.isCreated = true;
             setChanged();
             notifyObservers();

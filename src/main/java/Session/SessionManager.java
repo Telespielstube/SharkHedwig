@@ -1,7 +1,9 @@
 package Session;
 
+import Battery.IBattery;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
+import Location.IGeoSpatial;
 import Message.Solicitation;
 import Misc.Utilities;
 import Setup.ProtocolState;
@@ -27,20 +29,17 @@ public class SessionManager implements Observer, ISessionManager {
     private Optional<Message> optionalMessage;
     private boolean deliveryContractCreated;
     private boolean shippingLabelCreated;
-    private boolean noSession = false; // attribute because NoSession has no Session Object.
+    private boolean noSession;
     private String sender;
+    private IBattery battery;
 
-    public SessionManager(SessionState sessionState, ProtocolState protocolState, ReceivedMessageList receivedMessageList, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
-
+    public SessionManager(SessionState sessionState, ProtocolState protocolState, ReceivedMessageList receivedMessageList, IBattery battery, IGeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.sessionState = sessionState;
         this.protocolState = protocolState;
         this.receivedMessageList = receivedMessageList;
         this.contract = new Contract(sharkPKIComponent, this.receivedMessageList);
-        this.request = new Request((Contract) this.contract, this.receivedMessageList);
-        this.shippingLabel = null;
-        this.optionalMessage = Optional.empty();
-        this.deliveryContractCreated = false;
-        this.sender = "";
+        this.request = new Request((Contract) this.contract, battery, geoSpatial, this.receivedMessageList);
+
     }
 
     @Override
@@ -62,11 +61,13 @@ public class SessionManager implements Observer, ISessionManager {
         switch (this.sessionState) {
             case NO_SESSION:
                 processNoSession();
-                this.messageBuilder = new MessageBuilder(this.optionalMessage, Channel.NO_SESSION.getChannel(), this.sender);
+                this.optionalMessage.ifPresent(object
+                        -> this.messageBuilder = new MessageBuilder(this.optionalMessage, Channel.NO_SESSION.getChannel(), this.sender));
                 break;
             case REQUEST:
                 if (this.noSession) {
                     processRequest(message);
+                    this.messageBuilder = null; // wipes the data of the previous message build.
                     this.optionalMessage.ifPresent(object
                             -> this.messageBuilder = new MessageBuilder(object, Channel.REQUEST.getChannel(), this.sender));
                 }
@@ -74,6 +75,7 @@ public class SessionManager implements Observer, ISessionManager {
             case CONTRACT:
                 if (this.noSession && this.request.getSessionComplete()) {
                     processContract(message);
+                    this.messageBuilder = null;
                     this.optionalMessage.ifPresent(object
                             -> this.messageBuilder = new MessageBuilder(object, Channel.CONTRACT.getChannel(), this.sender));
                 }
@@ -109,14 +111,14 @@ public class SessionManager implements Observer, ISessionManager {
      */
     private void processRequest(IMessage message) {
         this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR)
-                ? this.request.transferor(message, this.sender)
+                ? this.request.transferor(message, this.shippingLabel, this.sender)
                 : this.request.transferee(message, this.sender);
         if (this.optionalMessage.isPresent()) {
             if (this.request.getSessionComplete()) {
                 this.sessionState = SessionState.REQUEST.nextState();
             }
         } else {
-            this.sessionState.resetState();
+            resetAll();
         }
     }
 
@@ -127,7 +129,7 @@ public class SessionManager implements Observer, ISessionManager {
      */
     private void processContract(IMessage message) {
         this.optionalMessage = protocolState.equals(ProtocolState.TRANSFEROR)
-                ? this.contract.transferor(message, this.sender)
+                ? this.contract.transferor(message, null, this.sender)
                 : this.contract.transferee(message, this.sender);
         if (this.optionalMessage.isPresent()) {
             if (this.contract.getSessionComplete()) {
@@ -135,7 +137,7 @@ public class SessionManager implements Observer, ISessionManager {
                 resetAll();
             }
         } else {
-            this.sessionState.resetState();
+            resetAll();
         }
     }
 
@@ -159,10 +161,10 @@ public class SessionManager implements Observer, ISessionManager {
      * and sets the session to incomplete.
      */
     private void resetAll() {
-        this.noSession = true;
+        this.noSession = false;
         this.request.setSessionComplete(false);
         this.contract.setSessionComplete(false);
         this.receivedMessageList.clearMessageList();
-        this.sessionState.resetState();
+        this.sessionState = SessionState.NO_SESSION;
     }
 }

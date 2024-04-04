@@ -15,7 +15,7 @@ public enum AppConstant {
     ERROR_LOG_PATH("hedwigStorage/log/errorLog.txt");
 
     private String name;
-    private int grams;
+    private int grams = 1000;
 
     AppConstant(String name) {
         this.name = name;

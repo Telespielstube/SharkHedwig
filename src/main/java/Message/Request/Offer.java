@@ -8,21 +8,18 @@ import java.util.UUID;
 
 public class Offer extends Message {
 
-    private double flightRange = 0.0;
+    private int flightRange = 0;
     private double maxFreightWeight = 0.0;
     private Location currentLocation;
 
-    public Offer(UUID uuid, MessageFlag messageFlag, long timestamp, double flightRange, double maxFreightWeight, Location currentLocation) {
+    public Offer(UUID uuid, MessageFlag messageFlag, long timestamp, int flightRange, double maxFreightWeight, Location currentLocation) {
         super(uuid, messageFlag, timestamp);
-        this.uuid = uuid;
-        this.messageFlag = messageFlag;
-        this.timestamp = timestamp;
         this.flightRange = flightRange;
         this.maxFreightWeight = maxFreightWeight;
         this.currentLocation = currentLocation;
     }
 
-    public double getFlightRange() {
+    public int getFlightRange() {
         return this.flightRange;
     }
 

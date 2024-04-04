@@ -8,7 +8,7 @@ public interface IBattery {
      *
      * @return    Current battery level.
      */
-    public int getBatteryLevel();
+    public int getCurrentBatteryLevel();
 
     /**
      * Claculates an estimated value based on the passed parameter.
@@ -29,5 +29,5 @@ public interface IBattery {
      *
      * @return    Distance in km.
      */
-    public long maxFlightRange();
+    public int maxFlightRange();
 }

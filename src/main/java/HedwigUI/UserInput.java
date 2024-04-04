@@ -1,7 +1,7 @@
 package HedwigUI;
 
 /**
- * This does nothing more than filling up the object constructor with the input data. This object mainly serves for testing purposes.
+ * This is just filling up the object constructor with the input data. This object mainly serves for testing purposes.
  * This can be/should be replaced by an e.g. JSON library to receive the user input from a phone, tablet, computer....
  */
 public class UserInput {

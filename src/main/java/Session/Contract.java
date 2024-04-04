@@ -36,7 +36,7 @@ public class Contract extends AbstractSession {
     }
 
     @Override
-    public Optional<Message> transferor(IMessage message, String sender) {
+    public Optional<Message> transferor(IMessage message, ShippingLabel shippingLabel, String sender) {
         switch(message.getMessageFlag()) {
             case CONFIRM:
                 handleConfirm((Confirm) message, sender);

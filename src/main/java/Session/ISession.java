@@ -1,5 +1,6 @@
 package Session;
 
+import DeliveryContract.ShippingLabel;
 import Message.IMessage;
 import Message.Message;
 
@@ -16,7 +17,7 @@ public interface ISession {
      *
      * @return
      */
-    Optional<Message> transferor(IMessage message, String sender);
+    Optional<Message> transferor(IMessage message, ShippingLabel shippingLabel, String sender);
 
     /**
      * If protocol is in transferee state.

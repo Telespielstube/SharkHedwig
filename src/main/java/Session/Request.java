@@ -6,12 +6,14 @@ import Message.Message;
 import Message.IMessage;
 import Message.MessageFlag;
 import Message.Request.*;
+import Message.Solicitation;
 import Misc.LogEntry;
 import Misc.Logger;
 import Misc.Utilities;
 import Setup.AppConstant;
 import Location.Location;
-
+import Battery.IBattery;
+import Location.IGeoSpatial;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -20,30 +22,31 @@ public class Request extends AbstractSession {
 
     private Contract contract;
     private String sender;
+    private Solicitation solicitation;
     private Offer offer;
     private OfferReply offerReply;
     private Confirm confirm;
     private DeliveryContract deliveryContract;
     private Ack ack;
-    private ShippingLabel shippingLabel;
+    private IBattery battery;
+    private IGeoSpatial geoSpatial;
     private ReceivedMessageList receivedMessageList;
     private Optional<Message> optionalMessage;
 
-    public  Request(){}
-
-    public Request(Contract contract, ReceivedMessageList receivedMessageList) {
+    public Request(Contract contract, IBattery battery, IGeoSpatial geoSpatial, ReceivedMessageList receivedMessageList) {
         this.optionalMessage = Optional.empty();
         this.contract = contract;
+        this.battery = battery;
+        this.geoSpatial = geoSpatial;
         this.receivedMessageList = receivedMessageList;
-        this.sender = "";
     }
 
     @Override
-    public Optional<Message> transferor(IMessage message, String sender) {
+    public Optional<Message> transferor(IMessage message, ShippingLabel shippingLabel, String sender) {
         this.sender = sender;
         switch(message.getMessageFlag()) {
             case OFFER:
-                handleOffer((Offer) message);
+                handleOffer((Offer) message, shippingLabel);
                 break;
             case CONFIRM:
                 handleConfirm((Confirm) message);
@@ -69,7 +72,7 @@ public class Request extends AbstractSession {
     public Optional<Message> transferee(IMessage message, String sender) {
         switch(message.getMessageFlag()) {
             case SOLICITATION:
-               // handleSolicitation((Solicitation) message);
+                handleSolicitation((Solicitation) message);
                 break;
             case OFFER_REPLY:
                 handleOfferReply((OfferReply) message);
@@ -97,13 +100,13 @@ public class Request extends AbstractSession {
      * @param message    Offer message object.
      * @return           OfferReply object, or and enpty object if data were not verified.
      */
-    private void handleOffer(Offer message) {
-        if (verifyOfferData(message)) {
+    private void handleOffer(Offer message, ShippingLabel shippingLabel) {
+        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && verifyOfferData(message)) {
             if (processOfferData(message)) {
                 this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY,
                     Utilities.createTimestamp(), shippingLabel.get().getPackageWeight(), shippingLabel.get().getPackageDestination()));
             }
-            }
+        }
     }
 
     /**
@@ -114,7 +117,7 @@ public class Request extends AbstractSession {
      * @return           Optional.empty if the calculation did not get verified, or Confirm message if data got verified.
      */
     private void handleOfferReply(OfferReply message) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset) && processOfferReplyData(message)) {
+        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && processOfferReplyData(message)) {
             this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
         }
     }
@@ -126,7 +129,7 @@ public class Request extends AbstractSession {
      * @return           An empty optional if a Confirm object is found.
      */
     private void handleConfirm(Confirm message) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset) && message.getConfirmed()) {
+        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
             this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
         }
     }
@@ -158,9 +161,12 @@ public class Request extends AbstractSession {
      *
      * @param message    The received Solicitation message.
      */
-//    private void handleSolicitation(Solicitation message) {
-//
-//    }
+    private void handleSolicitation(Solicitation message) {
+        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getSolicitate()) {
+            this.optionalMessage = Optional.of(new Offer(Utilities.createUUID(), MessageFlag.OFFER, Utilities.createTimestamp(),
+                    this.battery.getCurrentBatteryLevel(), AppConstant.MAX_FREIGHT_WEIGHT.getInt(), this.geoSpatial.getCurrentLocation()));
+        }
+    }
 
     /**
      * Processes the received OfferReply attributes. This serves as a double check of the necessary delivery data.

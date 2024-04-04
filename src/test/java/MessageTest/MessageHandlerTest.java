@@ -44,7 +44,7 @@ public class MessageHandlerTest {
         ASAPKeyStore asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
-        offer = new Offer(UUID.randomUUID(), MessageFlag.OFFER, System.currentTimeMillis(), 1.0, 10.0, new Location("HTW-Berlin", 52.456931, 13.526444));
+        offer = new Offer(UUID.randomUUID(), MessageFlag.OFFER, System.currentTimeMillis(), 100, 10.0, new Location("HTW-Berlin", 52.456931, 13.526444));
     }
 
     private static SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException {
@@ -93,12 +93,12 @@ public class MessageHandlerTest {
 
     // There is something wrong decrypting a incoming message!!
     // java.lang.RuntimeException: net.sharksystem.asap.ASAPSecurityException: asymmetric decryption failed: RSA/ECB/PKCS1Padding
-//    @Test
-//    public void testIfByteMessageGetsParsedToMessageObject() throws ASAPSecurityException {
-//        byte[] byteMessage = messageHandler.buildOutgoingMessage(offer, String.valueOf(MessageFlag.OFFER), francisID, sharkPKIComponent);
-//        Object object = messageHandler.parseIncomingMessage(byteMessage, francisID, sharkPKIComponent);
-//        assertEquals(object.getClass(), offer.getClass());
-//    }
+    @Test
+    public void testIfByteMessageGetsParsedToMessageObject() throws ASAPSecurityException {
+        byte[] byteMessage = messageHandler.buildOutgoingMessage(offer, String.valueOf(MessageFlag.OFFER), francisID, sharkPKIComponent);
+        Object object = messageHandler.parseIncomingMessage(byteMessage, francisID, sharkPKIComponent);
+        assertEquals(object.getClass(), offer.getClass());
+    }
 
     @Test
     public void testIfObjectGetsConvertedToByteArrayAndBackToObject() {

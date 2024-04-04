@@ -71,6 +71,16 @@ public class SharkHedwigComponentTest {
     }
 
     @Test
+    // Public keys are not equal
+    public void comparePublicKeyPairs() throws SharkException, NoSuchPaddingException, IOException, NoSuchAlgorithmException {
+        PublicKey pubKey = asapKeyStore.getPublicKey();
+        setup();
+        System.err.println(pubKey);
+        System.err.println(asapKeyStore.getPublicKey());
+        assertEquals(asapKeyStore.getPublicKey(), pubKey);
+    }
+
+    @Test
     public void testIfChannelAdvertisementEqualsReceivedURI() {
         String uri = "sn2://no_session";
         assertEquals(uri, Channel.NO_SESSION.getChannel());

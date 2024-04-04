@@ -1,5 +1,6 @@
 package Setup;
 
+
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import net.sharksystem.SharkComponent;
@@ -21,6 +22,8 @@ import java.util.Optional;
 import Misc.Logger;
 import Message.*;
 import Session.*;
+import Battery.*;
+import Location.*;
 
 import javax.crypto.NoSuchPaddingException;
 
@@ -39,6 +42,8 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             null, null, null, 0.0);
     private DeliveryContract deliveryContract = new DeliveryContract();
     private ReceivedMessageList receivedMessageList = new ReceivedMessageList();
+    private IBattery battery;
+    private IGeoSpatial geoSpatial;
 
     /**
      * The component implements a decentralized protocol that allows drones to transport a physical package from a
@@ -57,6 +62,8 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         this.sharkPeerFS = new SharkPeerFS(AppConstant.PEER_NAME.toString(), AppConstant.PEER_FOLDER.toString() + "/" + AppConstant.PEER_NAME.toString() );
         this.sharkPKIComponent = pkiComponent;
         this.messageHandler = new MessageHandler();
+        this.battery = new Battery();
+        this.geoSpatial = new GeoSpatial();
         setupComponent(sharkPeerFS);
     }
 
@@ -103,9 +110,10 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         }
         new PKIManager(sharkPKIComponent);
         try {
-            this.sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEREE, this.receivedMessageList, this.sharkPKIComponent);
+            this.sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEREE, this.receivedMessageList, this.battery, this.geoSpatial, this.sharkPKIComponent);
             shippingLabel.addObserver((Observer) this.sessionManager);
             deliveryContract.addObserver((Observer) this.sessionManager);
+
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
             System.err.println("Caught an Exception: " + e);
             throw new RuntimeException(e);
@@ -145,7 +153,6 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
      * @throws IOException           Is thrown after a read/write error occurs
      *
      */
-
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list)      throws IOException {
         CharSequence uri = messages.getURI();
         if ( uri.equals(Channel.NO_SESSION.getChannel()) ) {
@@ -159,7 +166,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     }
 
     /**
- * The methode parses the byte[] message to a Message object and passes it to the SEssionManager class.
+     * The methode parses the byte[] message to a Message object and passes it to the SEssionManager class.
      *
      * @param messages    received message as byte[] data type.
      * @param senderE2E   The device which sent the received message.
@@ -173,7 +180,6 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
                     continue;
                 }
                 IMessage message = (IMessage) this.messageHandler.parseIncomingMessage(it.next(), senderE2E, sharkPKIComponent);
-
                 Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(message, senderE2E);
                 messageBuilder.ifPresent(object -> {
                     byte[] encryptedMessage = messageHandler.buildOutgoingMessage(object.getMessage(), object.getUri(),
