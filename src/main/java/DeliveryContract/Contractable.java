@@ -3,7 +3,7 @@ package DeliveryContract;
 import java.io.Serializable;
 
 @FunctionalInterface
-public interface IDeliveryContract extends Serializable {
+public interface Contractable extends Serializable {
 
   /**
    * Returns an object

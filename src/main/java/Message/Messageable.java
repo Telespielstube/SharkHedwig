@@ -6,7 +6,7 @@ import java.util.UUID;
 /**
  * Message interface.
  */
-public interface IMessage extends Serializable {
+public interface Messageable extends Serializable {
 
     /**
      * Returns s a Version 4 (randomly generated) UUID which is an identifier that is

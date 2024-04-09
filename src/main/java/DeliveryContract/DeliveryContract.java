@@ -1,13 +1,12 @@
 package DeliveryContract;
 
-import Location.IGeoSpatial;
+import Location.Locationable;
 import Misc.Utilities;
 import Setup.AppConstant;
 
-import java.io.Serializable;
 import java.util.Observable;
 
-public class DeliveryContract extends Observable implements IDeliveryContract {
+public class DeliveryContract extends Observable implements Contractable {
 
     private TransitRecord transitRecord;
     private ShippingLabel shippingLabel;
@@ -16,7 +15,7 @@ public class DeliveryContract extends Observable implements IDeliveryContract {
 
     public DeliveryContract(){}
 
-    public DeliveryContract(String receiver, IGeoSpatial geoSpatial) {
+    public DeliveryContract(String receiver, Locationable geoSpatial) {
         this.shippingLabel = getShippingLabel();
         this.transitRecord = new TransitRecord();
         this.transitRecord.addEntry(new TransitEntry(this.transitRecord.countUp(),

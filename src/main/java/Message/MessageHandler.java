@@ -8,7 +8,7 @@ import net.sharksystem.asap.utils.ASAPSerialization;
 import net.sharksystem.pki.SharkPKIComponent;
 import java.io.*;
 
-public class MessageHandler implements IMessageHandler {
+public class MessageHandler implements Handleable {
 
     private EncryptedMessagePackage encryptedMessagePackage;
 

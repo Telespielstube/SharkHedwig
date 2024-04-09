@@ -3,7 +3,7 @@ package Session;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import Message.Message;
-import Message.IMessage;
+import Message.Messageable;
 import Message.MessageFlag;
 import Message.Request.*;
 import Message.Solicitation;
@@ -13,7 +13,7 @@ import Misc.Utilities;
 import Setup.AppConstant;
 import Location.Location;
 import Battery.IBattery;
-import Location.IGeoSpatial;
+import Location.Locationable;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -29,11 +29,11 @@ public class Request extends AbstractSession {
     private DeliveryContract deliveryContract;
     private Ack ack;
     private IBattery battery;
-    private IGeoSpatial geoSpatial;
+    private Locationable geoSpatial;
     private ReceivedMessageList receivedMessageList;
     private Optional<Message> optionalMessage;
 
-    public Request(Contract contract, IBattery battery, IGeoSpatial geoSpatial, ReceivedMessageList receivedMessageList) {
+    public Request(Contract contract, IBattery battery, Locationable geoSpatial, ReceivedMessageList receivedMessageList) {
         this.optionalMessage = Optional.empty();
         this.contract = contract;
         this.battery = battery;
@@ -42,7 +42,7 @@ public class Request extends AbstractSession {
     }
 
     @Override
-    public Optional<Message> transferor(IMessage message, ShippingLabel shippingLabel, String sender) {
+    public Optional<Message> transferor(Messageable message, ShippingLabel shippingLabel, String sender) {
         this.sender = sender;
         switch(message.getMessageFlag()) {
             case OFFER:
@@ -69,7 +69,7 @@ public class Request extends AbstractSession {
     }
 
     @Override
-    public Optional<Message> transferee(IMessage message, String sender) {
+    public Optional<Message> transferee(Messageable message, String sender) {
         switch(message.getMessageFlag()) {
             case SOLICITATION:
                 handleSolicitation((Solicitation) message);

@@ -1,11 +1,9 @@
 package HedwigUI;
 
-import DeliveryContract.ShippingLabel;
-
 /** Functional interface for user generated cshipping label.
  *
  */
-public interface IUserInterface {
+public interface Manageable {
 
     boolean create(UserInput userInput);
 }

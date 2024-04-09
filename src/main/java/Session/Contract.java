@@ -4,7 +4,7 @@ import DeliveryContract.*;
 import Location.*;
 import Message.Message;
 import Message.Contract.*;
-import Message.IMessage;
+import Message.Messageable;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import Misc.Logger;
@@ -20,7 +20,7 @@ public class Contract extends AbstractSession {
 
     private SharkPKIComponent sharkPKIComponent;
     private DeliveryContract deliveryContract;
-    private IGeoSpatial geoSpatial;
+    private Locationable geoSpatial;
     private TransitRecord transitRecord;
     private byte[] signedField;
     private boolean contractState = false;
@@ -36,7 +36,7 @@ public class Contract extends AbstractSession {
     }
 
     @Override
-    public Optional<Message> transferor(IMessage message, ShippingLabel shippingLabel, String sender) {
+    public Optional<Message> transferor(Messageable message, ShippingLabel shippingLabel, String sender) {
         switch(message.getMessageFlag()) {
             case CONFIRM:
                 handleConfirm((Confirm) message, sender);
@@ -62,7 +62,7 @@ public class Contract extends AbstractSession {
     }
 
     @Override
-    public Optional<Message> transferee(IMessage message, String sender) {
+    public Optional<Message> transferee(Messageable message, String sender) {
 
         switch(message.getMessageFlag()) {
             case CONTRACT_DOCUMENT:

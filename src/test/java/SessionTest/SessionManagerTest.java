@@ -1,6 +1,5 @@
 package SessionTest;
 
-import Battery.Battery;
 import Battery.IBattery;
 import DeliveryContract.*;
 import HedwigUI.UserInput;
@@ -20,7 +19,6 @@ import net.sharksystem.SharkPeer;
 import net.sharksystem.SharkTestPeerFS;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPKeyStore;
-import net.sharksystem.asap.engine.ASAPInMemoTransientMessages;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
@@ -46,7 +44,7 @@ public class SessionManagerTest {
     private DeliveryContract deliveryContract;
     private SharkPKIComponent sharkPKIComponent;
     private IBattery battery;
-    private IGeoSpatial geoSpatial;
+    private Locationable geoSpatial;
     private static ASAPKeyStore asapKeyStore;
     private static String francisID;
     private static PublicKey publicKeyFrancis;

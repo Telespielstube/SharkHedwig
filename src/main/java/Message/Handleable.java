@@ -4,7 +4,7 @@ import net.sharksystem.pki.SharkPKIComponent;
 
 import java.io.IOException;
 
-public interface IMessageHandler {
+public interface Handleable {
 
     /**
      * Checks if the current message in list is for this device.

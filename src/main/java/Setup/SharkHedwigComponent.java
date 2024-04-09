@@ -43,7 +43,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     private DeliveryContract deliveryContract = new DeliveryContract();
     private ReceivedMessageList receivedMessageList = new ReceivedMessageList();
     private IBattery battery;
-    private IGeoSpatial geoSpatial;
+    private Locationable geoSpatial;
 
     /**
      * The component implements a decentralized protocol that allows drones to transport a physical package from a
@@ -179,7 +179,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
                 if (!messageHandler.checkRecipient(it.next())) {
                     continue;
                 }
-                IMessage message = (IMessage) this.messageHandler.parseIncomingMessage(it.next(), senderE2E, sharkPKIComponent);
+                Messageable message = (Messageable) this.messageHandler.parseIncomingMessage(it.next(), senderE2E, sharkPKIComponent);
                 Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(message, senderE2E);
                 messageBuilder.ifPresent(object -> {
                     byte[] encryptedMessage = messageHandler.buildOutgoingMessage(object.getMessage(), object.getUri(),

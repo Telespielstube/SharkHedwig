@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Class to add a new entry to the list of all previous handovers of this package.
  */
-public class TransitRecord implements IDeliveryContract {
+public class TransitRecord implements Contractable {
 
     private final List<TransitEntry> entryList;
     private boolean isCreated = false;

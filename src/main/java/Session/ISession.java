@@ -1,7 +1,7 @@
 package Session;
 
 import DeliveryContract.ShippingLabel;
-import Message.IMessage;
+import Message.Messageable;
 import Message.Message;
 
 import java.util.Optional;
@@ -17,7 +17,7 @@ public interface ISession {
      *
      * @return
      */
-    Optional<Message> transferor(IMessage message, ShippingLabel shippingLabel, String sender);
+    Optional<Message> transferor(Messageable message, ShippingLabel shippingLabel, String sender);
 
     /**
      * If protocol is in transferee state.
@@ -26,7 +26,7 @@ public interface ISession {
      *
      * @return
      */
-    Optional<Message> transferee(IMessage message, String sender);
+    Optional<Message> transferee(Messageable message, String sender);
 
     /**
      * Returns the current state of the session.

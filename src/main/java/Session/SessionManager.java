@@ -3,7 +3,7 @@ package Session;
 import Battery.IBattery;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
-import Location.IGeoSpatial;
+import Location.Locationable;
 import Message.Solicitation;
 import Misc.Utilities;
 import Setup.ProtocolState;
@@ -33,7 +33,7 @@ public class SessionManager implements Observer, ISessionManager {
     private String sender;
     private IBattery battery;
 
-    public SessionManager(SessionState sessionState, ProtocolState protocolState, ReceivedMessageList receivedMessageList, IBattery battery, IGeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public SessionManager(SessionState sessionState, ProtocolState protocolState, ReceivedMessageList receivedMessageList, IBattery battery, Locationable geoSpatial, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.sessionState = sessionState;
         this.protocolState = protocolState;
         this.receivedMessageList = receivedMessageList;
@@ -56,7 +56,7 @@ public class SessionManager implements Observer, ISessionManager {
     }
 
     @Override
-    public Optional<MessageBuilder> sessionHandling(IMessage message, String sender) {
+    public Optional<MessageBuilder> sessionHandling(Messageable message, String sender) {
         this.sender = sender;
         switch (this.sessionState) {
             case NO_SESSION:
@@ -109,7 +109,7 @@ public class SessionManager implements Observer, ISessionManager {
      *
      * @param message    Received request message
      */
-    private void processRequest(IMessage message) {
+    private void processRequest(Messageable message) {
         this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR)
                 ? this.request.transferor(message, this.shippingLabel, this.sender)
                 : this.request.transferee(message, this.sender);
@@ -127,7 +127,7 @@ public class SessionManager implements Observer, ISessionManager {
      *
      * @param message    Received contract message
      */
-    private void processContract(IMessage message) {
+    private void processContract(Messageable message) {
         this.optionalMessage = protocolState.equals(ProtocolState.TRANSFEROR)
                 ? this.contract.transferor(message, null, this.sender)
                 : this.contract.transferee(message, this.sender);

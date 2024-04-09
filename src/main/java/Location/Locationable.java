@@ -3,7 +3,7 @@ package Location;
 /**
  * Interface for all thing geo locations.
  */
-public interface IGeoSpatial {
+public interface Locationable {
 
     /**
      * This is a very simplified method to calculate distance between two geo location points.

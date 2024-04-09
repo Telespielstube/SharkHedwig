@@ -1,6 +1,6 @@
 package DeliveryContract;
 
-import HedwigUI.IUserInterface;
+import HedwigUI.Manageable;
 import HedwigUI.UserInput;
 import Location.Location;
 import Misc.Utilities;
@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  * their entry. The input is immutable that means it cannot be changed after confimration.
  * That is why there are no set methods in this class.
  */
-public class ShippingLabel extends Observable implements IDeliveryContract, IUserInterface {
+public class ShippingLabel extends Observable implements Contractable, Manageable {
 
     private boolean isCreated;
     private final UUID packageUUID;

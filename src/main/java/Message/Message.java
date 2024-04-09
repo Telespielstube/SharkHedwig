@@ -2,7 +2,7 @@ package Message;
 
 import java.util.UUID;
 
-public abstract class Message implements IMessage {
+public abstract class Message implements Messageable {
 
     protected UUID uuid;
     protected MessageFlag messageFlag;
