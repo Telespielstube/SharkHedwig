@@ -2,13 +2,19 @@ package DeliveryContract;
 
 import java.io.Serializable;
 
-@FunctionalInterface
 public interface Contractable extends Serializable {
 
   /**
    * Returns an object
    *
-   * @return    REturns an object.
+   * @return    Returns an object.
    */
-    Object get();
+  Object get();
+
+  /**
+   * Returns a boolean value if the component is already created.
+   *
+   * @return    Boolean value of component state.
+   */
+  boolean getIsCreated();
 }

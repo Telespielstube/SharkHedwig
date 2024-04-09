@@ -3,15 +3,13 @@ package DeliveryContract;
 import Location.Locationable;
 import Misc.Utilities;
 import Setup.AppConstant;
-
 import java.util.Observable;
 
 public class DeliveryContract extends Observable implements Contractable {
 
     private TransitRecord transitRecord;
     private ShippingLabel shippingLabel;
-    private boolean isCreated = false;
-    private boolean isSent = false;
+    private boolean isCreated = ContractState.NOT_CREATED.getState();
 
     public DeliveryContract(){}
 
@@ -26,7 +24,7 @@ public class DeliveryContract extends Observable implements Contractable {
                 Utilities.createTimestamp(),
                 null,
                 null));
-        this.isCreated = true;
+        this.isCreated = ContractState.CREATED.getState();
         setChanged();
         notifyObservers();
     }
@@ -34,7 +32,7 @@ public class DeliveryContract extends Observable implements Contractable {
     public DeliveryContract(ShippingLabel shippingLabel, TransitRecord transitRecord) {
         this.shippingLabel = shippingLabel;
         this.transitRecord = transitRecord;
-        this.isCreated = true;
+        this.isCreated = ContractState.CREATED.getState();
         setChanged();
         notifyObservers();
     }
@@ -44,20 +42,16 @@ public class DeliveryContract extends Observable implements Contractable {
         return this;
     }
 
+    @Override
     public boolean getIsCreated() {
         return this.isCreated;
-    }
-
-    public void setIsCreated(boolean isCreated) {
-        this.isCreated = isCreated;
     }
 
     /**
      * After the hand-over is complete the former transferor has to reset all DeliveryContract states to the initial states.
      */
     public void resetContractState() {
-        this.isCreated = false;
-        this.isSent = false;
+        clearChanged();
     }
 
     /**
@@ -66,7 +60,7 @@ public class DeliveryContract extends Observable implements Contractable {
      * @return    ShippingLabel object.
      */
     public ShippingLabel getShippingLabel() {
-        return (ShippingLabel) this.shippingLabel.get();
+        return this.shippingLabel.get();
     }
 
     /**
@@ -75,7 +69,7 @@ public class DeliveryContract extends Observable implements Contractable {
      * @return    TransitRecord object.
      */
     public TransitRecord getTransitRecord() {
-        return (TransitRecord) this.transitRecord.get();
+        return this.transitRecord.get();
     }
 
     /**

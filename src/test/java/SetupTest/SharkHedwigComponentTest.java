@@ -1,38 +1,26 @@
 package SetupTest;
 
 import DeliveryContract.ShippingLabel;
-import Message.Advertisement;
-import Message.MessageFlag;
-import Misc.Utilities;
 import Session.ReceivedMessageList;
 import Session.SessionManager;
-import Session.SessionState;
 import Setup.Channel;
-import Setup.ProtocolState;
-import Setup.SharkHedwigComponent;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeer;
 import net.sharksystem.SharkTestPeerFS;
-import net.sharksystem.asap.ASAPMessages;
-import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import javax.crypto.NoSuchPaddingException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
-
 
 public class SharkHedwigComponentTest {
 

@@ -56,9 +56,9 @@ public class ContractTest {
         PublicKey publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
         MessageHandler messageHandler = new MessageHandler();
         contract = new Contract(sharkPKIComponent, receivedMessageList);
-        shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
+        shippingLabel = new ShippingLabel.Builder(UUID.randomUUID(), "Alice", "HTW-Berlin",
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",
-                new Location(52.5105, 13.4346), 1.2);
+                new Location(52.5105, 13.4346), 1.2).build();
         transitRecord = new TransitRecord();
         transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PEER_NAME.name(), "Peter", new Location
                 (57.5654645, 77.345345), 56563456, null, null));

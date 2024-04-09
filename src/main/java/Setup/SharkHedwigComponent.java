@@ -3,6 +3,7 @@ package Setup;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
+import HedwigUI.UserManager;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkException;
@@ -38,11 +39,12 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     private ISessionManager sessionManager;
     private final SharkPeerFS sharkPeerFS;
     private ASAPMessages messages;
-    private ShippingLabel shippingLabel = new ShippingLabel(null,null,null, null,
-            null, null, null, 0.0);
+    private ShippingLabel shippingLabel = new ShippingLabel.Builder(null,null,null, null,
+            null, null, null, null).build();
     private DeliveryContract deliveryContract = new DeliveryContract();
     private ReceivedMessageList receivedMessageList = new ReceivedMessageList();
-    private IBattery battery;
+    private final UserManager userManager;
+    private Battery battery;
     private Locationable geoSpatial;
 
     /**
@@ -62,8 +64,9 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         this.sharkPeerFS = new SharkPeerFS(AppConstant.PEER_NAME.toString(), AppConstant.PEER_FOLDER.toString() + "/" + AppConstant.PEER_NAME.toString() );
         this.sharkPKIComponent = pkiComponent;
         this.messageHandler = new MessageHandler();
-        this.battery = new Battery();
+        this.battery = new BatteryManager();
         this.geoSpatial = new GeoSpatial();
+        this.userManager = new UserManager();
         setupComponent(sharkPeerFS);
     }
 

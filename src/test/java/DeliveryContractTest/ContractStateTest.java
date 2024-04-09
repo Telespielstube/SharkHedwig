@@ -11,6 +11,5 @@ public class ContractStateTest {
     @Test
     public void testCurrentContractState() {
         assertTrue(ContractState.CREATED.getState());
-
     }
 }

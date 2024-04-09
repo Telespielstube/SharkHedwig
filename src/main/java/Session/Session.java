@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * Interface for all protcol sessions.
  */
-public interface ISession {
+public interface Session {
     /**
      * if protocol is in transferor state.
      *

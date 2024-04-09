@@ -1,6 +1,6 @@
 package Session;
 
-import Battery.IBattery;
+import Battery.Battery;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import Location.Locationable;
@@ -31,9 +31,9 @@ public class SessionManager implements Observer, ISessionManager {
     private boolean shippingLabelCreated;
     private boolean noSession;
     private String sender;
-    private IBattery battery;
+    private Battery battery;
 
-    public SessionManager(SessionState sessionState, ProtocolState protocolState, ReceivedMessageList receivedMessageList, IBattery battery, Locationable geoSpatial, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public SessionManager(SessionState sessionState, ProtocolState protocolState, ReceivedMessageList receivedMessageList, Battery battery, Locationable geoSpatial, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.sessionState = sessionState;
         this.protocolState = protocolState;
         this.receivedMessageList = receivedMessageList;

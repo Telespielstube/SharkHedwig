@@ -16,9 +16,9 @@ public class DeliveryContractTest {
 
     @Test
     public void getShippingLabelAndTransitRecord() {
-        shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
+        shippingLabel = new ShippingLabel.Builder(UUID.randomUUID(), "Alice", "HTW-Berlin",
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",
-                new Location(52.5105, 13.4346), 1.2);
+                new Location(52.5105, 13.4346), 1.2).build();
         transitRecord = new TransitRecord();
         transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PEER_NAME.name(), "Peter", new Location
                 (57.5654645, 77.345345), 56563456, null, null));
@@ -35,8 +35,8 @@ public class DeliveryContractTest {
 
     @Test
     public void deliveryContractIsCreatedWithoutAttributes() {
-        shippingLabel = new ShippingLabel(null,null,null, null,
-                null, null, null, 0.0);
+        shippingLabel = new ShippingLabel.Builder(null,null,null, null,
+                null, null, null, 0.0).build();
         transitRecord = new TransitRecord();
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         assertNotNull(deliveryContract);
@@ -61,9 +61,9 @@ public class DeliveryContractTest {
     @Test
     public void ShippingLabelAndTransitRecordObjectsAreAccessible() {
         transitRecord = new TransitRecord();
-        shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
+        shippingLabel = new ShippingLabel.Builder(UUID.randomUUID(), "Alice", "HTW-Berlin",
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",
-                new Location(52.5105, 13.4346), 1.2);
+                new Location(52.5105, 13.4346), 1.2).build();
         transitRecord.addEntry(new TransitEntry(2, null, "Alice", "Bobby", new Location(80.0,90.0), 45345345, null, null ));
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         System.out.println(deliveryContract.getShippingLabel());
@@ -94,9 +94,9 @@ public class DeliveryContractTest {
 
     @Test
     public void testIfShippingLabelIsReturned() {
-        shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
+        shippingLabel = new ShippingLabel.Builder(UUID.randomUUID(), "Alice", "HTW-Berlin",
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",
-                new Location(52.5105, 13.4346), 1.2);
+                new Location(52.5105, 13.4346), 1.2).build();
         assertNotNull(shippingLabel.getUUID());
         assertEquals("Bob", shippingLabel.getRecipient());
         assertNotNull(shippingLabel);
@@ -104,9 +104,9 @@ public class DeliveryContractTest {
 
     @Test
     public void printOutDeliveryContract() {
-        shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
+        shippingLabel = new ShippingLabel.Builder(UUID.randomUUID(), "Alice", "HTW-Berlin",
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",
-                new Location(52.5105, 13.4346), 1.2);
+                new Location(52.5105, 13.4346), 1.2).build();
         transitRecord = new TransitRecord();
         transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PEER_NAME.name(), "Peter", new Location
                 (57.5654645, 77.345345), 56563456, null, null));

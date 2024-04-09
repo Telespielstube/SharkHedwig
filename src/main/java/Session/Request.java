@@ -12,7 +12,7 @@ import Misc.Logger;
 import Misc.Utilities;
 import Setup.AppConstant;
 import Location.Location;
-import Battery.IBattery;
+import Battery.Battery;
 import Location.Locationable;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,12 +28,12 @@ public class Request extends AbstractSession {
     private Confirm confirm;
     private DeliveryContract deliveryContract;
     private Ack ack;
-    private IBattery battery;
+    private Battery battery;
     private Locationable geoSpatial;
     private ReceivedMessageList receivedMessageList;
     private Optional<Message> optionalMessage;
 
-    public Request(Contract contract, IBattery battery, Locationable geoSpatial, ReceivedMessageList receivedMessageList) {
+    public Request(Contract contract, Battery battery, Locationable geoSpatial, ReceivedMessageList receivedMessageList) {
         this.optionalMessage = Optional.empty();
         this.contract = contract;
         this.battery = battery;

@@ -6,7 +6,7 @@ import Message.Message;
 
 import java.util.Optional;
 
-public abstract class AbstractSession implements ISession {
+public abstract class AbstractSession implements Session {
 
     protected boolean sessionComplete = false;
     protected int timeOffset = 5000;

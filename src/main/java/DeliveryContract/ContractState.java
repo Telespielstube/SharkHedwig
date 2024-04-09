@@ -1,7 +1,8 @@
 package DeliveryContract;
 
 public enum ContractState {
-    CREATED(true);
+    CREATED(true),
+    NOT_CREATED(false);
 
     private boolean state;
     ContractState(boolean state) {

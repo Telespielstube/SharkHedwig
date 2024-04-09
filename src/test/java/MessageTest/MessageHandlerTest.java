@@ -36,7 +36,6 @@ public class MessageHandlerTest {
 
     @BeforeAll
     public static void setup() throws SharkException, IOException {
-
         SharkPeer sharkTestPeer = new SharkTestPeerFS(TestConstant.PEER_NAME.getTestConstant(), TestConstant.PEER_FOLDER.getTestConstant() + "/" + TestConstant.PEER_NAME.getTestConstant());
         sharkPKIComponent = setupComponent(sharkTestPeer);
         sharkTestPeer.start();

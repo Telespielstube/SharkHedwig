@@ -1,87 +1,38 @@
 package DeliveryContract;
 
-import HedwigUI.Manageable;
-import HedwigUI.UserInput;
 import Location.Location;
-import Misc.Utilities;
-
-import java.util.Objects;
 import java.util.Observable;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 /**
  * The shipping label object is a core function of the whole protocoll. The label is created after the user confirmed
  * their entry. The input is immutable that means it cannot be changed after confimration.
  * That is why there are no set methods in this class.
  */
-public class ShippingLabel extends Observable implements Contractable, Manageable {
+public class ShippingLabel extends Observable implements Contractable {
 
+    // Every field has to be an object because the validate methode checks for not null objects.
     private boolean isCreated;
     private final UUID packageUUID;
     private final String sender;
-    private String origin;
-    private String recipient;
-    private Double packageWeight;
-    private String destination;
-    private Location locationOrigin;
-    private Location locationDestination;
+    private final String origin;
+    private final String recipient;
+    private final Double packageWeight;
+    private final String destination;
+    private final Location locationOrigin;
+    private final Location locationDestination;
 
-
-    /**
-     * Creates the shipping label object from the user input data, the uuid and the PEER_NAME.
-     *
-     * @param sender            Sender of the package.
-     * @param origin            Human readable name of the origin location.
-     * @param locationOrigin    Geolocation of the origin location.
-     * @param recipient         Recipeint of the package.
-     * @param destination       Human readable name of the reception location.
-     * @param locationDestination      Geolocation of the reception location.
-     * @param packageWeight     Weight of the package.
-     */
-    public ShippingLabel(UUID packageUUID, String sender, String origin, Location locationOrigin, String recipient, String destination, Location locationDestination, double packageWeight) {
-        this.packageUUID = packageUUID;
-        this.sender = sender;
-        this.origin = origin;
-        this.locationOrigin = locationOrigin;
-        this.recipient = recipient;
-        this.destination = destination;
-        this.locationDestination = locationDestination;
-        this.packageWeight = packageWeight;
-        this.isCreated = false;
-    }
-
-    /**
-     * Creates a new ShippingLabel object passed from the UserInputBuilder object.
-     *
-     * @param userInput    UserInputBuilder object sent from the user interface.
-     */
-
-    public boolean create(UserInput userInput) {
-        if (verifyUserData(userInput)) {
-            ShippingLabel label = new ShippingLabel(Utilities.createUUID(), userInput.getSender(), userInput.getOrigin(),
-                    new Location(userInput.getLatitudeOrigin(), userInput.getLongitudeOrigin()), userInput.getRecipient(),
-                    userInput.getDestination(), new Location(userInput.getLatitudeDest(), userInput.getLongitudeDest()),
-                    userInput.getPackageWeight());
-            this.isCreated = true;
-            setChanged();
-            notifyObservers();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Verifies the user input if no attribute has a null value. If only one field is null no schipping
-     * label is created.
-     *
-     * @param userInput    UserInputBuilder object this one needs to be checked before the label gets created.
-     */
-    private boolean verifyUserData(UserInput userInput) {
-        return Stream.of(userInput.getSender(), userInput.getOrigin(), userInput.getLatitudeOrigin(), userInput.getLongitudeOrigin(),
-                userInput.getRecipient(), userInput.getDestination(), userInput.getLatitudeDest(), userInput.getLongitudeDest(),
-                userInput.getPackageWeight())
-                .anyMatch(Objects::nonNull);
+    private ShippingLabel(Builder builder) {
+        this.packageUUID = builder.packageUUID;
+        this.sender = builder.sender;
+        this.origin = builder.origin;
+        this.locationOrigin = builder.locationOrigin;
+        this.recipient = builder.recipient;
+        this.destination = builder.destination;
+        this.locationDestination = builder.locationDestination;
+        this.packageWeight = builder.packageWeight;
+        setChanged();
+        notifyObservers();
     }
 
     @Override
@@ -89,6 +40,7 @@ public class ShippingLabel extends Observable implements Contractable, Manageabl
         return this;
     }
 
+    @Override
     public boolean getIsCreated() {
         return this.isCreated;
     }
@@ -131,6 +83,10 @@ public class ShippingLabel extends Observable implements Contractable, Manageabl
         return this.packageWeight;
     }
 
+//    public boolean getIsPriority() {
+//        return this.isPriority;
+//    }
+
     /**
      * String representation of the ShippingLabel object.
      *
@@ -140,5 +96,52 @@ public class ShippingLabel extends Observable implements Contractable, Manageabl
         return String.format("PackageUUID: " + this.packageUUID + "; Sender: " + this.sender + "; Origin: " + this.origin +
                 "; Origin coordinates: " + this.locationOrigin + "; Recipient: " + this.recipient + "; Destination: " +
                 this.destination + "; Destination coordinates: " + this.locationDestination + "; Package weight: " + this.packageWeight);
+    }
+
+    /**
+     * This inner class is helful in not exposing the sensetive shippingLabel creation to the public. The creation
+     * proccess is delegated to the Builder class. Which is accessible through the public interface to other components.
+     */
+    public static class Builder {
+
+        private final UUID packageUUID;
+        private final String sender;
+        private final String origin;
+        private final Location locationOrigin;
+        private final String recipient;
+        private final String destination;
+        private final Location locationDestination;
+        private final Double packageWeight;
+
+        /**
+         * Creates the shipping label object from the user input data, the uuid and the PEER_NAME.
+         *
+         * @param sender            Sender of the package.
+         * @param origin            Human readable name of the origin location.
+         * @param locationOrigin    Geolocation of the origin location.
+         * @param recipient         Recipient of the package.
+         * @param destination       Human readable name of the reception location.
+         * @param locationDestination      Geolocation of the reception location.
+         * @param packageWeight     Weight of the package.
+         */
+        public Builder(UUID packageUUID, String sender, String origin, Location locationOrigin, String recipient, String destination, Location locationDestination, Double packageWeight) {
+            this.packageUUID = packageUUID;
+            this.sender = sender;
+            this.origin = origin;
+            this.recipient = recipient;
+            this.packageWeight = packageWeight;
+            this.destination = destination;
+            this.locationOrigin = locationOrigin;
+            this.locationDestination = locationDestination;
+        }
+
+        /**
+         * Creates the ShippingLabel object by calling the private constructor.
+         *
+         * @return    new ShippingLabel object.
+         */
+        public ShippingLabel build() {
+            return new ShippingLabel(this);
+        }
     }
 }

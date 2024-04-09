@@ -15,8 +15,8 @@ public class ProtocolStateTest {
 
     @Test
     public void testIfStateIsTransfereeAfterShippingLabelCreatedButEmpty() {
-        shippingLabel = new ShippingLabel(null, null, null, null, null,
-                null, null, 0.0);
+        shippingLabel = new ShippingLabel.Builder(null, null, null, null, null,
+                null, null, 0.0).build();
 
         assertFalse(shippingLabel.getIsCreated());
         assertEquals(TRANSFEREE, ProtocolState.TRANSFEREE.isActive());
@@ -24,9 +24,9 @@ public class ProtocolStateTest {
 
     @Test
     public void testIfStateIsSwitchedToTransferorAfterLabelIsFilledWithContent() {
-        shippingLabel = new ShippingLabel(null, "Alice", "HTW-Berlin",
+        shippingLabel = new ShippingLabel.Builder(null, "Alice", "HTW-Berlin",
                 new Location(52.456931, 13.526444), "Bob", "Ostbahnhof",
-                new Location(52.5105, 13.4346), 1.2);
+                new Location(52.5105, 13.4346), 1.2).build();
         assertFalse(shippingLabel.getIsCreated());
         assertEquals(TRANSFEROR, TRANSFEROR.isActive());
     }

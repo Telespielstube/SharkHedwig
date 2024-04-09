@@ -1,6 +1,6 @@
 package SessionTest;
 
-import Battery.IBattery;
+import Battery.Battery;
 import DeliveryContract.*;
 import HedwigUI.UserInput;
 import Location.Location;
@@ -43,13 +43,13 @@ public class SessionManagerTest {
     private SessionManager sessionManager;
     private DeliveryContract deliveryContract;
     private SharkPKIComponent sharkPKIComponent;
-    private IBattery battery;
+    private Battery battery;
     private Locationable geoSpatial;
     private static ASAPKeyStore asapKeyStore;
     private static String francisID;
     private static PublicKey publicKeyFrancis;
-    private static ShippingLabel shippingLabel = new ShippingLabel(null,null,null, null,
-            null, null, null, 0.0);
+    private static ShippingLabel shippingLabel = new ShippingLabel.Builder(null,null,null, null,
+            null, null, null, 0.0).build();
     private static ReceivedMessageList receivedMessageList;
 
     public SessionManagerTest() throws NoSuchPaddingException, NoSuchAlgorithmException {
@@ -81,32 +81,10 @@ public class SessionManagerTest {
         return (SharkPKIComponent) component;
     }
 
-//    @Test
-//    public void testIfACompleteTransferorSessionRunWorks() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, ASAPSecurityException, NoSuchFieldException, IllegalAccessException {
-//        IBattery battery = new Battery();
-//        IGeoSpatial geoSpatial = new GeoSpatial();
-//        SessionManager sessionManagerTransferor = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEROR, receivedMessageList, battery, geoSpatial, sharkPKIComponent);
-//        UserInput userInputBuilder = new UserInput("Alice", "HTW-Berlin",
-//                52.456931, 13.526444, "Bob", "Ostbahnhof", 52.5105, 13.4346, 1.2);
-//        //Working on the shippingLabel
-//        shippingLabel.create(userInputBuilder);
-//        Field shippingLabelCreatedField = sessionManagerTransferor.getClass().getDeclaredField("shippingLabelCreated");
-//        shippingLabelCreatedField.setAccessible(true);
-//        shippingLabelCreatedField.set(sessionManagerTransferor, true);
-//        // NoSession
-//        Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
-//        Optional<MessageBuilder> transferorObject = sessionManagerTransferor.sessionHandling(advertisement,"Bobby");
-//        // Request Session
-//        Offer offer = new Offer(Utilities.createUUID(), MessageFlag.OFFER, Utilities.createTimestamp(), 100, 100, new Location(52.5105, 13.4346));
-//        transferorObject = sessionManagerTransferor.sessionHandling(offer,"Bobby");
-//        assertFalse(transferorObject.isPresent());
-//
-//    }
-
     @Test
     public void testIfTransferorIsUnchangedWhenShippingLabelIsCreatedButEmpty() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        ShippingLabel shippingLabel = new ShippingLabel(null,null,null, null,
-                null, null, null, 0.0);
+        ShippingLabel shippingLabel = new ShippingLabel.Builder(null,null,null, null,
+                null, null, null, null).build();
         sessionManager = new SessionManager(SessionState.REQUEST, ProtocolState.TRANSFEREE, receivedMessageList, battery, geoSpatial, sharkPKIComponent);
         assertFalse(shippingLabel.getIsCreated());
         assertNotEquals(ProtocolState.TRANSFEROR, ProtocolState.TRANSFEREE);
@@ -114,24 +92,23 @@ public class SessionManagerTest {
 
     @Test
     public void transfereeIsNotChangedIfCreateMethodeIsNotCalled() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        shippingLabel = new ShippingLabel(null,null,null, null,
-                null, null, null, 0.0);
+        shippingLabel = new ShippingLabel.Builder(null,null,null, null,
+                null, null, null, 0.0).build();
         sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEREE, receivedMessageList, battery, geoSpatial, sharkPKIComponent);
         assertEquals(ProtocolState.TRANSFEREE, ProtocolState.TRANSFEREE);
-        shippingLabel = new ShippingLabel(null, "Alice", "HTW-Berlin",
+        shippingLabel = new ShippingLabel.Builder(null, "Alice", "HTW-Berlin",
                 new Location(52.456931, 13.526444), "Bob", "Ostbahnhof",
-                new Location(52.5105, 13.4346), 1.2);
+                new Location(52.5105, 13.4346), 1.2).build();
         assertEquals(ProtocolState.TRANSFEREE, ProtocolState.TRANSFEREE);
     }
 
     @Test
     public void transfereeStateChangesWhenCreateShippingLabelIsCalled() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        shippingLabel = new ShippingLabel(null,null,null, null,
-                null, null, null, 0.0);
+        shippingLabel = new ShippingLabel.Builder(null,null,null, null,
+                null, null, null, 0.0).build();
         sessionManager = new SessionManager(SessionState.REQUEST, ProtocolState.TRANSFEREE, receivedMessageList, battery, geoSpatial,  sharkPKIComponent);
         UserInput userInput = new UserInput("Alice", "HTW-Berlin", 52.456931, 13.526444,
                 "Bob", "Ostbahnhof", 52.5105, 13.4346, 1.2);
-        shippingLabel.create(userInput);
         assertNotEquals(ProtocolState.TRANSFEREE, ProtocolState.TRANSFEROR);
     }
 

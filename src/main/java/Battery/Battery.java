@@ -1,31 +1,33 @@
 package Battery;
 
-public class Battery implements IBattery{
 
-    private int batteryLevel = 100;
-    private int maxFlightRange = 100;
-    private boolean deliveryPossible = false;
-    private int expectedbatteryConsuption = 0;
+public interface Battery {
 
-    public Battery() {}
+    /**
+     * the current battery level.
+     *
+     * @return    Current battery level.
+     */
+    public int getCurrentBatteryLevel();
 
-    @Override
-    public int getCurrentBatteryLevel() {
-        return this.batteryLevel;
-    }
+    /**
+     * Claculates an estimated value based on the passed parameter.
+     *
+     * @return               Expected battery consumption.
+     */
+    public int expectedConsumptionToDestination();
 
-    @Override
-    public int expectedConsumptionToDestination() {
-        return this.expectedbatteryConsuption;
-    }
+    /**
+     * Based on the calculated consumption trueor false is returned.
+     *
+     * @return    true if delivery is possible false if not.
+     */
+    public boolean isDeliveryPossible();
 
-    @Override
-    public boolean isDeliveryPossible() {
-        return this.deliveryPossible;
-    }
-
-    @Override
-    public int maxFlightRange() {
-        return this.maxFlightRange;
-    }
+    /**
+     * Returns the maximum flight range of the device.
+     *
+     * @return    Distance in km.
+     */
+    public int maxFlightRange();
 }

@@ -14,5 +14,6 @@
     <orderEntry type="library" scope="TEST" name="junit.jupiter" level="project" />
     <orderEntry type="library" name="libs" level="project" />
     <orderEntry type="library" name="junit.platform.suite" level="project" />
+    <orderEntry type="library" name="mockito.core" level="project" />
   </component>
 </module>

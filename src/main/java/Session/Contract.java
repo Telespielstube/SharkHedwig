@@ -186,9 +186,9 @@ public class Contract extends AbstractSession {
      */
     private void inMemoDeliveryContract(DeliveryContract message) {
         ShippingLabel label = message.getShippingLabel();
-        this.deliveryContract = new DeliveryContract(new ShippingLabel(label.getUUID(), label.getSender(), label.getOrigin(),
+        this.deliveryContract = new DeliveryContract(new ShippingLabel.Builder(label.getUUID(), label.getSender(), label.getOrigin(),
                 label.getPackageOrigin(), label.getRecipient(), label.getDestination(), label.getPackageDestination(),
-                label.getPackageWeight()), new TransitRecord(this.transitRecord.getAllEntries()));
+                label.getPackageWeight()).build(), new TransitRecord(this.transitRecord.getAllEntries()));
         this.contractState = ContractState.CREATED.getState();
     }
 
