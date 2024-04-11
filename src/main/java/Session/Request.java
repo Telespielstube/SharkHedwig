@@ -56,7 +56,7 @@ public class Request extends AbstractSession {
                 saveData();
                 break;
             default:
-                System.err.println("Missing message flag.");
+                System.err.println(Utilities.formattedTimestamp() + "Missing message flag.");
                 this.receivedMessageList.clearMessageList();
                 break;
         }
@@ -82,7 +82,7 @@ public class Request extends AbstractSession {
                 saveData();
                 break;
             default:
-                System.err.println("Missing message flag.");
+                System.err.println(Utilities.formattedTimestamp() + "Missing message flag.");
                 this.receivedMessageList.clearMessageList();
                 break;
         }

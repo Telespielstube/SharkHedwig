@@ -49,7 +49,7 @@ public class Contract extends AbstractSession {
                 handleCompleteMessage((Complete) message);
                 break;
             default:
-                System.err.println("Message flag was incorrect: " + message.getMessageFlag());
+                System.err.println(Utilities.formattedTimestamp() + "Message flag was incorrect: " + message.getMessageFlag());
                 this.receivedMessageList.clearMessageList();
                 break;
         }
@@ -76,7 +76,7 @@ public class Contract extends AbstractSession {
                 handleAckMessage((Ack) message);
                 break;
             default:
-                System.err.println("Message flag was incorrect: " + message.getMessageFlag());
+                System.err.println(Utilities.formattedTimestamp() + "Message flag was incorrect: " + message.getMessageFlag());
                 this.receivedMessageList.clearMessageList();
                 break;
         }
@@ -151,7 +151,7 @@ public class Contract extends AbstractSession {
                     this.transitRecord.getLastElement().setSignatureTransferor(this.signedField);
                 }
             } catch (ASAPSecurityException e) {
-                System.err.println("Caught an ASAPSecurityException: " + e);
+                System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPSecurityException: " + e.getMessage());
                 throw new RuntimeException(e);
             }
             this.optionalMessage = Optional.of(new PickUp(Utilities.createUUID(), MessageFlag.PICK_UP, Utilities.createTimestamp(), this.transitRecord));
@@ -171,7 +171,7 @@ public class Contract extends AbstractSession {
                 this.signedField = ASAPCryptoAlgorithms.sign(MessageHandler.objectToByteArray(this.transitRecord.getLastElement()), sharkPKIComponent);
                 this.transitRecord.getLastElement().setSignatureTransferee(this.signedField);
             } catch (ASAPSecurityException e) {
-                System.err.println("Caught an ASAPSecurityException: " + e);
+                System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPSecurityException: " + e.getMessage());
                 throw new RuntimeException(e);
             }
             inMemoDeliveryContract(message.getDeliveryContract());

@@ -1,5 +1,6 @@
 package Message;
 
+import Misc.Utilities;
 import Setup.AppConstant;
 import net.sharksystem.asap.*;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
@@ -21,7 +22,7 @@ public class MessageHandler implements Handleable {
                 return false;
             }
         } catch (IOException | ASAPException e) {
-            System.err.println("Caught an ASAP or IOException: " + e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an ASAP or IOException: " + e.getMessage());
             throw new RuntimeException(e);
         }
         return true;
@@ -36,7 +37,7 @@ public class MessageHandler implements Handleable {
             verifiedMessage = verifySignedMessage(decryptedMessage, senderE2E, sharkPKIComponent);
             object = byteArrayToObject(verifiedMessage);
         } catch (ASAPException | IOException e) {
-            System.err.println("Caught an ASAP or IOException: " + e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an ASAP or IOException: " + e.getMessage());
             throw new RuntimeException(e);
         }
         return object;
@@ -58,7 +59,7 @@ public class MessageHandler implements Handleable {
                 return byteMessage;
             }
         } catch (ASAPException | IOException e) {
-            System.err.println("Caught an ASAP or IOException: " + e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an ASAP or IOException: " + e.getMessage());
             throw new RuntimeException(e);
         }
         return new byte[0];
@@ -74,7 +75,7 @@ public class MessageHandler implements Handleable {
             encryptedMessage = ASAPCryptoAlgorithms.produceEncryptedMessagePackage(signedMessage, recipient,
                     sharkPKIComponent.getASAPKeyStore());
         } catch (ASAPException e) {
-            System.err.println("Caught an ASAPException: " + e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPException: " + e.getMessage());
             throw new RuntimeException(e);
         }
         return encryptedMessage;
@@ -95,7 +96,7 @@ public class MessageHandler implements Handleable {
             ASAPSerialization.writeByteArray(signedMessagePackage, outputStream);
             ASAPSerialization.writeByteArray(byteMessage, outputStream);
         } catch (ASAPSecurityException | IOException e) {
-            System.err.println("Caught an ASAPSecurityException: " + e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPSecurityException: " + e.getMessage());
             throw new RuntimeException(e);
         }
         return  outputStream.toByteArray();
@@ -107,7 +108,7 @@ public class MessageHandler implements Handleable {
             ObjectOutputStream oos = new ObjectOutputStream(outputStream);
             oos.writeObject(object);
         } catch (IOException e) {
-            System.err.println("Caught an IOException: " + e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an IOException: " + e.getMessage());
             throw new RuntimeException(e);
         }
         return outputStream.toByteArray();
@@ -120,7 +121,7 @@ public class MessageHandler implements Handleable {
             input = new ObjectInputStream(inputStream);
             return input.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Caught an Exception: " + e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an Exception: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }

@@ -112,7 +112,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             shippingLabel.addObserver((Observer) this.sessionManager);
             deliveryContract.addObserver((Observer) this.sessionManager);
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
-            System.err.println("Caught an Exception: " + e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an Exception: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -125,7 +125,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             try {
                 this.peer.getASAPStorage(AppConstant.APP_FORMAT.toString()).createChannel(type.getChannel());
             } catch (IOException | ASAPException e) {
-                System.err.println("Caught an Exception: " + e);
+                System.err.println(Utilities.formattedTimestamp() + "Caught an Exception: " + e.getMessage());
                 throw new RuntimeException(e);
             }
         }
@@ -141,7 +141,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             System.setErr(new PrintStream(Files.newOutputStream(Paths.get(path + "/" +
                     AppConstant.ERROR_LOG_FILE.toString()), CREATE, APPEND)));
         } catch (IOException e) {
-            System.err.println("Caught an Exception while creating the log folders: " + e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an Exception while creating the log folders: " + e.getMessage());
             throw new RuntimeException(e);
         }
         
@@ -175,7 +175,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         } else if (uri.equals(Channel.CONTRACT.toString()))  {
             processMessages(messages, senderE2E);
         }
-        System.err.println("Message has invalid format: " + uri);
+        System.err.println(Utilities.formattedTimestamp() + "Message has invalid format: " + uri );
     }
 
     /**
@@ -201,13 +201,13 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
                         this.peer.sendASAPMessage(AppConstant.APP_FORMAT.toString(), AppConstant.SCHEME +
                                 object.getUri(), encryptedMessage);
                     } catch (ASAPException e) {
-                        System.err.println("Caught an Exception: " + e);
+                        System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPException: " + e.getMessage());
                         throw new RuntimeException(e);
                     }
                 });
             }
         } catch (IOException e) {
-            System.err.println("Caught an IOException: " + e.getMessage());
+            System.err.println(Utilities.formattedTimestamp() + "Caught an IOException: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }

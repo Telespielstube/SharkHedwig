@@ -81,7 +81,7 @@ public class SessionManager implements Observer, ISessionManager {
                 }
                 break;
             default:
-                System.err.println("There was no session flag: " + this.sessionState);
+                System.err.println(Utilities.formattedTimestamp() + "There was no session flag: " + this.sessionState);
                 resetAll();
                 break;
         }

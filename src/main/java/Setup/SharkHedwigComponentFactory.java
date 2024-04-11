@@ -1,5 +1,6 @@
 package Setup;
 
+import Misc.Utilities;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkComponentFactory;
 import net.sharksystem.SharkException;
@@ -21,7 +22,7 @@ public class SharkHedwigComponentFactory implements SharkComponentFactory {
         try {
             return new SharkHedwigComponent();
         } catch (NoSuchPaddingException | NoSuchAlgorithmException | IOException | SharkException e) {
-            System.err.println("SharkHedwigComoponent could not be added to SharkPeer." + e);
+            System.err.println(Utilities.formattedTimestamp() + "SharkHedwigComoponent could not be added to SharkPeer." + e.getMessage());
             throw new RuntimeException(e);
         }
     }

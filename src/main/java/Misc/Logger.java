@@ -23,7 +23,7 @@ public class Logger {
         try {
             Files.createDirectories(Paths.get(directory));
         } catch (IOException e) {
-            System.err.println("Caught an Exception while creating the log folders: " + e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an Exception while creating the log folders: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -39,7 +39,7 @@ public class Logger {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(file), StandardCharsets.UTF_8, StandardOpenOption.CREATE)) {
             writer.write(entry);
         } catch (IOException e) {
-            System.err.println("Caught an exception while writing log data: " + e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an exception while writing log data: " + e.getMessage());
             throw new RuntimeException(e);
         }
         return true;
