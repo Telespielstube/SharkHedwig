@@ -3,6 +3,7 @@ package HedwigUITest;
 import HedwigUI.UserInput;
 import HedwigUI.UserManager;
 import Setup.SharkHedwigComponent;
+import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeerFS;
 import net.sharksystem.pki.SharkPKIComponent;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ public class UserManagerTest {
     private SharkPKIComponent sharkPKIComponent;
 
     @Test
-    public void testIfShippingLabelChangesProtocolState() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {
+    public void testIfShippingLabelChangesProtocolState() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, SharkException {
         SharkHedwigComponent sharkHedwigComponent = Mockito.mock(SharkHedwigComponent.class);
         sharkHedwigComponent.setupComponent((SharkPeerFS) sharkPKIComponent);
 

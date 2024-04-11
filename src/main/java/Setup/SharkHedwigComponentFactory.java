@@ -2,6 +2,7 @@ package Setup;
 
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkComponentFactory;
+import net.sharksystem.SharkException;
 import net.sharksystem.pki.SharkPKIComponent;
 
 import javax.crypto.NoSuchPaddingException;
@@ -21,6 +22,8 @@ public class SharkHedwigComponentFactory implements SharkComponentFactory {
             return new SharkHedwigComponent(sharkPKIComponent);
         } catch (NoSuchPaddingException | NoSuchAlgorithmException | IOException e) {
             System.err.println("SharkHedwigComoponent could not be added to SharkPeer." + e);
+            throw new RuntimeException(e);
+        } catch (SharkException e) {
             throw new RuntimeException(e);
         }
     }

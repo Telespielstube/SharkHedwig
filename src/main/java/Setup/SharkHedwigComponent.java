@@ -59,8 +59,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
      * @throws NoSuchAlgorithmException
      * @throws IOException
      */
-    public SharkHedwigComponent(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException {
-        System.setErr(new PrintStream(Files.newOutputStream(Paths.get(AppConstant.ERROR_LOG_PATH.toString()), CREATE, APPEND)));
+    public SharkHedwigComponent(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, SharkException {
         this.sharkPeerFS = new SharkPeerFS(AppConstant.PEER_NAME.toString(), AppConstant.PEER_FOLDER.toString() + "/" + AppConstant.PEER_NAME.toString() );
         this.sharkPKIComponent = pkiComponent;
         this.messageHandler = new MessageHandler();
@@ -76,20 +75,22 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
      * @param sharkPeerFS        SharkPeerFS Object that the PKIComponent and SharkHedwigComponent can be added.
      * @throws SharkException    Is thrown if something goes wrong during the setup process.
      */
-    public void setupComponent(SharkPeerFS sharkPeerFS) {
+    public void setupComponent(SharkPeerFS sharkPeerFS) throws SharkException {
         SharkPKIComponentFactory sharkPkiComponentFactory = new SharkPKIComponentFactory();
-        SharkHedwigComponentFactory sharkHedwigComponentFactory;
-        try {
+        SharkHedwigComponentFactory sharkHedwigComponentFactory = new SharkHedwigComponentFactory((SharkPKIComponent)
+                this.sharkPeerFS.getComponent(SharkPKIComponent.class));;
+     //   try {
+
             sharkPeerFS.addComponent(sharkPkiComponentFactory, SharkPKIComponent.class);
             this.sharkPKIComponent = (SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class);
-            sharkHedwigComponentFactory = new SharkHedwigComponentFactory((SharkPKIComponent)
-                    sharkPeerFS.getComponent(SharkPKIComponent.class));
+
             sharkPeerFS.addComponent(sharkHedwigComponentFactory, SharkComponent.class);
             this.sharkPeerFS.start();
-        } catch (SharkException e) {
-            System.err.println("Caught an Exception: " + e);
-            throw new RuntimeException(e);
-        }
+
+//        } catch (SharkException e) {
+//            System.err.println("Caught an Exception: " + e);
+//            throw new RuntimeException(e);
+//        }
     }
 
     /**
@@ -104,9 +105,10 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         this.peer.addASAPMessageReceivedListener(AppConstant.APP_FORMAT.toString(), this);
         try {
             this.peer.setASAPRoutingAllowed(AppConstant.APP_FORMAT.toString(), true);
-            this.setupChannel();
+            setupChannel();
             this.peer.getASAPStorage(AppConstant.APP_FORMAT.toString()).getOwner();
-            this.setupLogger();
+            setupLogger();
+            setupErrorStream();
         } catch (IOException | ASAPException e) {
             System.err.println("Caught an IOException while setting up component:   " + e.getMessage());
             throw new RuntimeException(e);
@@ -134,6 +136,19 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    /**
+     * To make the occuring error messages persistent. Every occuring error is redirected to a file on the device.
+     */
+    public void setupErrorStream() throws IOException {
+        try {
+            Files.createDirectories(Paths.get(AppConstant.ERROR_LOG_PATH.toString()));
+        } catch (IOException e) {
+            System.err.println("Caught an Exception while creating the log folders: " + e);
+            throw new RuntimeException(e);
+        }
+        System.setErr(new PrintStream(Files.newOutputStream(Paths.get(AppConstant.ERROR_LOG_PATH.toString()), CREATE, APPEND)));
     }
 
     /**
