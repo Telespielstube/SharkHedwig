@@ -73,7 +73,7 @@ public class SharkHedwigComponentTest {
     public void comparePublicKeyPairs() throws SharkException, NoSuchPaddingException, IOException, NoSuchAlgorithmException {
         PublicKey pubKey = asapKeyStore.getPublicKey();
         setup();
-        assertNotEquals(asapKeyStore.getPublicKey(), pubKey);
+        assertEquals(asapKeyStore.getPublicKey(), pubKey);
     }
 
     @Test

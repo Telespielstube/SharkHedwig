@@ -29,7 +29,7 @@ public class Utilities {
      */
     public static String formattedTimestamp() {
         Date date = new Date();
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(date);
+        return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss").format(date);
     }
 
     /**

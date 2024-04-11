@@ -4,6 +4,7 @@ package Setup;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import HedwigUI.UserManager;
+import Misc.Utilities;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkException;
@@ -81,7 +82,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             this.sharkPKIComponent = (SharkPKIComponent) this.sharkPeerFS.getComponent(SharkPKIComponent.class);
             this.sharkPeerFS.start();
         } catch (SharkException e) {
-            System.err.println("Caught an Exception: " + e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an Exception: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -102,7 +103,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             this.peer.getASAPStorage(AppConstant.APP_FORMAT.toString()).getOwner();
             setupLogger();
         } catch (IOException | ASAPException e) {
-            System.err.println("Caught an IOException while setting up component:   " + e.getMessage());
+            System.err.println(Utilities.formattedTimestamp() + "Caught an IOException while setting up component:   " + e.getMessage());
             throw new RuntimeException(e);
         }
         new PKIManager(sharkPKIComponent);
