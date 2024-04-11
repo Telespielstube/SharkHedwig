@@ -71,10 +71,10 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     }
 
     /**
-     * Setup process for the SkarkPKIComponent.
+     * Setup process to add the SkarkPKIComponent and SharkHedwigComponent to the SharkPeer platform.
      *
-     * @param sharkPeerFS SharkPeerFS Object that the PKIComponent can be created.
-     * @throws SharkException Is thrown if something goes wrong during the setup process.
+     * @param sharkPeerFS        SharkPeerFS Object that the PKIComponent and SharkHedwigComponent can be added.
+     * @throws SharkException    Is thrown if something goes wrong during the setup process.
      */
     public void setupComponent(SharkPeerFS sharkPeerFS) {
         SharkPKIComponentFactory sharkPkiComponentFactory = new SharkPKIComponentFactory();
@@ -85,7 +85,6 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             sharkHedwigComponentFactory = new SharkHedwigComponentFactory((SharkPKIComponent)
                     sharkPeerFS.getComponent(SharkPKIComponent.class));
             sharkPeerFS.addComponent(sharkHedwigComponentFactory, SharkComponent.class);
-
             this.sharkPeerFS.start();
         } catch (SharkException e) {
             System.err.println("Caught an Exception: " + e);
@@ -94,13 +93,13 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     }
 
     /**
-     * This methode is called from within the methode SharkPeerFS to get the component
+     * This methode is called from within the methode SharkPeerFS.start() to get the component
      * and its setup process started.
      * <p>
      * ASAPPeer  Describes the actual Peer
      */
     @Override
-    public void onStart(ASAPPeer asapPeer) throws SharkException {
+    public void onStart(ASAPPeer asapPeer)  {
         this.peer = asapPeer;
         this.peer.addASAPMessageReceivedListener(AppConstant.APP_FORMAT.toString(), this);
         try {
@@ -108,15 +107,15 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             this.setupChannel();
             this.peer.getASAPStorage(AppConstant.APP_FORMAT.toString()).getOwner();
             this.setupLogger();
-        } catch (IOException e) {
+        } catch (IOException | ASAPException e) {
             System.err.println("Caught an IOException while setting up component:   " + e.getMessage());
+            throw new RuntimeException(e);
         }
         new PKIManager(sharkPKIComponent);
         try {
             this.sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEREE, this.receivedMessageList, this.battery, this.geoSpatial, this.sharkPKIComponent);
             shippingLabel.addObserver((Observer) this.sessionManager);
             deliveryContract.addObserver((Observer) this.sessionManager);
-
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
             System.err.println("Caught an Exception: " + e);
             throw new RuntimeException(e);

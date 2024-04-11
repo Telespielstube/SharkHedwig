@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class SharkHedwigComponentFactory implements SharkComponentFactory {
     private final SharkPKIComponent sharkPKIComponent;
+
     public SharkHedwigComponentFactory(SharkPKIComponent sharkPKIComponent){
         this.sharkPKIComponent = sharkPKIComponent;
     }
@@ -19,6 +20,7 @@ public class SharkHedwigComponentFactory implements SharkComponentFactory {
         try {
             return new SharkHedwigComponent(sharkPKIComponent);
         } catch (NoSuchPaddingException | NoSuchAlgorithmException | IOException e) {
+            System.err.println("SharkHedwigComoponent could not be added to SharkPeer." + e);
             throw new RuntimeException(e);
         }
     }
