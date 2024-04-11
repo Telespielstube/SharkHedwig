@@ -13,6 +13,7 @@ import net.sharksystem.pki.SharkPKIComponent;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
@@ -54,7 +55,6 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
      *
      * Created my Martina Brüning
      *
-     * @param pkiComponent                  Reference to the SharkPKICOmponent.
      * @throws NoSuchPaddingException
      * @throws NoSuchAlgorithmException
      * @throws IOException
@@ -65,23 +65,21 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         this.battery = new BatteryManager();
         this.geoSpatial = new GeoSpatial();
         this.userManager = new UserManager();
-        setupComponent(sharkPeerFS);
+        setupErrorStream();
+        setupComponent();
     }
 
     /**
      * Setup process to add the SkarkPKIComponent and to the SharkPeer platform.
      *
-     * @param sharkPeerFS        SharkPeerFS Object that the PKIComponent and SharkHedwigComponent can be added.
      * @throws SharkException    Is thrown if something goes wrong during the setup process.
      */
-    public void setupComponent(SharkPeerFS sharkPeerFS) {
+    public void setupComponent() {
         SharkPKIComponentFactory sharkPkiComponentFactory = new SharkPKIComponentFactory();
-        SharkHedwigComponentFactory sharkHedwigComponentFactory = new SharkHedwigComponentFactory(sharkPKIComponent);;
         try {
             sharkPeerFS.addComponent(sharkPkiComponentFactory, SharkPKIComponent.class);
-            this.sharkPKIComponent = (SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class);
+            this.sharkPKIComponent = (SharkPKIComponent) this.sharkPeerFS.getComponent(SharkPKIComponent.class);
             this.sharkPeerFS.start();
-
         } catch (SharkException e) {
             System.err.println("Caught an Exception: " + e);
             throw new RuntimeException(e);
@@ -103,7 +101,6 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             setupChannel();
             this.peer.getASAPStorage(AppConstant.APP_FORMAT.toString()).getOwner();
             setupLogger();
-            setupErrorStream();
         } catch (IOException | ASAPException e) {
             System.err.println("Caught an IOException while setting up component:   " + e.getMessage());
             throw new RuntimeException(e);
@@ -138,12 +135,15 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
      */
     public void setupErrorStream() throws IOException {
         try {
-            Files.createDirectories(Paths.get(AppConstant.ERROR_LOG_PATH.toString()));
+            Path path = Paths.get(AppConstant.ERROR_LOG_PATH.toString());
+            Files.createDirectories(path);
+            System.setErr(new PrintStream(Files.newOutputStream(Paths.get(path + "/" +
+                    AppConstant.ERROR_LOG_FILE.toString()), CREATE, APPEND)));
         } catch (IOException e) {
             System.err.println("Caught an Exception while creating the log folders: " + e);
             throw new RuntimeException(e);
         }
-        System.setErr(new PrintStream(Files.newOutputStream(Paths.get(AppConstant.ERROR_LOG_PATH.toString()), CREATE, APPEND)));
+        
     }
 
     /**

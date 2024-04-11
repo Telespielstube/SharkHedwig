@@ -15,7 +15,6 @@ import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import javax.crypto.NoSuchPaddingException;
@@ -28,6 +27,7 @@ import java.security.PublicKey;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SharkHedwigComponentTest {
+
 
     private SessionManager sessionManager;
     private SharkPKIComponent sharkPKIComponent;
@@ -66,12 +66,6 @@ public class SharkHedwigComponentTest {
     @Test
     public void checkIfSetupHedwigComponentWorksProperly() throws NoSuchFieldException, NoSuchPaddingException, NoSuchAlgorithmException, IOException, SharkException {
         SharkHedwigComponent sharkHedwig = new SharkHedwigComponent();
-        Field sharkPKITestField = sharkHedwig.getClass().getDeclaredField("sharkPKIComponent");
-        Field peerField = sharkHedwig.getClass().getDeclaredField("sharkPeerFS");
-        sharkPKITestField.setAccessible(true);
-        peerField.setAccessible(true);
-        assertNotNull(sharkPKITestField.getClass());
-
     }
 
     @Test

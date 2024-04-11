@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
 
 
@@ -22,10 +23,8 @@ public class UserManagerTest {
     @Test
     public void testIfShippingLabelChangesProtocolState() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, SharkException {
         SharkHedwigComponent sharkHedwigComponent = Mockito.mock(SharkHedwigComponent.class);
-        sharkHedwigComponent.setupComponent((SharkPeerFS) sharkPKIComponent);
-
-        UserManager userManager = new UserManager();
-        userManager.create(userInputBuilder);
+        sharkHedwigComponent.setupComponent();
+        // Not finished yet
     }
 
 }

@@ -12,7 +12,8 @@ public enum AppConstant {
     // Constants for the log files. */
     REQUEST_LOG_PATH("hedwigStorage/log/request/"),
     DELIVERY_CONTRACT_LOG_PATH("hedwigStorage/log/deliveryContract/"),
-    ERROR_LOG_PATH("hedwigStorage/log/errorLog.txt");
+    ERROR_LOG_PATH("hedwigStorage/log/"),
+    ERROR_LOG_FILE("errorLog.txt");
 
     private String name;
     private int grams = 1000;
