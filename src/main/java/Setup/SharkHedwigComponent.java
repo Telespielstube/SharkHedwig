@@ -59,9 +59,8 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
      * @throws NoSuchAlgorithmException
      * @throws IOException
      */
-    public SharkHedwigComponent(SharkPKIComponent pkiComponent) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, SharkException {
+    public SharkHedwigComponent() throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, SharkException {
         this.sharkPeerFS = new SharkPeerFS(AppConstant.PEER_NAME.toString(), AppConstant.PEER_FOLDER.toString() + "/" + AppConstant.PEER_NAME.toString() );
-        this.sharkPKIComponent = pkiComponent;
         this.messageHandler = new MessageHandler();
         this.battery = new BatteryManager();
         this.geoSpatial = new GeoSpatial();
@@ -70,27 +69,23 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     }
 
     /**
-     * Setup process to add the SkarkPKIComponent and SharkHedwigComponent to the SharkPeer platform.
+     * Setup process to add the SkarkPKIComponent and to the SharkPeer platform.
      *
      * @param sharkPeerFS        SharkPeerFS Object that the PKIComponent and SharkHedwigComponent can be added.
      * @throws SharkException    Is thrown if something goes wrong during the setup process.
      */
-    public void setupComponent(SharkPeerFS sharkPeerFS) throws SharkException {
+    public void setupComponent(SharkPeerFS sharkPeerFS) {
         SharkPKIComponentFactory sharkPkiComponentFactory = new SharkPKIComponentFactory();
-        SharkHedwigComponentFactory sharkHedwigComponentFactory = new SharkHedwigComponentFactory((SharkPKIComponent)
-                this.sharkPeerFS.getComponent(SharkPKIComponent.class));;
-     //   try {
-
+        SharkHedwigComponentFactory sharkHedwigComponentFactory = new SharkHedwigComponentFactory(sharkPKIComponent);;
+        try {
             sharkPeerFS.addComponent(sharkPkiComponentFactory, SharkPKIComponent.class);
             this.sharkPKIComponent = (SharkPKIComponent) sharkPeerFS.getComponent(SharkPKIComponent.class);
-
-            sharkPeerFS.addComponent(sharkHedwigComponentFactory, SharkComponent.class);
             this.sharkPeerFS.start();
 
-//        } catch (SharkException e) {
-//            System.err.println("Caught an Exception: " + e);
-//            throw new RuntimeException(e);
-//        }
+        } catch (SharkException e) {
+            System.err.println("Caught an Exception: " + e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
