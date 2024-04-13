@@ -1,4 +1,6 @@
-package Setup.State;
+package ProtocolRole.State;
+
+import Message.Messageable;
 
 /**
  * Enum class to set the role of the device. The initial state of the protocol is Transferee.
@@ -9,6 +11,6 @@ package Setup.State;
  */
 public interface ProtocolState {
 
-    void handle();
+    void handle(Messageable message, String sender);
     void changeRole();
 }

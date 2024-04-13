@@ -3,6 +3,7 @@ package Setup;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import HedwigUI.UserManager;
+import ProtocolRole.ProtocolRole;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkException;

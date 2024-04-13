@@ -1,8 +1,8 @@
-package Setup;
+package ProtocolRole;
 
-import Setup.State.ProtocolState;
-import Setup.State.Transferee;
-import Setup.State.Transferor;
+import ProtocolRole.State.ProtocolState;
+import ProtocolRole.State.Transferee;
+import ProtocolRole.State.Transferor;
 
 public class ProtocolRole {
     private ProtocolState currentState;

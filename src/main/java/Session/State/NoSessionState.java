@@ -5,7 +5,7 @@ import Message.MessageFlag;
 import Message.Solicitation;
 import Misc.Utilities;
 import Session.Session;
-import Setup.State.ProtocolState;
+import ProtocolRole.State.ProtocolState;
 
 import java.util.Optional;
 import Message.*;
