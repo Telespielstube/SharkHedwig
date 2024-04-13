@@ -43,7 +43,7 @@ public class SessionManager implements Observer, ISessionManager {
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof ShippingLabel ) {
-            this.protocolRole.getTransferorState().isActive();
+            this.protocolRole.getTransferorState().handle();
             this.shippingLabelCreated = ((ShippingLabel) o).getIsCreated();
             this.shippingLabel = ((ShippingLabel) o).get();
         }

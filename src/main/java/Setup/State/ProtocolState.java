@@ -9,5 +9,6 @@ package Setup.State;
  */
 public interface ProtocolState {
 
-    boolean isActive();
+    void handle();
+    void changeRole();
 }

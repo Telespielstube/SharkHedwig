@@ -11,15 +11,15 @@ import java.util.Optional;
 import Message.*;
 
 public class NoSessionState implements SessionState {
-    private final Session session;
 
+    private final Session session;
     public NoSessionState(Session session) {
         this.session = session;
     }
 
     @Override
-    public Optional<Message.Message> handle(Message.Messageable message, String sender) {
-        Optional<Message> optionalMessage = Optional.empty();
+    public Optional<Message> handle(Messageable message, String sender) {
+        Optional<Message> optionalMessage;
         if (this.protocolState.equals(ProtocolState.TRANSFEROR) && this.shippingLabelCreated) {
             optionalMessage = Optional.of(new Solicitation(Utilities.createUUID(), MessageFlag.SOLICITATION, Utilities.createTimestamp(), true));
         } else {
@@ -32,11 +32,11 @@ public class NoSessionState implements SessionState {
 
     @Override
     public void nextState() {
-        this.session.setSessionState(session.getRequestState());
+        this.session.setSessionState(this.session.getRequestState());
     }
 
     @Override
     public void resetState() {
-        this.session.setSessionState(session.getNoSession());
+        this.session.setSessionState(this.session.getNoSession());
     }
 }

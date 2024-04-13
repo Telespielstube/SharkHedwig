@@ -9,8 +9,14 @@ public class Transferor implements ProtocolState {
     public Transferor(ProtocolRole protocolRole) {
         this.protocolRole = protocolRole;
     }
+
     @Override
-    public boolean isActive() {
-        return true;
+    public void handle() {
+        this.protocolRole.setProtocolState(this.protocolRole.getTransferorState());
+    }
+
+    @Override
+    public void changeRole() {
+        this.protocolRole.setProtocolState(this.protocolRole.getTranfereeState());
     }
 }

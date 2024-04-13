@@ -5,7 +5,7 @@ import Setup.State.Transferee;
 import Setup.State.Transferor;
 
 public class ProtocolRole {
-    private final ProtocolState currentState;
+    private ProtocolState currentState;
     private final ProtocolState tranfereeState;
     private final ProtocolState transferorState;
 
@@ -17,6 +17,10 @@ public class ProtocolRole {
 
     public ProtocolState getCurrentState() {
         return this.currentState;
+    }
+
+    public void setProtocolState(ProtocolState protocolState) {
+        this.currentState = protocolState;
     }
     public ProtocolState getTransferorState() {
         return this.transferorState;

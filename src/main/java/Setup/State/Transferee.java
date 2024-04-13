@@ -11,7 +11,12 @@ public class Transferee implements ProtocolState{
     }
 
     @Override
-    public boolean isActive() {
-        return true;
+    public boolean handle() {
+        return false;
+    }
+
+    @Override
+    public void changeRole() {
+        this.protocolRole.setProtocolState(this.protocolRole.getTransferorState());
     }
 }
