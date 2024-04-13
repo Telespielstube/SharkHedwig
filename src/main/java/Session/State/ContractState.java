@@ -2,7 +2,7 @@ package Session.State;
 
 import Message.Message;
 import Session.Session;
-import Setup.ProtocolState;
+import Setup.State.ProtocolState;
 
 import java.util.Optional;
 

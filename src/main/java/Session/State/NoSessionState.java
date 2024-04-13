@@ -5,7 +5,7 @@ import Message.MessageFlag;
 import Message.Solicitation;
 import Misc.Utilities;
 import Session.Session;
-import Setup.ProtocolState;
+import Setup.State.ProtocolState;
 
 import java.util.Optional;
 import Message.*;
@@ -18,14 +18,14 @@ public class NoSessionState implements SessionState {
     }
 
     @Override
-    public Optional<Message> handle() {
+    public Optional<Message.Message> handle(Message.Messageable message, String sender) {
         Optional<Message> optionalMessage = Optional.empty();
         if (this.protocolState.equals(ProtocolState.TRANSFEROR) && this.shippingLabelCreated) {
             optionalMessage = Optional.of(new Solicitation(Utilities.createUUID(), MessageFlag.SOLICITATION, Utilities.createTimestamp(), true));
         } else {
             optionalMessage = Optional.of(new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true));
         }
-        this.receivedMessageList.addMessageToList(this.optionalMessage.get());
+        this.receivedMessageList.addMessageToList(optionalMessage.get());
         nextState();
         return optionalMessage;
     }

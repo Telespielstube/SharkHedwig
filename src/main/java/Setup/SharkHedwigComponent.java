@@ -32,6 +32,7 @@ import static java.nio.file.StandardOpenOption.CREATE;
 
 public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkComponent {
 
+    private ProtocolRole protocolRole;
     private Session session;
     private ASAPPeer peer;
     private SharkPKIComponent sharkPKIComponent;
@@ -61,6 +62,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         this.geoSpatial = new GeoSpatial();
         this.userManager = new UserManager();
         this.session = new Session();
+        this.protocolRole = new ProtocolRole();
         setupComponent();
     }
 
@@ -103,7 +105,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         }
         new PKIManager(sharkPKIComponent);
         try {
-            this.sessionManager = new SessionManager(this.session, ProtocolState.TRANSFEREE.isActive(),
+            this.sessionManager = new SessionManager(this.session, this.protocolRole,
                     this.receivedMessageList, this.battery, this.geoSpatial, this.sharkPKIComponent);
             shippingLabel.addObserver((Observer) this.sessionManager);
             deliveryContract.addObserver((Observer) this.sessionManager);

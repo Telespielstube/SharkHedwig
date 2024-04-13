@@ -1,4 +1,4 @@
-package Setup;
+package Setup.State;
 
 /**
  * Enum class to set the role of the device. The initial state of the protocol is Transferee.
@@ -7,20 +7,7 @@ package Setup;
  * the protocol hands over a carriage to a different device or destination.
  * This would change the state back to transferee.
  */
-public enum ProtocolState {
-    TRANSFEROR {
+public interface ProtocolState {
 
-        @Override
-        public ProtocolState isActive() {
-            return TRANSFEROR;
-        }
-    },
-    TRANSFEREE {
-        @Override
-        public ProtocolState isActive() {
-            return TRANSFEREE;
-        }
-    };
-
-    public abstract ProtocolState isActive();
+    boolean isActive();
 }

@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface SessionState {
 
-    Optional<Message> handle();
+    Optional<Message.Message> handle(Message.Messageable message, String sender);
     void nextState();
     void resetState();
 }

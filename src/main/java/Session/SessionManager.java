@@ -4,10 +4,8 @@ import Battery.Battery;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import Location.Locationable;
-import Message.Solicitation;
-import Misc.Utilities;
-import Session.State.SessionState;
-import Setup.ProtocolState;
+import Setup.ProtocolRole;
+import Setup.State.ProtocolState;
 import Message.*;
 import net.sharksystem.pki.SharkPKIComponent;
 import javax.crypto.NoSuchPaddingException;
@@ -19,6 +17,7 @@ import Setup.Channel;
 
 public class SessionManager implements Observer, ISessionManager {
 
+    private ProtocolRole protocolRole;
     private Session session;
     private ProtocolState protocolState;
     private final ReceivedMessageList receivedMessageList;
@@ -30,23 +29,21 @@ public class SessionManager implements Observer, ISessionManager {
     private Optional<Message> optionalMessage;
     private boolean deliveryContractCreated;
     private boolean shippingLabelCreated;
-    private boolean noSession;
     private String sender;
     private Battery battery;
 
-    public SessionManager(Session session, ProtocolState protocolState, ReceivedMessageList receivedMessageList, Battery battery, Locationable geoSpatial, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public SessionManager(Session session, ProtocolRole protocolRole, ReceivedMessageList receivedMessageList, Battery battery, Locationable geoSpatial, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.session = session;
-        this.protocolState = protocolState;
+        this.protocolRole = protocolRole;
         this.receivedMessageList = receivedMessageList;
         this.contract = new Contract(sharkPKIComponent, this.receivedMessageList);
         this.request = new Request((Contract) this.contract, battery, geoSpatial, this.receivedMessageList);
-
     }
 
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof ShippingLabel ) {
-            this.protocolState = ProtocolState.TRANSFEROR;
+            this.protocolRole.getTransferorState().isActive();
             this.shippingLabelCreated = ((ShippingLabel) o).getIsCreated();
             this.shippingLabel = ((ShippingLabel) o).get();
         }
@@ -58,7 +55,7 @@ public class SessionManager implements Observer, ISessionManager {
 
     @Override
     public Optional<MessageBuilder> sessionHandling(Messageable message, String sender) {
-        this.optionalMessage = this.session.getCurrentState().handle(this, message, sender);
+        this.optionalMessage = this.session.getCurrentState().handle(message, sender);
         this.optionalMessage.ifPresent(object
                 -> this.messageBuilder = new MessageBuilder(object, Channel.REQUEST.getChannel(), this.sender));
         return Optional.ofNullable(this.messageBuilder);
@@ -85,10 +82,9 @@ public class SessionManager implements Observer, ISessionManager {
      * and sets the session to incomplete.
      */
     private void resetAll() {
-        this.noSession = false;
         this.request.setSessionComplete(false);
         this.contract.setSessionComplete(false);
         this.receivedMessageList.clearMessageList();
-        this.sessionState = SessionState.NO_SESSION;
+        this.session.getCurrentState().resetState();
     }
 }

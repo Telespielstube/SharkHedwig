@@ -2,7 +2,7 @@ package Session.State;
 
 import Message.Message;
 import Session.Session;
-import Setup.ProtocolState;
+import Setup.State.ProtocolState;
 
 import java.util.Optional;
 
@@ -18,6 +18,7 @@ public class RequestState implements SessionState {
     public RequestState(Session session) {
         this.session = session;
     }
+
     @Override
     public Optional<Message> handle() {
         this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR)

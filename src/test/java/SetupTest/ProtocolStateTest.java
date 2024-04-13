@@ -2,11 +2,11 @@ package SetupTest;
 
 import DeliveryContract.*;
 import Location.Location;
-import Setup.ProtocolState;
+import Setup.State.ProtocolState;
 import org.junit.jupiter.api.Test;
 
-import static Setup.ProtocolState.TRANSFEREE;
-import static Setup.ProtocolState.TRANSFEROR;
+import static Setup.State.ProtocolState.TRANSFEREE;
+import static Setup.State.ProtocolState.TRANSFEROR;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ProtocolStateTest {

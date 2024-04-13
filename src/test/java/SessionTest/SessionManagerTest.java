@@ -9,7 +9,7 @@ import Message.Request.Offer;
 import Misc.Utilities;
 import Session.ReceivedMessageList;
 import Session.SessionManager;
-import Setup.ProtocolState;
+import Setup.State.ProtocolState;
 import SetupTest.TestConstant;
 import Location.*;
 import net.sharksystem.SharkComponent;
