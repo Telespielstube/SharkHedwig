@@ -6,6 +6,7 @@ import DeliveryContract.ShippingLabel;
 import Location.Locationable;
 import Message.Solicitation;
 import Misc.Utilities;
+import Session.State.SessionState;
 import Setup.ProtocolState;
 import Message.*;
 import net.sharksystem.pki.SharkPKIComponent;
@@ -18,7 +19,7 @@ import Setup.Channel;
 
 public class SessionManager implements Observer, ISessionManager {
 
-    private SessionState sessionState;
+    private Session session;
     private ProtocolState protocolState;
     private final ReceivedMessageList receivedMessageList;
     private final AbstractSession request;
@@ -33,8 +34,8 @@ public class SessionManager implements Observer, ISessionManager {
     private String sender;
     private Battery battery;
 
-    public SessionManager(SessionState sessionState, ProtocolState protocolState, ReceivedMessageList receivedMessageList, Battery battery, Locationable geoSpatial, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
-        this.sessionState = sessionState;
+    public SessionManager(Session session, ProtocolState protocolState, ReceivedMessageList receivedMessageList, Battery battery, Locationable geoSpatial, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
+        this.session = session;
         this.protocolState = protocolState;
         this.receivedMessageList = receivedMessageList;
         this.contract = new Contract(sharkPKIComponent, this.receivedMessageList);
@@ -58,7 +59,7 @@ public class SessionManager implements Observer, ISessionManager {
     @Override
     public Optional<MessageBuilder> sessionHandling(Messageable message, String sender) {
         this.sender = sender;
-        switch (this.sessionState) {
+        switch (this.session) {
             case NO_SESSION:
                 processNoSession();
                 this.optionalMessage.ifPresent(object
@@ -100,7 +101,7 @@ public class SessionManager implements Observer, ISessionManager {
             this.optionalMessage = Optional.of(new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true));
         }
         this.receivedMessageList.addMessageToList(this.optionalMessage.get()); // get() without isPresent() is possible because auf the Optional.of(new ...)
-        this.sessionState = SessionState.NO_SESSION.nextState();
+        this.sessionState = SessionState_tmp.NO_SESSION.nextState();
         this.noSession = true;
 
     }
@@ -115,7 +116,7 @@ public class SessionManager implements Observer, ISessionManager {
                 : this.request.transferee(message, this.sender);
         if (this.optionalMessage.isPresent()) {
             if (this.request.getSessionComplete()) {
-                this.sessionState = SessionState.REQUEST.nextState();
+                this.sessionState = SessionState_tmp.REQUEST.nextState();
             }
         } else {
             resetAll();
@@ -165,6 +166,6 @@ public class SessionManager implements Observer, ISessionManager {
         this.request.setSessionComplete(false);
         this.contract.setSessionComplete(false);
         this.receivedMessageList.clearMessageList();
-        this.sessionState = SessionState.NO_SESSION;
+        this.sessionState = SessionState_tmp.NO_SESSION;
     }
 }

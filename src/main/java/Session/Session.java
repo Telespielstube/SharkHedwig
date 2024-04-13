@@ -1,46 +1,85 @@
 package Session;
 
-import DeliveryContract.ShippingLabel;
-import Message.Messageable;
-import Message.Message;
-
-import java.util.Optional;
+import Session.State.NoSessionState;
+import Session.State.RequestState;
+import Session.State.ContractState;
+import Session.State.SessionState;
 
 /**
  * Interface for all protcol sessions.
  */
-public interface Session {
-    /**
-     * if protocol is in transferor state.
-     *
-     * @param message    Message object to be processed by transferor
-     *
-     * @return
-     */
-    Optional<Message> transferor(Messageable message, ShippingLabel shippingLabel, String sender);
+public class Session {
+    private SessionState currentState;
+    private SessionState noSession;
+    private SessionState requestState;
+    private SessionState contractState;
 
-    /**
-     * If protocol is in transferee state.
-     *
-     * @param message
-     *
-     * @return
-     */
-    Optional<Message> transferee(Messageable message, String sender);
+    public Session() {
+        this.noSession = new NoSessionState(this);
+        this.requestState = new RequestState(this);
+        this.contractState = new ContractState(this);
+        this.currentState = this.noSession;
+    }
+    public void setSessionState(SessionState sessionState) {
+        this.currentState = sessionState;
+    }
 
-    /**
-     * Returns the current state of the session.
-     *
-     * @return  boolean value of the session state.
-     */
-    boolean getSessionComplete();
+    public SessionState getNoSession() {
+        return this.noSession;
+    }
 
-    /**
-     * If all messages of a session are exchanged the list needs to be checked if
-     * all messages are cleared out.
-     *
-     * @param message    Message object.
-     * @return           true if list is cleared.
-     */
-    void setSessionComplete(boolean complete);
+    public SessionState getRequestState() {
+        return this.requestState;
+    }
+
+    public SessionState getContractState() {
+        return this.contractState;
+    }
+
+
+//package Session;
+//
+//import DeliveryContract.ShippingLabel;
+//import Message.Messageable;
+//import Message.Message;
+//
+//import java.util.Optional;
+//
+///**
+// * Interface for all protcol sessions.
+// */
+//public interface Session {
+//    /**
+//     * if protocol is in transferor state.
+//     *
+//     * @param message    Message object to be processed by transferor
+//     *
+//     * @return
+//     */
+//    Optional<Message> transferor(Messageable message, ShippingLabel shippingLabel, String sender);
+//
+//    /**
+//     * If protocol is in transferee state.
+//     *
+//     * @param message
+//     *
+//     * @return
+//     */
+//    Optional<Message> transferee(Messageable message, String sender);
+//
+//    /**
+//     * Returns the current state of the session.
+//     *
+//     * @return  boolean value of the session state.
+//     */
+//    boolean getSessionComplete();
+//
+//    /**
+//     * If all messages of a session are exchanged the list needs to be checked if
+//     * all messages are cleared out.
+//     *
+//     * @param message    Message object.
+//     * @return           true if list is cleared.
+//     */
+//    void setSessionComplete(boolean complete);
 }

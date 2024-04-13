@@ -1,6 +1,5 @@
 package SessionTest;
 
-import Session.SessionState;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,26 +10,26 @@ public class SessionStateTest {
 
     @Test
     public void testIfNexSessioneIsRequest() {
-        assertEquals(SessionState.REQUEST, SessionState.NO_SESSION.nextState());
+        assertEquals(SessionState_tmp.REQUEST, SessionState_tmp.NO_SESSION.nextState());
     }
 
     @Test
     public void testIfNextSessionIsActive() {
-        assertEquals(SessionState.CONTRACT, SessionState.REQUEST.nextState());
+        assertEquals(SessionState_tmp.CONTRACT, SessionState_tmp.REQUEST.nextState());
     }
 
     @Test
     public void testIfResetNoSessionIsNoSession() {
-        assertEquals(SessionState.NO_SESSION, SessionState.NO_SESSION.resetState());
+        assertEquals(SessionState_tmp.NO_SESSION, SessionState_tmp.NO_SESSION.resetState());
     }
 
     @Test
     public void testIResetContractSessionIsNoSession() {
-        assertEquals(SessionState.NO_SESSION, SessionState.CONTRACT.resetState());
+        assertEquals(SessionState_tmp.NO_SESSION, SessionState_tmp.CONTRACT.resetState());
     }
 
     @Test
     public void testIfResetContractSessionIsNotAuthentificationnSession() {
-        assertNotEquals(SessionState.REQUEST, SessionState.CONTRACT.resetState());
+        assertNotEquals(SessionState_tmp.REQUEST, SessionState_tmp.CONTRACT.resetState());
     }
 }

@@ -19,11 +19,6 @@ public class SharkHedwigComponentFactory implements SharkComponentFactory {
 
     @Override
     public SharkComponent getComponent() {
-        try {
-            return new SharkHedwigComponent();
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | IOException | SharkException e) {
-            System.err.println(Utilities.formattedTimestamp() + "SharkHedwigComoponent could not be added to SharkPeer." + e.getMessage());
-            throw new RuntimeException(e);
-        }
+        return new SharkHedwigComponent();
     }
 }

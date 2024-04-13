@@ -9,7 +9,6 @@ import Message.Request.Offer;
 import Misc.Utilities;
 import Session.ReceivedMessageList;
 import Session.SessionManager;
-import Session.SessionState;
 import Setup.ProtocolState;
 import SetupTest.TestConstant;
 import Location.*;
@@ -85,7 +84,7 @@ public class SessionManagerTest {
     public void testIfTransferorIsUnchangedWhenShippingLabelIsCreatedButEmpty() throws NoSuchPaddingException, NoSuchAlgorithmException {
         ShippingLabel shippingLabel = new ShippingLabel.Builder(null,null,null, null,
                 null, null, null, null).build();
-        sessionManager = new SessionManager(SessionState.REQUEST.isActive(), ProtocolState.TRANSFEREE.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState_tmp.REQUEST.isActive(), ProtocolState.TRANSFEREE.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
         assertFalse(shippingLabel.getIsCreated());
         assertNotEquals(ProtocolState.TRANSFEROR, ProtocolState.TRANSFEREE);
     }
@@ -94,7 +93,7 @@ public class SessionManagerTest {
     public void transfereeIsNotChangedIfCreateMethodeIsNotCalled() throws NoSuchPaddingException, NoSuchAlgorithmException {
         shippingLabel = new ShippingLabel.Builder(null,null,null, null,
                 null, null, null, 0.0).build();
-        sessionManager = new SessionManager(SessionState.NO_SESSION.isActive(), ProtocolState.TRANSFEREE.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState_tmp.NO_SESSION.isActive(), ProtocolState.TRANSFEREE.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
         assertEquals(ProtocolState.TRANSFEREE, ProtocolState.TRANSFEREE);
         shippingLabel = new ShippingLabel.Builder(null, "Alice", "HTW-Berlin",
                 new Location(52.456931, 13.526444), "Bob", "Ostbahnhof",
@@ -106,7 +105,7 @@ public class SessionManagerTest {
     public void transfereeStateChangesWhenCreateShippingLabelIsCalled() throws NoSuchPaddingException, NoSuchAlgorithmException {
         shippingLabel = new ShippingLabel.Builder(null,null,null, null,
                 null, null, null, 0.0).build();
-        sessionManager = new SessionManager(SessionState.REQUEST.isActive(), ProtocolState.TRANSFEREE.isActive(), receivedMessageList, battery, geoSpatial,  sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState_tmp.REQUEST.isActive(), ProtocolState.TRANSFEREE.isActive(), receivedMessageList, battery, geoSpatial,  sharkPKIComponent);
         UserInput userInput = new UserInput("Alice", "HTW-Berlin", 52.456931, 13.526444,
                 "Bob", "Ostbahnhof", 52.5105, 13.4346, 1.2);
         assertNotEquals(ProtocolState.TRANSFEREE, ProtocolState.TRANSFEROR);
@@ -114,7 +113,7 @@ public class SessionManagerTest {
 
     @Test
     public void testIfMessageIsUnhandledWhenSessionDiffers() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
-        sessionManager = new SessionManager(SessionState.NO_SESSION.isActive(), ProtocolState.TRANSFEROR.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState_tmp.NO_SESSION.isActive(), ProtocolState.TRANSFEROR.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
         Offer offer = new Offer(UUID.randomUUID(), MessageFlag.OFFER, System.currentTimeMillis(), 100, 10.0, new Location("HTW-Berlin", 52.456931, 13.526444) );
         Optional<Optional<MessageBuilder>> messageBuilder = Optional.ofNullable(sessionManager.sessionHandling(offer, "Marta"));
         assertThrows(NullPointerException.class, () -> sessionManager.sessionHandling(offer, "Marta"));
@@ -122,7 +121,7 @@ public class SessionManagerTest {
 
     @Test
     public void handleNoSessionAsTransferee() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        sessionManager = new SessionManager(SessionState.NO_SESSION.isActive(), ProtocolState.TRANSFEREE.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState_tmp.NO_SESSION.isActive(), ProtocolState.TRANSFEREE.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
         Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
         Optional<Object> object = Optional.ofNullable(sessionManager.sessionHandling(advertisement,"Bobby"));
         assertTrue(object.isPresent()); // This is true because uri and sender are present
@@ -130,7 +129,7 @@ public class SessionManagerTest {
 
     @Test
     public void doNotProcessAdvertisementIfStateIsTransferorWithoutAShippingLabel() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchFieldException, IllegalAccessException {
-        sessionManager = new SessionManager(SessionState.NO_SESSION.isActive(), ProtocolState.TRANSFEROR.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState_tmp.NO_SESSION.isActive(), ProtocolState.TRANSFEROR.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
         Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
         Optional<Object> object = Optional.ofNullable(sessionManager.sessionHandling(advertisement,"Bobby"));
         Field protocolStateField = sessionManager.getClass().getDeclaredField("protocolState");
@@ -142,7 +141,7 @@ public class SessionManagerTest {
     @Test
     // Need to rewrite the test with Offer!!!
     public void testIfOfferMessageGetsRejectedWithoutAdvertisement() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException {
-        sessionManager = new SessionManager(SessionState.REQUEST.isActive(), ProtocolState.TRANSFEROR.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState_tmp.REQUEST.isActive(), ProtocolState.TRANSFEROR.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
         Offer offer = new Offer(UUID.randomUUID(), MessageFlag.OFFER, System.currentTimeMillis(), 100, 10.0, new Location("HTW-Berlin", 52.456931, 13.526444) );
         Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(offer, "Marta");
         assertFalse(messageBuilder.isPresent());
@@ -151,7 +150,7 @@ public class SessionManagerTest {
     @Test
     public void handleAnEmptyMessageObjectFromSessionHandler() throws NoSuchPaddingException, NoSuchAlgorithmException {
         MessageHandler messageHandler = new MessageHandler();
-        SessionManager sessionManager = new SessionManager(SessionState.NO_SESSION.isActive(), ProtocolState.TRANSFEROR.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
+        SessionManager sessionManager = new SessionManager(SessionState_tmp.NO_SESSION.isActive(), ProtocolState.TRANSFEROR.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
         Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
         Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(advertisement, "Marta");
         if (messageBuilder.isPresent()) {
@@ -163,7 +162,7 @@ public class SessionManagerTest {
 
     @Test
     public void testIfAdvertisementGetsRejectedWithoutShippingLabel() throws NoSuchPaddingException, NoSuchAlgorithmException, ASAPSecurityException, NoSuchFieldException, IllegalAccessException {
-        sessionManager = new SessionManager(SessionState.NO_SESSION, ProtocolState.TRANSFEREE, receivedMessageList, battery, geoSpatial, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState_tmp.NO_SESSION, ProtocolState.TRANSFEREE, receivedMessageList, battery, geoSpatial, sharkPKIComponent);
         Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
         Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(advertisement, "Marta");
         messageBuilder.ifPresent(Assertions::assertNotNull);
@@ -171,7 +170,7 @@ public class SessionManagerTest {
 
     @Test
     public void testIfProtocolStatesGetChanged() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        sessionManager = new SessionManager(SessionState.REQUEST.isActive(), ProtocolState.TRANSFEROR.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState_tmp.REQUEST.isActive(), ProtocolState.TRANSFEROR.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
         Method protocolState = sessionManager.getClass().getDeclaredMethod("changeProtocolState");
         Field labelCreated = sessionManager.getClass().getDeclaredField("shippingLabelCreated");
         Field deliveryContract = sessionManager.getClass().getDeclaredField("deliveryContract");
@@ -186,7 +185,7 @@ public class SessionManagerTest {
 
     @Test
     public void testIfResetWorks() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        sessionManager = new SessionManager(SessionState.REQUEST.isActive(), ProtocolState.TRANSFEROR.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
+        sessionManager = new SessionManager(SessionState_tmp.REQUEST.isActive(), ProtocolState.TRANSFEROR.isActive(), receivedMessageList, battery, geoSpatial, sharkPKIComponent);
         Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true);
         receivedMessageList.addMessageToList(advertisement);
         Method reset = sessionManager.getClass().getDeclaredMethod("resetAll");
