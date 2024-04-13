@@ -13,3 +13,4 @@ or [VSCode](https://code.visualstudio.com) just because they offer a excellent l
 After cloning into the project you can start by running all test cases from the ```src/test/java/TestRunner``` file.
 The ```public class TestRunner {}``` suite runs all test cases automatically and gives a first insight into the workflow 
 of the project.
+

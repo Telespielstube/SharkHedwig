@@ -14,6 +14,11 @@ public enum SessionState {
 
     NO_SESSION {
         @Override
+        public SessionState isActive() {
+            return NO_SESSION;
+        }
+
+        @Override
         public SessionState resetState() {
             return NO_SESSION;
         }
@@ -24,6 +29,11 @@ public enum SessionState {
     },
 
     REQUEST {
+        @Override
+        public SessionState isActive() {
+            return REQUEST;
+        }
+
         @Override
         public SessionState resetState() {
             return NO_SESSION;
@@ -36,6 +46,11 @@ public enum SessionState {
 
     CONTRACT() {
         @Override
+        public SessionState isActive() {
+            return CONTRACT;
+        }
+
+        @Override
         public SessionState resetState() {
             return NO_SESSION;
         }
@@ -45,6 +60,13 @@ public enum SessionState {
             return NO_SESSION;
         }
     };
+
+    /**
+     * Returns the current session state of the protocol.
+     *
+     * @return    Session state enum object.
+     */
+    public abstract SessionState isActive();
 
     /**
      * Returns the current session state of the protocol.
