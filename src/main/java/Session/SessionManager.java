@@ -58,89 +58,12 @@ public class SessionManager implements Observer, ISessionManager {
 
     @Override
     public Optional<MessageBuilder> sessionHandling(Messageable message, String sender) {
-        this.sender = sender;
-        switch (this.session) {
-            case NO_SESSION:
-                processNoSession();
-                this.optionalMessage.ifPresent(object
-                        -> this.messageBuilder = new MessageBuilder(this.optionalMessage, Channel.NO_SESSION.getChannel(), this.sender));
-                break;
-            case REQUEST:
-                if (this.noSession) {
-                    processRequest(message);
-                    this.messageBuilder = null; // wipes the data of the previous message build.
-                    this.optionalMessage.ifPresent(object
-                            -> this.messageBuilder = new MessageBuilder(object, Channel.REQUEST.getChannel(), this.sender));
-                }
-                break;
-            case CONTRACT:
-                if (this.noSession && this.request.getSessionComplete()) {
-                    processContract(message);
-                    this.messageBuilder = null;
-                    this.optionalMessage.ifPresent(object
-                            -> this.messageBuilder = new MessageBuilder(object, Channel.CONTRACT.getChannel(), this.sender));
-                }
-                break;
-            default:
-                System.err.println(Utilities.formattedTimestamp() + "There was no session flag: " + this.sessionState);
-                resetAll();
-                break;
-        }
+        this.optionalMessage = this.session.getCurrentState().handle(this, message, sender);
+        this.optionalMessage.ifPresent(object
+                -> this.messageBuilder = new MessageBuilder(object, Channel.REQUEST.getChannel(), this.sender));
         return Optional.ofNullable(this.messageBuilder);
-
     }
 
-    /**
-     * This represents the default state of every drone. It handles the creation of advertisment and solicitation
-     * messages.
-     */
-    private void processNoSession() {
-        if (this.protocolState.equals(ProtocolState.TRANSFEROR) && this.shippingLabelCreated) {
-            this.optionalMessage = Optional.of(new Solicitation(Utilities.createUUID(), MessageFlag.SOLICITATION, Utilities.createTimestamp(), true));
-        } else {
-            this.optionalMessage = Optional.of(new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true));
-        }
-        this.receivedMessageList.addMessageToList(this.optionalMessage.get()); // get() without isPresent() is possible because auf the Optional.of(new ...)
-        this.sessionState = SessionState_tmp.NO_SESSION.nextState();
-        this.noSession = true;
-
-    }
-    /**
-     * If the previous session is completed the received request message gets processed.
-     *
-     * @param message    Received request message
-     */
-    private void processRequest(Messageable message) {
-        this.optionalMessage = this.protocolState.equals(ProtocolState.TRANSFEROR)
-                ? this.request.transferor(message, this.shippingLabel, this.sender)
-                : this.request.transferee(message, this.sender);
-        if (this.optionalMessage.isPresent()) {
-            if (this.request.getSessionComplete()) {
-                this.sessionState = SessionState_tmp.REQUEST.nextState();
-            }
-        } else {
-            resetAll();
-        }
-    }
-
-    /**
-     * If the previous session is completed the received contract message gets processed.
-     *
-     * @param message    Received contract message
-     */
-    private void processContract(Messageable message) {
-        this.optionalMessage = protocolState.equals(ProtocolState.TRANSFEROR)
-                ? this.contract.transferor(message, null, this.sender)
-                : this.contract.transferee(message, this.sender);
-        if (this.optionalMessage.isPresent()) {
-            if (this.contract.getSessionComplete()) {
-                changeProtocolState();
-                resetAll();
-            }
-        } else {
-            resetAll();
-        }
-    }
 
     /**
      * After the contract log is written it is assumed that the package is exchanged. Therefore, the states must switch
@@ -166,6 +89,6 @@ public class SessionManager implements Observer, ISessionManager {
         this.request.setSessionComplete(false);
         this.contract.setSessionComplete(false);
         this.receivedMessageList.clearMessageList();
-        this.sessionState = SessionState_tmp.NO_SESSION;
+        this.sessionState = SessionState.NO_SESSION;
     }
 }
