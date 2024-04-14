@@ -1,6 +1,9 @@
 package ProtocolRole.State;
 
+import Message.Message;
 import Message.Messageable;
+
+import java.util.Optional;
 
 /**
  * Enum class to set the role of the device. The initial state of the protocol is Transferee.
@@ -11,6 +14,6 @@ import Message.Messageable;
  */
 public interface ProtocolState {
 
-    void handle(Messageable message, String sender);
+    Optional<Message> handle(Messageable message, String sender);
     void changeRole();
 }

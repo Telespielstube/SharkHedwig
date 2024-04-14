@@ -1,19 +1,10 @@
 package ProtocolRole.State;
 
 import DeliveryContract.ShippingLabel;
-import Message.Contract.Complete;
-import Message.Contract.PickUp;
-import Message.MessageFlag;
-import Message.MessageHandler;
-import Message.Messageable;
-import Message.Request.Ack;
-import Message.Request.Confirm;
-import Message.Request.Offer;
-import Message.Request.OfferReply;
-import Misc.LogEntry;
-import Misc.Logger;
-import Misc.Utilities;
+import Message.*;
+import Misc.*;
 import ProtocolRole.ProtocolRole;
+import Session.ReceivedMessageList;
 import Setup.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
@@ -23,14 +14,16 @@ import java.util.Optional;
 public class Transferor implements ProtocolState {
 
     private final ProtocolRole protocolRole;
+    private ShippingLabel shippingLabel;
+    private ReceivedMessageList receivedMessageList;
+    private Optional<Message> optionalMessage;
 
     public Transferor(ProtocolRole protocolRole) {
         this.protocolRole = protocolRole;
     }
 
     @Override
-    public void handle(Messageable message, String sender) {
-        //this.protocolRole.setProtocolState(this.protocolRole.getTransferorState());
+    public Optional<Message> handle(Messageable message, String sender) {
         switch (message.getMessageFlag()) {
             case OFFER:
                 handleOffer((Offer) message, shippingLabel);
@@ -69,6 +62,8 @@ public class Transferor implements ProtocolState {
     public void changeRole() {
         this.protocolRole.setProtocolState(this.protocolRole.getTranfereeState());
     }
+
+
 
     /**
      * Processes the Offer data received from the Transferee.
