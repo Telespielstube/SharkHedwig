@@ -29,7 +29,7 @@ public class Session {
         this.currentState = sessionState;
     }
 
-    public SessionState getNoSession() {
+    public SessionState getNoSessionState() {
         return this.noSessionState;
     }
 

@@ -25,11 +25,11 @@ public class Contract extends AbstractSession {
     private byte[] signedField;
     private boolean contractState = false;
     private Optional<Message> optionalMessage;
-    private ReceivedMessageList receivedMessageList;
+    private MessageList messageList;
 
-    public Contract(SharkPKIComponent sharkPKIComponent, ReceivedMessageList receivedMessageList) {
+    public Contract(SharkPKIComponent sharkPKIComponent, MessageList messageList) {
         this.sharkPKIComponent = sharkPKIComponent;
-        this.receivedMessageList = receivedMessageList;
+        this.messageList = messageList;
         this.contractState = false;
         this.geoSpatial = new GeoSpatial();
         this.optionalMessage = Optional.empty();
@@ -50,13 +50,13 @@ public class Contract extends AbstractSession {
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Message flag was incorrect: " + message.getMessageFlag());
-                this.receivedMessageList.clearMessageList();
+                this.messageList.clearMessageList();
                 break;
         }
         if (!this.optionalMessage.isPresent()) {
-            this.receivedMessageList.clearMessageList();
+            this.messageList.clearMessageList();
         } else {
-            this.receivedMessageList.addMessageToList(this.optionalMessage.get());
+            this.messageList.addMessageToList(this.optionalMessage.get());
         }
         return Optional.of(this.optionalMessage.get());
     }
@@ -77,13 +77,13 @@ public class Contract extends AbstractSession {
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Message flag was incorrect: " + message.getMessageFlag());
-                this.receivedMessageList.clearMessageList();
+                this.messageList.clearMessageList();
                 break;
         }
         if (!this.optionalMessage.isPresent()) {
-            this.receivedMessageList.clearMessageList();
+            this.messageList.clearMessageList();
         } else {
-            this.receivedMessageList.addMessageToList(this.optionalMessage.get());
+            this.messageList.addMessageToList(this.optionalMessage.get());
         }
         return Optional.of(this.optionalMessage.get());
     }
@@ -142,7 +142,7 @@ public class Contract extends AbstractSession {
      * @param message    Confirm messge object.
      */
     private void handleConfirm(Confirm message, String sender) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
             byte[] signedTransfereeField = message.getDeliveryContract().getTransitRecord().getLastElement().getSignatureTransferee();
             byte[] byteTransitEntry = MessageHandler.objectToByteArray(this.transitRecord.getLastElement());
             try {
@@ -201,7 +201,7 @@ public class Contract extends AbstractSession {
         byte[] signedTransferorField = message.getTransitRecord().getLastElement().getSignatureTransferor();
         byte[] byteTransitEntry = MessageHandler.objectToByteArray(this.transitRecord.getLastElement());
 
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
             try {
                 if (ASAPCryptoAlgorithms.verify(signedTransferorField, byteTransitEntry, sender, sharkPKIComponent)) {
                     this.transitRecord = message.getTransitRecord();
@@ -220,7 +220,7 @@ public class Contract extends AbstractSession {
      * @param message    The received AckMessage object.
      */
     private void handleAckMessage(Ack message)  {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
             if (message.getIsAck()) {
                 this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.READY,
                         Utilities.createTimestamp(), true));
@@ -240,7 +240,7 @@ public class Contract extends AbstractSession {
      */
     private void handleCompleteMessage(Complete message) {
         timeOffset = 30000;
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset) && message.getComplete()) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), timeOffset) && message.getComplete()) {
             // Send a message to the owner of the drone that a package is handed over to another drone.
             //notificationService.newMessage(DeliveryContract deliveryContract);
             this.sessionComplete = true;

@@ -8,7 +8,7 @@ import Message.Contract.ContractDocument;
 import Message.MessageFlag;
 import Misc.Utilities;
 import Session.Contract;
-import Session.ReceivedMessageList;
+import Session.MessageList;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -35,7 +35,7 @@ public class ReceivedMessageListTest {
     private static TransitRecord transitRecord;
     private static DeliveryContract deliveryContract;
     private static ShippingLabel shippingLabel;
-    private static ReceivedMessageList receivedMessageList;
+    private static MessageList messageList;
     private static String francisID;
     private static SharkPKIComponent sharkPKIComponent;
     private static ASAPKeyStore asapKeyStore;
@@ -44,7 +44,7 @@ public class ReceivedMessageListTest {
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
         SharkTestPeerFS testSharkPeer = new SharkTestPeerFS(TestConstant.PEER_NAME.getTestConstant(), TestConstant.PEER_FOLDER.getTestConstant());
         sharkPKIComponent = setupComponent(testSharkPeer);
-        receivedMessageList = new ReceivedMessageList();
+        messageList = new MessageList();
         testSharkPeer.start();
 
         String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
@@ -52,7 +52,7 @@ public class ReceivedMessageListTest {
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         PublicKey publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
-        contract = new Contract(sharkPKIComponent, receivedMessageList);
+        contract = new Contract(sharkPKIComponent, messageList);
     }
 
     private static SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException {
@@ -75,21 +75,21 @@ public class ReceivedMessageListTest {
     @Test
     public void compareIfTimestampISOutOFRange() {
         Ack ack = new Ack(Utilities.createUUID(), MessageFlag.ACK, 1705740810, true); // fixed timestamp Saturday, 9:58, 20th 2014
-        receivedMessageList.addMessageToList(ack);
-        assertTrue(receivedMessageList.compareTimestamp(1705741000, 300));
+        messageList.addMessageToList(ack);
+        assertTrue(messageList.compareTimestamp(1705741000, 300));
     }
 
     @Test
     public void compareIfTimestampIsInRange() {
         Ack ack = new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true); // fixed timestamp Saturday, 9:58, 20th 2014
-        receivedMessageList.addMessageToList(ack);
-        assertTrue(receivedMessageList.compareTimestamp(Utilities.createTimestamp(), 3000));
+        messageList.addMessageToList(ack);
+        assertTrue(messageList.compareTimestamp(Utilities.createTimestamp(), 3000));
     }
 
     @Test
     public void testIfSessionIsSetComplete() {
         Ack ack = new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true); // fixed timestamp Saturday, 9:58, 20th 2014
-        receivedMessageList.addMessageToList(ack);
+        messageList.addMessageToList(ack);
         contract.setSessionComplete(true);
     }
 }

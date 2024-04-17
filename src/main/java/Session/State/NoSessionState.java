@@ -20,8 +20,9 @@ public class NoSessionState implements SessionState {
 
     @Override
     public Optional<Message> handle(Messageable message, String sender) {
-        Optional<Message> optionalMessage = Optional.empty();
-        optionalMessage = this.protocolRole.getCurrentState().handle(message, sender);
+        Optional<Message> optionalMessage = this.protocolRole.getCurrentState().handle(message, sender);
+        this.receivedMessageList.addMessageToList(optionalMessage.get());
+        nextState();
         return optionalMessage;
 //        Optional<Message> optionalMessage;
 //
@@ -42,6 +43,6 @@ public class NoSessionState implements SessionState {
 
     @Override
     public void resetState() {
-        this.session.setSessionState(this.session.getNoSession());
+        this.session.setSessionState(this.session.getNoSessionState());
     }
 }

@@ -2,9 +2,12 @@ package ProtocolRole.State;
 
 import DeliveryContract.ShippingLabel;
 import Message.*;
+import Message.NoSession.Advertisement;
+import Message.NoSession.Solicitation;
+import Message.Request.Offer;
 import Misc.*;
 import ProtocolRole.ProtocolRole;
-import Session.ReceivedMessageList;
+import Session.MessageList;
 import Setup.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
@@ -15,7 +18,7 @@ public class Transferor implements ProtocolState {
 
     private final ProtocolRole protocolRole;
     private ShippingLabel shippingLabel;
-    private ReceivedMessageList receivedMessageList;
+    private MessageList messageList;
     private Optional<Message> optionalMessage;
 
     public Transferor(ProtocolRole protocolRole) {
@@ -25,6 +28,8 @@ public class Transferor implements ProtocolState {
     @Override
     public Optional<Message> handle(Messageable message, String sender) {
         switch (message.getMessageFlag()) {
+            case ADVERTISEMENT:
+                handleAdvertisement((Advertisement) message);
             case OFFER:
                 handleOffer((Offer) message, shippingLabel);
                 break;
@@ -47,13 +52,13 @@ public class Transferor implements ProtocolState {
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Missing message flag.");
-                this.receivedMessageList.clearMessageList();
+                this.messageList.clearMessageList();
                 break;
         }
         if (!this.optionalMessage.isPresent()) {
-            this.receivedMessageList.clearMessageList();
+            this.messageList.clearMessageList();
         } else {
-            this.receivedMessageList.addMessageToList(this.optionalMessage.get());
+            this.messageList.addMessageToList(this.optionalMessage.get());
         }
         return this.optionalMessage;
     }
@@ -63,7 +68,17 @@ public class Transferor implements ProtocolState {
         this.protocolRole.setProtocolState(this.protocolRole.getTranfereeState());
     }
 
-
+    /**
+     * Processes the received Adverntisement message and creates Solocitation message object.
+     *
+     * @param message    message object.
+     */
+    private void handleAdvertisement(Advertisement message) {
+        if (message.getAdTag()) {
+            optionalMessage = Optional.of(new Solicitation(Utilities.createUUID(), MessageFlag.SOLICITATION,
+                    Utilities.createTimestamp(), true));
+        }
+    }
 
     /**
      * Processes the Offer data received from the Transferee.
@@ -72,7 +87,7 @@ public class Transferor implements ProtocolState {
      * @return OfferReply object, or and enpty object if data were not verified.
      */
     private void handleOffer(Offer message, ShippingLabel shippingLabel) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && verifyOfferData(message)) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && verifyOfferData(message)) {
             if (processOfferData(message)) {
                 this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY, Utilities.createTimestamp(), shippingLabel.get().getPackageWeight(), shippingLabel.get().getPackageDestination()));
             }
@@ -86,7 +101,7 @@ public class Transferor implements ProtocolState {
      * @return An empty optional if a Confirm object is found.
      */
     private void handleConfirm(Confirm message) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
             this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
         }
     }
@@ -100,7 +115,7 @@ public class Transferor implements ProtocolState {
      * or an empty Optional if it's not.
      */
     private void handleAck(Ack message) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset) && message.getIsAck()) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), timeOffset) && message.getIsAck()) {
             if (message.getMessageFlag().equals(MessageFlag.ACK)) {
                 this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.READY, Utilities.createTimestamp(), true));
                 this.sessionComplete = true;
@@ -129,7 +144,7 @@ public class Transferor implements ProtocolState {
      * @param message    Confirm messge object.
      */
     private void handleConfirmMessage(Message.Contract.Confirm message, String sender) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
             byte[] signedTransfereeField = message.getDeliveryContract().getTransitRecord().getLastElement().getSignatureTransferee();
             byte[] byteTransitEntry = MessageHandler.objectToByteArray(this.transitRecord.getLastElement());
             try {
@@ -152,7 +167,7 @@ public class Transferor implements ProtocolState {
      * @param message    The received AckMessage object.
      */
     private void handleAckMessage(Message.Contract.Ack message)  {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
             if (message.getIsAck()) {
                 this.optionalMessage = Optional.of(new Message.Contract.Ack(Utilities.createUUID(), MessageFlag.READY,
                         Utilities.createTimestamp(), true));
@@ -172,7 +187,7 @@ public class Transferor implements ProtocolState {
      */
     private void handleCompleteMessage(Complete message) {
         timeOffset = 30000;
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset) && message.getComplete()) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), timeOffset) && message.getComplete()) {
             // Send a message to the owner of the drone that a package is handed over to another drone.
             //notificationService.newMessage(DeliveryContract deliveryContract);
             this.sessionComplete = true;

@@ -1,7 +1,7 @@
 package SetupTest;
 
 import DeliveryContract.ShippingLabel;
-import Session.ReceivedMessageList;
+import Session.MessageList;
 import Session.SessionManager;
 import Setup.Channel;
 import Setup.SharkHedwigComponent;
@@ -20,7 +20,6 @@ import org.mockito.Mockito;
 import javax.crypto.NoSuchPaddingException;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -36,7 +35,7 @@ public class SharkHedwigComponentTest {
     private static String francisID;
     private static PublicKey publicKeyFrancis;
     private static ShippingLabel shippingLabel;
-    private static ReceivedMessageList receivedMessageList;
+    private static MessageList messageList;
 
     @BeforeAll
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {

@@ -6,7 +6,7 @@ import Message.Message;
 import Message.Messageable;
 import Message.MessageFlag;
 import Message.Request.*;
-import Message.Solicitation;
+import Message.NoSession.Solicitation;
 import Misc.LogEntry;
 import Misc.Logger;
 import Misc.Utilities;
@@ -30,15 +30,15 @@ public class Request extends AbstractSession {
     private Ack ack;
     private Battery battery;
     private Locationable geoSpatial;
-    private ReceivedMessageList receivedMessageList;
+    private MessageList messageList;
     private Optional<Message> optionalMessage;
 
-    public Request(Contract contract, Battery battery, Locationable geoSpatial, ReceivedMessageList receivedMessageList) {
+    public Request(Contract contract, Battery battery, Locationable geoSpatial, MessageList messageList) {
         this.optionalMessage = Optional.empty();
         this.contract = contract;
         this.battery = battery;
         this.geoSpatial = geoSpatial;
-        this.receivedMessageList = receivedMessageList;
+        this.messageList = messageList;
     }
 
     @Override
@@ -57,13 +57,13 @@ public class Request extends AbstractSession {
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Missing message flag.");
-                this.receivedMessageList.clearMessageList();
+                this.messageList.clearMessageList();
                 break;
         }
         if (!this.optionalMessage.isPresent()) {
-            this.receivedMessageList.clearMessageList();
+            this.messageList.clearMessageList();
         } else {
-            this.receivedMessageList.addMessageToList(this.optionalMessage.get());
+            this.messageList.addMessageToList(this.optionalMessage.get());
         }
         return this.optionalMessage;
     }
@@ -83,13 +83,13 @@ public class Request extends AbstractSession {
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Missing message flag.");
-                this.receivedMessageList.clearMessageList();
+                this.messageList.clearMessageList();
                 break;
         }
         if (!this.optionalMessage.isPresent()) {
-            this.receivedMessageList.clearMessageList();
+            this.messageList.clearMessageList();
         } else {
-            this.receivedMessageList.addMessageToList(this.optionalMessage.get());
+            this.messageList.addMessageToList(this.optionalMessage.get());
         }
         return this.optionalMessage;
     }
@@ -101,7 +101,7 @@ public class Request extends AbstractSession {
      * @return           OfferReply object, or and enpty object if data were not verified.
      */
     private void handleOffer(Offer message, ShippingLabel shippingLabel) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && verifyOfferData(message)) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && verifyOfferData(message)) {
             if (processOfferData(message)) {
                 this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY,
                     Utilities.createTimestamp(), shippingLabel.get().getPackageWeight(), shippingLabel.get().getPackageDestination()));
@@ -117,7 +117,7 @@ public class Request extends AbstractSession {
      * @return           Optional.empty if the calculation did not get verified, or Confirm message if data got verified.
      */
     private void handleOfferReply(OfferReply message) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && processOfferReplyData(message)) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && processOfferReplyData(message)) {
             this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
         }
     }
@@ -129,7 +129,7 @@ public class Request extends AbstractSession {
      * @return           An empty optional if a Confirm object is found.
      */
     private void handleConfirm(Confirm message) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
             this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
         }
     }
@@ -143,7 +143,7 @@ public class Request extends AbstractSession {
      *                   or an empty Optional if it's not.
      */
     private void handleAck(Ack message) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset) && message.getIsAck()) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), timeOffset) && message.getIsAck()) {
             if (message.getMessageFlag().equals(MessageFlag.ACK)) {
                 this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.READY,
                         Utilities.createTimestamp(), true));
@@ -162,7 +162,7 @@ public class Request extends AbstractSession {
      * @param message    The received Solicitation message.
      */
     private void handleSolicitation(Solicitation message) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getSolicitate()) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getSolicitate()) {
             this.optionalMessage = Optional.of(new Offer(Utilities.createUUID(), MessageFlag.OFFER, Utilities.createTimestamp(),
                     this.battery.getCurrentBatteryLevel(), AppConstant.MAX_FREIGHT_WEIGHT.getInt(), this.geoSpatial.getCurrentLocation()));
         }

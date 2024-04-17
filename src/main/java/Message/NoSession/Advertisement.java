@@ -1,4 +1,6 @@
-package Message;
+package Message.NoSession;
+
+import Message.Message;
 
 import java.util.UUID;
 

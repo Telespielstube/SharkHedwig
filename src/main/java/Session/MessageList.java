@@ -5,7 +5,7 @@ import Message.Message;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class ReceivedMessageList {
+public class MessageList {
 
     // A TreeMap to store sent and Received Messages with their timestamps as key and the Message as value.
     private final SortedMap<Long, Object> messageList = new TreeMap<>();

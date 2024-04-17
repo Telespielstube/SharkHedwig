@@ -14,20 +14,15 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observer;
 import java.util.Optional;
-
 import Misc.*;
 import Message.*;
 import Session.*;
 import Battery.*;
 import Location.*;
-
-import javax.crypto.NoSuchPaddingException;
-
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 
@@ -44,7 +39,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     private ShippingLabel shippingLabel = new ShippingLabel.Builder(null,null,null, null,
             null, null, null, null).build();
     private DeliveryContract deliveryContract = new DeliveryContract();
-    private ReceivedMessageList receivedMessageList = new ReceivedMessageList();
+    private MessageList messageList = new MessageList();
     private final UserManager userManager;
     private Battery battery;
     private Locationable geoSpatial;
@@ -105,15 +100,11 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             throw new RuntimeException(e);
         }
         new PKIManager(sharkPKIComponent);
-        try {
-            this.sessionManager = new SessionManager(this.session, this.protocolRole,
-                    this.receivedMessageList, this.battery, this.geoSpatial, this.sharkPKIComponent);
-            shippingLabel.addObserver((Observer) this.sessionManager);
-            deliveryContract.addObserver((Observer) this.sessionManager);
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
-            System.err.println(Utilities.formattedTimestamp() + "Caught an Exception: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
+        this.sessionManager = new SessionManager(this.session, this.protocolRole,
+                this.messageList, this.battery, this.geoSpatial, this.sharkPKIComponent);
+        shippingLabel.addObserver((Observer) this.sessionManager);
+        deliveryContract.addObserver((Observer) this.sessionManager);
+
     }
 
     /**

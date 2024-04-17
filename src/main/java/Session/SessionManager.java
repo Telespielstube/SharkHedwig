@@ -8,8 +8,7 @@ import ProtocolRole.ProtocolRole;
 import ProtocolRole.State.ProtocolState;
 import Message.*;
 import net.sharksystem.pki.SharkPKIComponent;
-import javax.crypto.NoSuchPaddingException;
-import java.security.NoSuchAlgorithmException;
+
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
@@ -20,7 +19,7 @@ public class SessionManager implements Observer, ISessionManager {
     private ProtocolRole protocolRole;
     private Session session;
     private ProtocolState protocolState;
-    private final ReceivedMessageList receivedMessageList;
+    private final MessageList messageList;
     private final AbstractSession request;
     private final AbstractSession contract;
     private MessageBuilder messageBuilder;
@@ -32,18 +31,18 @@ public class SessionManager implements Observer, ISessionManager {
     private String sender;
     private Battery battery;
 
-    public SessionManager(Session session, ProtocolRole protocolRole, ReceivedMessageList receivedMessageList, Battery battery, Locationable geoSpatial, SharkPKIComponent sharkPKIComponent) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public SessionManager(Session session, ProtocolRole protocolRole, MessageList messageList, Battery battery, Locationable geoSpatial, SharkPKIComponent sharkPKIComponent) {
         this.session = session;
         this.protocolRole = protocolRole;
-        this.receivedMessageList = receivedMessageList;
-        this.contract = new Contract(sharkPKIComponent, this.receivedMessageList);
-        this.request = new Request((Contract) this.contract, battery, geoSpatial, this.receivedMessageList);
+        this.messageList = messageList;
+        this.contract = new Contract(sharkPKIComponent, this.messageList);
+        this.request = new Request((Contract) this.contract, battery, geoSpatial, this.messageList);
     }
 
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof ShippingLabel ) {
-            this.protocolRole.getTransferorState().handle();
+            this.protocolRole.getTransferorState().changeRole();
             this.shippingLabelCreated = ((ShippingLabel) o).getIsCreated();
             this.shippingLabel = ((ShippingLabel) o).get();
         }
@@ -84,7 +83,7 @@ public class SessionManager implements Observer, ISessionManager {
     private void resetAll() {
         this.request.setSessionComplete(false);
         this.contract.setSessionComplete(false);
-        this.receivedMessageList.clearMessageList();
+        this.messageList.clearMessageList();
         this.session.getCurrentState().resetState();
     }
 }

@@ -11,7 +11,7 @@ import Message.Request.Ack;
 import Message.Request.Confirm;
 import Message.Request.Offer;
 import Message.Request.OfferReply;
-import Message.Solicitation;
+import Message.NoSession.Solicitation;
 import Misc.Logger;
 import Misc.Utilities;
 import ProtocolRole.ProtocolRole;

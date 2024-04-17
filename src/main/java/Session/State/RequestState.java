@@ -28,12 +28,14 @@ public class RequestState implements SessionState {
     }
 
     @Override
-    public void resetState() {
-
+    public void nextState() {
+        this.session.setSessionState(this.session.getContractState());
     }
 
     @Override
-    public void nextState() {
-
+    public void resetState() {
+        this.session.setSessionState(this.session.getNoSession());
     }
+
+
 }
