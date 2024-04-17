@@ -33,12 +33,11 @@ public class Request extends AbstractSession {
     private MessageList messageList;
     private Optional<Message> optionalMessage;
 
-    public Request(Contract contract, Battery battery, Locationable geoSpatial, MessageList messageList) {
+    public Request(Contract contract, Battery battery, Locationable geoSpatial) {
         this.optionalMessage = Optional.empty();
         this.contract = contract;
         this.battery = battery;
         this.geoSpatial = geoSpatial;
-        this.messageList = messageList;
     }
 
     @Override

@@ -5,10 +5,10 @@ import Message.Message;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class MessageList {
+public final class MessageList {
 
     // A TreeMap to store sent and Received Messages with their timestamps as key and the Message as value.
-    private final SortedMap<Long, Object> messageList = new TreeMap<>();
+    private static final SortedMap<Long, Object> messageList = new TreeMap<>();
 
     /**
      * Compares to timestamps if the difference is less than the offset of 5 seconds.
@@ -16,8 +16,8 @@ public class MessageList {
      * @param timestamp    timestamp of received message.
      * @return             True if difference is less than offset. False if it is greater than.
      */
-    public boolean compareTimestamp(long timestamp, int timeOffset) {
-        return timestamp - this.messageList.lastKey() < timeOffset;
+    public static boolean compareTimestamp(long timestamp, int timeOffset) {
+        return timestamp - messageList.lastKey() < timeOffset;
     }
 
     /**
@@ -25,23 +25,23 @@ public class MessageList {
      *
      * @return               Last object from TreeMap.
      */
-    public Object getLastValueFromList() {
-        return this.messageList.get(this.messageList.lastKey());
+    public static Object getLastValueFromList() {
+        return messageList.get(messageList.lastKey());
     }
 
     /**
      * Adds a message object to the TreeMap.
      */
-    public void addMessageToList(Message message) {
-        this.messageList.put(message.getTimestamp(), message);
+    public static void addMessageToList(Message message) {
+        messageList.put(message.getTimestamp(), message);
     }
 
     /**
      * Clears the messageList TreeMap object.
      */
-    public void clearMessageList() {
+    public static void clearMessageList() {
         if (!messageList.isEmpty()) {
-            this.messageList.clear();
+            messageList.clear();
         }
     }
 }

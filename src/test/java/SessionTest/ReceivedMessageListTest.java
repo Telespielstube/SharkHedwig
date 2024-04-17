@@ -3,7 +3,6 @@ package SessionTest;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import DeliveryContract.TransitRecord;
-import Message.Contract.Ack;
 import Message.Contract.ContractDocument;
 import Message.MessageFlag;
 import Misc.Utilities;

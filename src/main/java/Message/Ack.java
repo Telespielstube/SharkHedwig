@@ -1,10 +1,10 @@
-package Message.Contract;
-
-import Message.Message;
-import Message.MessageFlag;
+package Message;
 
 import java.util.UUID;
 
+/**
+ * This message object signals the confirmation of the receipt or processing of data.
+ */
 public class Ack extends Message {
 
     private boolean isAck = false;

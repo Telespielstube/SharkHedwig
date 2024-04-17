@@ -9,7 +9,7 @@ import java.util.UUID;
  * The Utilities class is a collection of small small useful methods like
  * CheckDroneID()
  */
-public class Utilities {
+public final class Utilities {
 
     private Utilities() {}
     /**

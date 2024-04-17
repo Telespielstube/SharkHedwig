@@ -13,12 +13,14 @@ public class Session {
     private final SessionState noSessionState;
     private final SessionState requestState;
     private final SessionState contractState;
+    private boolean isComplete;
 
     public Session() {
         this.noSessionState = new NoSessionState(this);
         this.requestState = new RequestState(this);
         this.contractState = new ContractState(this);
         this.currentState = this.noSessionState;
+        this.isComplete = false;
     }
 
     public SessionState getCurrentState() {
@@ -27,6 +29,10 @@ public class Session {
 
     public void setSessionState(SessionState sessionState) {
         this.currentState = sessionState;
+    }
+
+    public void setSessionComplete(boolean isComplete) {
+        this.isComplete = isComplete;
     }
 
     public SessionState getNoSessionState() {

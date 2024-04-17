@@ -2,8 +2,8 @@ package ProtocolRole.State;
 
 import DeliveryContract.ShippingLabel;
 import Message.*;
+import Message.Contract.Confirm;
 import Message.NoSession.Advertisement;
-import Message.NoSession.Solicitation;
 import Message.Request.Offer;
 import Misc.*;
 import ProtocolRole.ProtocolRole;
@@ -143,7 +143,7 @@ public class Transferor implements ProtocolState {
      *
      * @param message    Confirm messge object.
      */
-    private void handleConfirmMessage(Message.Contract.Confirm message, String sender) {
+    private void handleConfirmMessage(Confirm message, String sender) {
         if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
             byte[] signedTransfereeField = message.getDeliveryContract().getTransitRecord().getLastElement().getSignatureTransferee();
             byte[] byteTransitEntry = MessageHandler.objectToByteArray(this.transitRecord.getLastElement());

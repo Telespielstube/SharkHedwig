@@ -34,7 +34,7 @@ public class RequestState implements SessionState {
 
     @Override
     public void resetState() {
-        this.session.setSessionState(this.session.getNoSession());
+        this.session.setSessionState(this.session.getNoSessionState());
     }
 
 

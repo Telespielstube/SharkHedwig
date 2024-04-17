@@ -27,9 +27,8 @@ public class Contract extends AbstractSession {
     private Optional<Message> optionalMessage;
     private MessageList messageList;
 
-    public Contract(SharkPKIComponent sharkPKIComponent, MessageList messageList) {
+    public Contract(SharkPKIComponent sharkPKIComponent) {
         this.sharkPKIComponent = sharkPKIComponent;
-        this.messageList = messageList;
         this.contractState = false;
         this.geoSpatial = new GeoSpatial();
         this.optionalMessage = Optional.empty();

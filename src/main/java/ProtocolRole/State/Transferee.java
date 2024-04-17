@@ -4,10 +4,11 @@ import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import Message.Contract.ContractDocument;
 import Message.Contract.PickUp;
+import Message.Message;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import Message.Messageable;
-import Message.Request.Ack;
+import Message.Ack;
 import Message.Request.Confirm;
 import Message.Request.Offer;
 import Message.Request.OfferReply;
@@ -24,13 +25,14 @@ import java.util.Optional;
 public class Transferee implements ProtocolState{
 
     private final ProtocolRole protocolRole;
+    private Optional<Message> optionalMessage;
 
     public Transferee(ProtocolRole protocolRole) {
         this.protocolRole = protocolRole;
     }
 
     @Override
-    public void handle(Messageable message, String sender) {
+    public Optional<Message> handle(Messageable message, String sender) {
         switch(message.getMessageFlag()) {
             case SOLICITATION:
                 handleSolicitation((Solicitation) message);
@@ -54,13 +56,7 @@ public class Transferee implements ProtocolState{
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Message flag was incorrect: " + message.getMessageFlag());
-                this.receivedMessageList.clearMessageList();
                 break;
-        }
-        if (!this.optionalMessage.isPresent()) {
-            this.receivedMessageList.clearMessageList();
-        } else {
-            this.receivedMessageList.addMessageToList(this.optionalMessage.get());
         }
         return this.optionalMessage;
     }
@@ -111,7 +107,7 @@ public class Transferee implements ProtocolState{
      * @param message    The received Solicitation message.
      */
     private void handleSolicitation(Solicitation message) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getSolicitate()) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getSolicitate()) {
             this.optionalMessage = Optional.of(new Offer(Utilities.createUUID(), MessageFlag.OFFER, Utilities.createTimestamp(),
                     this.battery.getCurrentBatteryLevel(), AppConstant.MAX_FREIGHT_WEIGHT.getInt(), this.geoSpatial.getCurrentLocation()));
         }
@@ -125,7 +121,7 @@ public class Transferee implements ProtocolState{
      * @return           Optional.empty if the calculation did not get verified, or Confirm message if data got verified.
      */
     private void handleOfferReply(OfferReply message) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && processOfferReplyData(message)) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && processOfferReplyData(message)) {
             this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
         }
     }

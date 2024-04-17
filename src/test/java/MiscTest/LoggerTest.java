@@ -1,6 +1,5 @@
 package MiscTest;
 
-import Message.Contract.Ack;
 import Message.MessageFlag;
 import Misc.LogEntry;
 import Misc.Logger;
