@@ -10,25 +10,25 @@ import Session.Session;
  * state of the ProtocolRole.
  */
 public class ProtocolRole {
-    private ProtocolState currentState;
+    private ProtocolState currentProtocolState;
     private final ProtocolState transfereeState;
     private final ProtocolState transferorState;
 
     public ProtocolRole(Session session) {
         this.transferorState = new Transferor(this, session);
         this.transfereeState = new Transferee(this, session);
-        this.currentState = this.transfereeState;
+        this.currentProtocolState = this.transfereeState;
     }
 
     /**
      * The following methods are getters and setters to control the protocol states.
      */
-    public ProtocolState getCurrentState() {
-        return this.currentState;
+    public ProtocolState getCurrentProtocolState() {
+        return this.currentProtocolState;
     }
 
     public void setProtocolState(ProtocolState protocolState) {
-        this.currentState = protocolState;
+        this.currentProtocolState = protocolState;
     }
     public ProtocolState getTransferorState() {
         return this.transferorState;

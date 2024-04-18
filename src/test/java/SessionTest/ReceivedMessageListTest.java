@@ -6,7 +6,6 @@ import DeliveryContract.TransitRecord;
 import Message.Contract.ContractDocument;
 import Message.MessageFlag;
 import Misc.Utilities;
-import Session.Contract;
 import Message.MessageList;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;

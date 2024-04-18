@@ -15,8 +15,8 @@ public class NoSessionState implements SessionState {
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, String sender) {
-        return this.protocolRole.getCurrentState().handle(message, sender);
+    public Optional<Message> handle(Messageable message, ProtocolRole protocolRole, String sender) {
+        return protocolRole.getCurrentProtocolState().handle(message, sender);
     }
 
     @Override

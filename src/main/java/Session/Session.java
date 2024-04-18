@@ -10,7 +10,7 @@ import Session.State.SessionState;
  * state of the Session.
  */
 public class Session {
-    private SessionState currentState;
+    private SessionState currentSessionState;
     private final SessionState noSessionState;
     private final SessionState requestState;
     private final SessionState contractState;
@@ -19,18 +19,18 @@ public class Session {
         this.noSessionState = new NoSessionState(this);
         this.requestState = new RequestState(this);
         this.contractState = new ContractState(this);
-        this.currentState = this.noSessionState;
+        this.currentSessionState = this.noSessionState;
     }
 
     /**
      * The following methods are getters and setters to control the session states.
      */
-    public SessionState getCurrentState() {
-        return this.currentState;
+    public SessionState getCurrentSessionState() {
+        return this.currentSessionState;
     }
 
     public void setSessionState(SessionState sessionState) {
-        this.currentState = sessionState;
+        this.currentSessionState = sessionState;
     }
 
     public SessionState getNoSessionState() {

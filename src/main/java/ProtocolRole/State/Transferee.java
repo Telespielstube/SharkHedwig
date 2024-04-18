@@ -2,16 +2,13 @@ package ProtocolRole.State;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
-import Message.Contract.ContractDocument;
-import Message.Contract.PickUp;
-import Message.Contract.Ready;
+import Message.Contract.*;
 import Message.Message;
 import Message.Request.Confirm;
 import Message.MessageList;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import Message.Messageable;
-import Message.Contract.Release;
 import Message.Request.Offer;
 import Message.Request.OfferReply;
 import Message.NoSession.Solicitation;
@@ -44,10 +41,12 @@ public class Transferee implements ProtocolState{
         switch(message.getMessageFlag()) {
             case SOLICITATION:
                 handleSolicitation((Solicitation) message);
+                this.session.getNoSessionState().nextState();
                 break;
             case OFFER_REPLY:
                 handleOfferReply((OfferReply) message);
                 saveData();
+                this.session.getRequestState().nextState();
                 break;
             case CONTRACT_DOCUMENT:
                 handleContract((ContractDocument) message);
@@ -56,11 +55,13 @@ public class Transferee implements ProtocolState{
                 handlePickUp((PickUp) message, sender);
                 saveData();
                 break;
-            case READY_TO_PICK_UP:
-                handleAckMessage((Release) message);
+            case RELEASE:
+                handleRelease((Release) message);
+                this.session.getContractState().nextState();
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Message flag was incorrect: " + message.getMessageFlag());
+                this.session.getCurrentSessionState().resetState();
                 break;
         }
         return this.optionalMessage;
@@ -113,6 +114,19 @@ public class Transferee implements ProtocolState{
     }
 
     /**
+     * Processes the received OfferReply attributes. This serves as a double check of the necessary delivery data.
+     *
+     * @param message    OfferReply message object
+     * @return           True if the transferee is able to deliver, false if not.
+     */
+    private boolean processOfferReplyData(OfferReply message) {
+        double packageWeight = message.getPackageWeight();
+        Location packageDestination = message.getPackageDestination();
+        // Code to process the received data.
+        return true;
+    }
+
+    /**
      * Handles all things data processing after receiving contract documents.
      *
      * @param message    PickUp message object.
@@ -160,17 +174,9 @@ public class Transferee implements ProtocolState{
      *
      * @param message    The received AckMessage object.
      */
-    private void handleAckMessage(Release message)  {
+    private void handleRelease(Release message)  {
         if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
-            if (message.getIsAck()) {
-                this.optionalMessage = Optional.of(new Release(Utilities.createUUID(), MessageFlag.READY,
-                        Utilities.createTimestamp(), true));
-                this.sessionComplete = true;
-            } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
-                this.optionalMessage = Optional.of(new Release(Utilities.createUUID(), MessageFlag.COMPLETE,
-                        Utilities.createTimestamp(), true));
-                this.sessionComplete = true;
-            }
+            this.optionalMessage = Optional.of(new Complete(Utilities.createUUID(), MessageFlag.COMPLETE, Utilities.createTimestamp()));
         }
     }
 

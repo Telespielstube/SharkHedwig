@@ -10,7 +10,8 @@ public enum MessageFlag {
     AFFIRM(6),
     PICK_UP(7),
     READY_TO_PICK_UP(8),
-    COMPLETE(9);
+    RELEASE(9),
+    COMPLETE(10);
 
     private final int flag;
 

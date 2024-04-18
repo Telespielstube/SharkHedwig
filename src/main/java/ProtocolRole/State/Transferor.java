@@ -3,14 +3,11 @@ package ProtocolRole.State;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import Message.*;
-import Message.Contract.Release;
-import Message.Contract.Affirm;
-import Message.Contract.ContractDocument;
+import Message.Contract.*;
 import Message.NoSession.Advertisement;
 import Message.NoSession.Solicitation;
 import Message.Request.Confirm;
 import Message.Request.Offer;
-import Message.Contract.Complete;
 import Message.Request.OfferReply;
 import Misc.*;
 import ProtocolRole.ProtocolRole;
@@ -39,21 +36,23 @@ public class Transferor implements ProtocolState {
     public Transferor(ProtocolRole protocolRole, Session session) {
         this.protocolRole = protocolRole;
         this.session = session;
+        this.optionalMessage = Optional.empty();
     }
 
     @Override
     public Optional<Message> handle(Messageable message, String sender) {
         this.sender = sender;
-        this.optionalMessage = Optional.empty();
         switch (message.getMessageFlag()) {
             case ADVERTISEMENT:
                 handleAdvertisement((Advertisement) message);
+                this.session.getNoSessionState().nextState();
             case OFFER:
                 handleOffer((Offer) message, shippingLabel);
                 break;
             case CONFIRM:
                 handleConfirm((Confirm) message);
                 saveData();
+                this.session.getRequestState().nextState();
                 break;
             case AFFIRM:
                 handleAffirm((Affirm) message);
@@ -64,9 +63,11 @@ public class Transferor implements ProtocolState {
             case COMPLETE:
                 handleComplete((Complete) message);
                 saveData();
+                this.session.getContractState().nextState();
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Missing message flag.");
+                this.session.getCurrentSessionState().resetState();
                 break;
         }
         return this.optionalMessage;
@@ -75,7 +76,7 @@ public class Transferor implements ProtocolState {
     private void handleReadyToPickUp(Release message) {
         if (this.messageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
             this.optionalMessage = Optional.of(new Release(Utilities.createUUID(), MessageFlag.READY_TO_PICK_UP,
-                    Utilities.createTimestamp(), true));
+                    Utilities.createTimestamp()));
         }
     }
 
@@ -94,7 +95,6 @@ public class Transferor implements ProtocolState {
         if (message.getAdTag()) {
             this.optionalMessage = Optional.of(new Solicitation(Utilities.createUUID(), MessageFlag.SOLICITATION,
                     Utilities.createTimestamp(), true));
-            this.session.getNoSessionState().nextState();
         }
     }
 
@@ -114,10 +114,9 @@ public class Transferor implements ProtocolState {
     }
 
 
-    private void handleConfirm(Affirm message, String sender) {
+    private void handleConfirm(Confirm message) {
         if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
-            this.optionalMessage = checkContractState(this.sender);
-            this.session.getRequestState().nextState();
+            this.optionalMessage = checkContractState();
         }
     }
 
@@ -151,10 +150,10 @@ public class Transferor implements ProtocolState {
      */
     private void handleComplete(Complete message) {
         timeOffset = 30000;
-        if (this.messageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
+        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset)) {
             // Send a message to the owners email address that a package is handed over to another drone.
             //notificationService.newMessage(DeliveryContract deliveryContract);
-            this.session.getContractState().nextState();
+
         } else {
             // Send a message to the owners email address that a package is lost
             //notificationService.newMessage(DeliveryContract deliveryContract);
@@ -167,13 +166,13 @@ public class Transferor implements ProtocolState {
      *
      * @return    Optional message ContractDocument containing the DeliveryContract.
      */
-    public Optional<Message> checkContractState(String sender) {
+    public Optional<Message> checkContractState() {
         // Check object state to make sure to send the contract documents only once.
         if (!this.contractState) {
-            createDeliveryContract(sender);
+            createDeliveryContract(this.sender);
         } else if (this.deliveryContract.getTransitRecord().getListSize() > 1
                 && !this.deliveryContract.getTransitRecord().getLastElement().getTransferor().equals(AppConstant.PEER_NAME)) {
-            updateTransitRecord(sender);
+            updateTransitRecord(this.sender);
         }
         return this.optionalMessage;
     }

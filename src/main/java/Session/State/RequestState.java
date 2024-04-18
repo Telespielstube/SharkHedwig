@@ -6,21 +6,19 @@ import ProtocolRole.*;
 
 import java.util.Optional;
 
+/**
+ *
+ */
 public class RequestState implements SessionState {
-
-    private ProtocolRole protocolRole;
     private final Session session;
 
-    /**
-     *
-     */
     public RequestState(Session session) {
         this.session = session;
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, String sender) {
-        return this.protocolRole.getCurrentState().handle(message, sender);
+    public Optional<Message> handle(Messageable message, ProtocolRole protocolRole, String sender) {
+        return protocolRole.getCurrentProtocolState().handle(message, sender);
     }
 
     @Override

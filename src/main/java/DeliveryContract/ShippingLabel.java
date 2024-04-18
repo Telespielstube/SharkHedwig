@@ -83,10 +83,6 @@ public class ShippingLabel extends Observable implements Contractable {
         return this.packageWeight;
     }
 
-//    public boolean getIsPriority() {
-//        return this.isPriority;
-//    }
-
     /**
      * String representation of the ShippingLabel object.
      *

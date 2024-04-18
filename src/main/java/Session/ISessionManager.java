@@ -2,7 +2,6 @@ package Session;
 
 import Message.Messageable;
 import Message.MessageBuilder;
-
 import java.util.Optional;
 
 public interface ISessionManager {
