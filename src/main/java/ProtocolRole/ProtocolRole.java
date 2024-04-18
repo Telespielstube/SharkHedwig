@@ -3,18 +3,26 @@ package ProtocolRole;
 import ProtocolRole.State.ProtocolState;
 import ProtocolRole.State.Transferee;
 import ProtocolRole.State.Transferor;
+import Session.Session;
 
+/**
+ * The class ProtocolRole maintains a state object (instance of a sublcass of ProtocolState) that represents the current
+ * state of the ProtocolRole.
+ */
 public class ProtocolRole {
     private ProtocolState currentState;
-    private final ProtocolState tranfereeState;
+    private final ProtocolState transfereeState;
     private final ProtocolState transferorState;
 
-    public ProtocolRole() {
-        this.transferorState = new Transferor(this);
-        this.tranfereeState = new Transferee(this);
-        this.currentState = this.tranfereeState;
+    public ProtocolRole(Session session) {
+        this.transferorState = new Transferor(this, session);
+        this.transfereeState = new Transferee(this, session);
+        this.currentState = this.transfereeState;
     }
 
+    /**
+     * The following methods are getters and setters to control the protocol states.
+     */
     public ProtocolState getCurrentState() {
         return this.currentState;
     }
@@ -27,6 +35,6 @@ public class ProtocolRole {
     }
 
     public ProtocolState getTranfereeState() {
-        return this.tranfereeState;
+        return this.transfereeState;
     }
 }

@@ -7,9 +7,9 @@ public enum MessageFlag {
     OFFER_REPLY(3),
     CONFIRM(4),
     CONTRACT_DOCUMENT(5),
-    PICK_UP(6),
-    ACK(7),
-    READY(8),
+    AFFIRM(6),
+    PICK_UP(7),
+    READY_TO_PICK_UP(8),
     COMPLETE(9);
 
     private final int flag;
@@ -19,6 +19,6 @@ public enum MessageFlag {
     }
 
     public int getFlag() {
-        return Integer.parseInt(String.valueOf(this.flag));
+        return this.flag;
     }
 }

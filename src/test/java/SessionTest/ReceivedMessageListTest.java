@@ -7,7 +7,7 @@ import Message.Contract.ContractDocument;
 import Message.MessageFlag;
 import Misc.Utilities;
 import Session.Contract;
-import Session.MessageList;
+import Message.MessageList;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;

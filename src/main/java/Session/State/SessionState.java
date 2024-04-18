@@ -9,5 +9,4 @@ public interface SessionState {
     Optional<Message.Message> handle(Messageable message, String sender);
     void nextState();
     void resetState();
-
 }

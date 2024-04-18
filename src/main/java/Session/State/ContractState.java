@@ -9,9 +9,11 @@ import java.util.Optional;
 
 public class ContractState implements SessionState {
     private final Session session;
+    private boolean isComplete;
 
     public ContractState(Session session) {
         this.session = session;
+        this.isComplete = false;
     }
 
 //    /**
@@ -48,5 +50,10 @@ public class ContractState implements SessionState {
     @Override
     public void resetState() {
         this.session.setSessionState(this.session.getNoSessionState());
+    }
+
+    @Override
+    public void stateComplete() {
+        this.isComplete = true;
     }
 }

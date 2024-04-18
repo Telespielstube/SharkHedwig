@@ -25,7 +25,7 @@ public class Request extends AbstractSession {
     private Solicitation solicitation;
     private Offer offer;
     private OfferReply offerReply;
-    private Confirm confirm;
+    private Affirm confirm;
     private DeliveryContract deliveryContract;
     private Ack ack;
     private Battery battery;
@@ -48,7 +48,7 @@ public class Request extends AbstractSession {
                 handleOffer((Offer) message, shippingLabel);
                 break;
             case CONFIRM:
-                handleConfirm((Confirm) message);
+                handleConfirm((Affirm) message);
                 break;
             case READY:
                 handleAck((Ack) message);
@@ -117,7 +117,7 @@ public class Request extends AbstractSession {
      */
     private void handleOfferReply(OfferReply message) {
         if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && processOfferReplyData(message)) {
-            this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
+            this.optionalMessage = Optional.of(new Affirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
         }
     }
 
@@ -127,7 +127,7 @@ public class Request extends AbstractSession {
      * @param message    Confirm messge object.
      * @return           An empty optional if a Confirm object is found.
      */
-    private void handleConfirm(Confirm message) {
+    private void handleConfirm(Affirm message) {
         if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
             this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
         }

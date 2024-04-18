@@ -57,7 +57,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         this.geoSpatial = new GeoSpatial();
         this.userManager = new UserManager();
         this.session = new Session();
-        this.protocolRole = new ProtocolRole();
+        this.protocolRole = new ProtocolRole(this.session);
         setupComponent();
     }
 

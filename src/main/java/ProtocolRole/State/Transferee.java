@@ -4,31 +4,39 @@ import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import Message.Contract.ContractDocument;
 import Message.Contract.PickUp;
+import Message.Contract.Ready;
 import Message.Message;
+import Message.Request.Confirm;
+import Message.MessageList;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import Message.Messageable;
-import Message.Ack;
-import Message.Request.Confirm;
+import Message.Contract.Release;
 import Message.Request.Offer;
 import Message.Request.OfferReply;
 import Message.NoSession.Solicitation;
 import Misc.Logger;
 import Misc.Utilities;
 import ProtocolRole.ProtocolRole;
+import Session.Session;
 import Setup.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
-
 import java.util.Optional;
 
+/**
+ * The Transferee subclass implements a behavior associated with a state of the ProtocolRole context class.
+ */
 public class Transferee implements ProtocolState{
-
     private final ProtocolRole protocolRole;
+    private final Session session;
     private Optional<Message> optionalMessage;
+    private int timeOffset;
 
-    public Transferee(ProtocolRole protocolRole) {
+    public Transferee(ProtocolRole protocolRole, Session session) {
         this.protocolRole = protocolRole;
+        this.session = session;
+        this.timeOffset = 5000;
     }
 
     @Override
@@ -39,9 +47,6 @@ public class Transferee implements ProtocolState{
                 break;
             case OFFER_REPLY:
                 handleOfferReply((OfferReply) message);
-                break;
-            case ACK:
-                handleAck((Ack) message);
                 saveData();
                 break;
             case CONTRACT_DOCUMENT:
@@ -51,8 +56,8 @@ public class Transferee implements ProtocolState{
                 handlePickUp((PickUp) message, sender);
                 saveData();
                 break;
-            case READY:
-                handleAckMessage((Message.Contract.Ack) message);
+            case READY_TO_PICK_UP:
+                handleAckMessage((Release) message);
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Message flag was incorrect: " + message.getMessageFlag());
@@ -79,26 +84,7 @@ public class Transferee implements ProtocolState{
         this.contractState = ContractState.CREATED.getState();
     }
 
-    /**
-     * Handles all things data processing after receiving contract documents.
-     *
-     * @param message    PickUp message object.
-     */
-    private void handleContract(ContractDocument message) {
-        if (message.getDeliveryContract() != null) {
-            this.transitRecord = message.getDeliveryContract().getTransitRecord();
-            this.geoSpatial.setPickUpLocation(this.transitRecord.getLastElement().getPickUpLocation());
-            try {
-                this.signedField = ASAPCryptoAlgorithms.sign(MessageHandler.objectToByteArray(this.transitRecord.getLastElement()), sharkPKIComponent);
-                this.transitRecord.getLastElement().setSignatureTransferee(this.signedField);
-            } catch (ASAPSecurityException e) {
-                System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPSecurityException: " + e.getMessage());
-                throw new RuntimeException(e);
-            }
-            inMemoDeliveryContract(message.getDeliveryContract());
-            this.optionalMessage = Optional.of(new Message.Contract.Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), this.deliveryContract, true));
-        }
-    }
+
 
     /**
      * The incoming solicitation message gives the signal to the transferee to create and send out the offer message to the
@@ -121,29 +107,29 @@ public class Transferee implements ProtocolState{
      * @return           Optional.empty if the calculation did not get verified, or Confirm message if data got verified.
      */
     private void handleOfferReply(OfferReply message) {
-        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && processOfferReplyData(message)) {
+        if (MessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && processOfferReplyData(message)) {
             this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
         }
     }
 
     /**
-     * An Acknowledgment massage to signal that the second secure code was decrypted successfully. It compares the timestamp
-     * checks the flag and checks if the last TreeMap entry equals Ack.
+     * Handles all things data processing after receiving contract documents.
      *
-     * @param message    The received AckMessage object.
-     * @return           An Optional AckMessage object if timestamp and ack flag are ok
-     *                   or an empty Optional if it's not.
+     * @param message    PickUp message object.
      */
-    private void handleAck(Ack message) {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset) && message.getIsAck()) {
-            if (message.getMessageFlag().equals(MessageFlag.ACK)) {
-                this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.READY,
-                        Utilities.createTimestamp(), true));
-                this.sessionComplete = true;
-            } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
-                this.optionalMessage = this.contract.checkContractState(this.sender);
-                this.sessionComplete = true;
+    private void handleContract(ContractDocument message) {
+        if (message.getDeliveryContract() != null) {
+            this.transitRecord = message.getDeliveryContract().getTransitRecord();
+            this.geoSpatial.setPickUpLocation(this.transitRecord.getLastElement().getPickUpLocation());
+            try {
+                this.signedField = ASAPCryptoAlgorithms.sign(MessageHandler.objectToByteArray(this.transitRecord.getLastElement()), sharkPKIComponent);
+                this.transitRecord.getLastElement().setSignatureTransferee(this.signedField);
+            } catch (ASAPSecurityException e) {
+                System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPSecurityException: " + e.getMessage());
+                throw new RuntimeException(e);
             }
+            inMemoDeliveryContract(message.getDeliveryContract());
+            this.optionalMessage = Optional.of(new Message.Contract.Affirm(Utilities.createUUID(), MessageFlag.AFFIRM, Utilities.createTimestamp(), this.deliveryContract));
         }
     }
 
@@ -155,8 +141,8 @@ public class Transferee implements ProtocolState{
     private void handlePickUp(PickUp message, String sender) {
         byte[] signedTransferorField = message.getTransitRecord().getLastElement().getSignatureTransferor();
         byte[] byteTransitEntry = MessageHandler.objectToByteArray(this.transitRecord.getLastElement());
-
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
+        // Transferee needs to verify the transferor signature as well!!
+        if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
             try {
                 if (ASAPCryptoAlgorithms.verify(signedTransferorField, byteTransitEntry, sender, sharkPKIComponent)) {
                     this.transitRecord = message.getTransitRecord();
@@ -164,7 +150,7 @@ public class Transferee implements ProtocolState{
             } catch (ASAPSecurityException e) {
                 throw new RuntimeException(e);
             }
-            this.optionalMessage = Optional.of(new Message.Contract.Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
+            this.optionalMessage = Optional.of(new Ready(Utilities.createUUID(), MessageFlag.READY_TO_PICK_UP, Utilities.createTimestamp()));
         }
     }
 
@@ -174,14 +160,14 @@ public class Transferee implements ProtocolState{
      *
      * @param message    The received AckMessage object.
      */
-    private void handleAckMessage(Message.Contract.Ack message)  {
-        if (this.receivedMessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
+    private void handleAckMessage(Release message)  {
+        if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
             if (message.getIsAck()) {
-                this.optionalMessage = Optional.of(new Message.Contract.Ack(Utilities.createUUID(), MessageFlag.READY,
+                this.optionalMessage = Optional.of(new Release(Utilities.createUUID(), MessageFlag.READY,
                         Utilities.createTimestamp(), true));
                 this.sessionComplete = true;
             } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
-                this.optionalMessage = Optional.of(new Message.Contract.Ack(Utilities.createUUID(), MessageFlag.COMPLETE,
+                this.optionalMessage = Optional.of(new Release(Utilities.createUUID(), MessageFlag.COMPLETE,
                         Utilities.createTimestamp(), true));
                 this.sessionComplete = true;
             }

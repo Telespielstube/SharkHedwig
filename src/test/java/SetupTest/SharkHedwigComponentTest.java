@@ -1,7 +1,7 @@
 package SetupTest;
 
 import DeliveryContract.ShippingLabel;
-import Session.MessageList;
+import Message.MessageList;
 import Session.SessionManager;
 import Setup.Channel;
 import Setup.SharkHedwigComponent;

@@ -1,6 +1,4 @@
-package Session;
-
-import Message.Message;
+package Message;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -23,7 +21,7 @@ public final class MessageList {
     /**
      * Gets the last value from the message TreeMap, which is a (K,V) map.
      *
-     * @return               Last object from TreeMap.
+     * @return    Last object from TreeMap.
      */
     public static Object getLastValueFromList() {
         return messageList.get(messageList.lastKey());

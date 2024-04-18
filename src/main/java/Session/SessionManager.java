@@ -5,7 +5,6 @@ import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import Location.Locationable;
 import ProtocolRole.ProtocolRole;
-import ProtocolRole.State.ProtocolState;
 import Message.*;
 import net.sharksystem.pki.SharkPKIComponent;
 
@@ -18,7 +17,6 @@ public class SessionManager implements Observer, ISessionManager {
 
     private ProtocolRole protocolRole;
     private Session session;
-    private ProtocolState protocolState;
     private final AbstractSession request;
     private final AbstractSession contract;
     private MessageBuilder messageBuilder;
@@ -26,9 +24,6 @@ public class SessionManager implements Observer, ISessionManager {
     private ShippingLabel shippingLabel;
     private Optional<Message> optionalMessage;
     private boolean deliveryContractCreated;
-    private boolean shippingLabelCreated;
-    private String sender;
-    private Battery battery;
 
     public SessionManager(Session session, ProtocolRole protocolRole, Battery battery, Locationable geoSpatial, SharkPKIComponent sharkPKIComponent) {
         this.session = session;
@@ -40,8 +35,7 @@ public class SessionManager implements Observer, ISessionManager {
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof ShippingLabel ) {
-            this.protocolRole.getTransferorState().changeRole();
-            this.shippingLabelCreated = ((ShippingLabel) o).getIsCreated();
+            this.protocolRole.getTranfereeState().changeRole();
             this.shippingLabel = ((ShippingLabel) o).get();
         }
         if (o instanceof DeliveryContract) {
@@ -54,7 +48,11 @@ public class SessionManager implements Observer, ISessionManager {
     public Optional<MessageBuilder> sessionHandling(Messageable message, String sender) {
         this.optionalMessage = this.session.getCurrentState().handle(message, sender);
         if (this.optionalMessage.isPresent()) {
-            this.messageBuilder = new MessageBuilder(this.optionalMessage, Channel.REQUEST.getChannel(), this.sender);
+            if (this.session.getCurrentState().equals(this.session.getRequestState())) {
+                this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.REQUEST.getChannel(), sender);
+            } else if (this.session.getCurrentState().equals(this.session.getContractState())) {
+                this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.CONTRACT.getChannel(), sender);
+            }
             MessageList.addMessageToList(optionalMessage.get());
         } else {
             MessageList.clearMessageList();
@@ -63,14 +61,13 @@ public class SessionManager implements Observer, ISessionManager {
         return Optional.ofNullable(this.messageBuilder);
     }
 
-
 //    /**
 //     * After the contract log is written it is assumed that the package is exchanged. Therefore, the states must switch
 //     * vice versa= and the ShippingLabel state must change as well.
 //     */
 //    private void changeProtocolState() {
-//        if (protocolState.equals(ProtocolState.TRANSFEROR)) {
-//            protocolState = ProtocolState.TRANSFEREE;
+//        if (protocolRole.getCurrentState().equals(protocolRole.getTransferorState())) {
+//            p
 //            this.deliveryContract.resetContractState();
 //            this.shippingLabelCreated = false;
 //        } else {

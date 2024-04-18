@@ -12,9 +12,7 @@ public class RequestState implements SessionState {
     private final Session session;
 
     /**
-     * If the previous session is completed the received request message gets processed.
      *
-     * @param message    Received request message
      */
     public RequestState(Session session) {
         this.session = session;
@@ -22,9 +20,7 @@ public class RequestState implements SessionState {
 
     @Override
     public Optional<Message> handle(Messageable message, String sender) {
-        Optional<Message> optionalMessage = Optional.empty();
-        optionalMessage = this.protocolRole.getCurrentState().handle(message, sender);
-        return optionalMessage;
+        return this.protocolRole.getCurrentState().handle(message, sender);
     }
 
     @Override
@@ -36,6 +32,4 @@ public class RequestState implements SessionState {
     public void resetState() {
         this.session.setSessionState(this.session.getNoSessionState());
     }
-
-
 }

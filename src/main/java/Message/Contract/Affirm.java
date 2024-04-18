@@ -6,22 +6,16 @@ import Message.MessageFlag;
 
 import java.util.UUID;
 
-public class Confirm extends Message {
+public class Affirm extends Message {
 
     private final DeliveryContract deliveryContract;
-    private boolean isConfirmed = false;
 
-    public Confirm(UUID uuid, MessageFlag messageFlag, long timestamp, DeliveryContract deliveryContract, boolean isConfirmed) {
+    public Affirm(UUID uuid, MessageFlag messageFlag, long timestamp, DeliveryContract deliveryContract) {
         super(uuid, messageFlag, timestamp);
         this.deliveryContract = deliveryContract;
-        this.isConfirmed = isConfirmed;
     }
 
     public DeliveryContract getDeliveryContract() {
         return this.deliveryContract;
-    }
-
-    public boolean getConfirmed() {
-        return this.isConfirmed;
     }
 }

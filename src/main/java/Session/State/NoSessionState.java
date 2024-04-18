@@ -7,7 +7,6 @@ import Session.Session;
 import java.util.Optional;
 
 public class NoSessionState implements SessionState {
-
     private final Session session;
     private ProtocolRole protocolRole;
 
@@ -17,9 +16,7 @@ public class NoSessionState implements SessionState {
 
     @Override
     public Optional<Message> handle(Messageable message, String sender) {
-        Optional<Message> optionalMessage = this.protocolRole.getCurrentState().handle(message, sender);
-        nextState();
-        return optionalMessage;
+        return this.protocolRole.getCurrentState().handle(message, sender);
     }
 
     @Override

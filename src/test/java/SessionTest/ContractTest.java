@@ -5,10 +5,10 @@ import Location.Location;
 import Message.Contract.ContractDocument;
 import Message.MessageFlag;
 import Message.MessageHandler;
-import Message.Contract.Confirm;
+import Message.Contract.Affirm;
 import Misc.Utilities;
 import Session.Contract;
-import Session.MessageList;
+import Message.MessageList;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -122,8 +122,8 @@ public class ContractTest {
         handleContract.setAccessible(true);
         contractDocument = new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), deliveryContract);
         handleContract.invoke(contract, contractDocument);
-        Optional<Confirm> optionalConfirm = (Optional<Confirm>) optionalMessage.get(contract);
-        assertEquals(optionalConfirm.get().getClass(), Confirm.class);
+        Optional<Affirm> optionalConfirm = (Optional<Affirm>) optionalMessage.get(contract);
+        assertEquals(optionalConfirm.get().getClass(), Affirm.class);
         assertTrue(optionalConfirm.isPresent());
     }
 

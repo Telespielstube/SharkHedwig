@@ -8,7 +8,7 @@ import Message.*;
 import Message.NoSession.Advertisement;
 import Message.Request.Offer;
 import Misc.Utilities;
-import Session.MessageList;
+import Message.MessageList;
 import Session.SessionManager;
 import ProtocolRole.State.ProtocolState;
 import SetupTest.TestConstant;

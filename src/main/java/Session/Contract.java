@@ -38,10 +38,10 @@ public class Contract extends AbstractSession {
     public Optional<Message> transferor(Messageable message, ShippingLabel shippingLabel, String sender) {
         switch(message.getMessageFlag()) {
             case CONFIRM:
-                handleConfirm((Confirm) message, sender);
+                handleConfirm((Affirm) message, sender);
                 break;
             case ACK:
-                handleAckMessage((Ack) message);
+                handleAckMessage((Release) message);
                 saveData();
                 break;
             case COMPLETE:
@@ -72,7 +72,7 @@ public class Contract extends AbstractSession {
                 saveData();
                 break;
             case READY:
-                handleAckMessage((Ack) message);
+                handleAckMessage((Release) message);
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Message flag was incorrect: " + message.getMessageFlag());
@@ -140,7 +140,7 @@ public class Contract extends AbstractSession {
      *
      * @param message    Confirm messge object.
      */
-    private void handleConfirm(Confirm message, String sender) {
+    private void handleConfirm(Affirm message, String sender) {
         if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getConfirmed()) {
             byte[] signedTransfereeField = message.getDeliveryContract().getTransitRecord().getLastElement().getSignatureTransferee();
             byte[] byteTransitEntry = MessageHandler.objectToByteArray(this.transitRecord.getLastElement());
@@ -174,7 +174,7 @@ public class Contract extends AbstractSession {
                 throw new RuntimeException(e);
             }
             inMemoDeliveryContract(message.getDeliveryContract());
-            this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), this.deliveryContract, true));
+            this.optionalMessage = Optional.of(new Affirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), this.deliveryContract, true));
         }
     }
 
@@ -208,7 +208,7 @@ public class Contract extends AbstractSession {
             } catch (ASAPSecurityException e) {
                 throw new RuntimeException(e);
             }
-            this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
+            this.optionalMessage = Optional.of(new Release(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true));
         }
     }
 
@@ -218,14 +218,14 @@ public class Contract extends AbstractSession {
      *
      * @param message    The received AckMessage object.
      */
-    private void handleAckMessage(Ack message)  {
+    private void handleAckMessage(Release message)  {
         if (this.messageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
             if (message.getIsAck()) {
-                this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.READY,
+                this.optionalMessage = Optional.of(new Release(Utilities.createUUID(), MessageFlag.READY,
                         Utilities.createTimestamp(), true));
                 this.sessionComplete = true;
             } else if (!message.getMessageFlag().equals(MessageFlag.READY)) {
-                this.optionalMessage = Optional.of(new Ack(Utilities.createUUID(), MessageFlag.COMPLETE,
+                this.optionalMessage = Optional.of(new Release(Utilities.createUUID(), MessageFlag.COMPLETE,
                         Utilities.createTimestamp(), true));
                 this.sessionComplete = true;
             }
