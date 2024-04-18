@@ -11,8 +11,6 @@ public class DeliveryContract extends Observable implements Contractable {
     private ShippingLabel shippingLabel;
     private boolean isCreated = ContractState.NOT_CREATED.getState();
 
-    public DeliveryContract(){}
-
     public DeliveryContract(String receiver, Locationable geoSpatial) {
         this.shippingLabel = getShippingLabel();
         this.transitRecord = new TransitRecord();
@@ -36,6 +34,8 @@ public class DeliveryContract extends Observable implements Contractable {
         setChanged();
         notifyObservers();
     }
+
+    public DeliveryContract() {}
 
     @Override
     public DeliveryContract get() {

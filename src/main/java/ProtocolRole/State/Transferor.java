@@ -2,6 +2,8 @@ package ProtocolRole.State;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
+import DeliveryContract.ContractState;
+import DeliveryContract.TransitEntry;
 import Message.*;
 import Message.Contract.*;
 import Message.NoSession.Advertisement;
@@ -9,13 +11,14 @@ import Message.NoSession.Solicitation;
 import Message.Request.Confirm;
 import Message.Request.Offer;
 import Message.Request.OfferReply;
+import Location.GeoSpatial;
 import Misc.*;
 import ProtocolRole.ProtocolRole;
-import Message.MessageList;
 import Session.Session;
 import Setup.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
+import net.sharksystem.pki.SharkPKIComponent;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -27,15 +30,23 @@ import java.util.stream.Stream;
 public class Transferor implements ProtocolState {
     private final ProtocolRole protocolRole;
     private final Session session;
+    private final SharkPKIComponent sharkPKIComponent;
     private ShippingLabel shippingLabel;
-    private MessageList messageList;
+    private DeliveryContract deliveryContract;
     private Optional<Message> optionalMessage;
     private int timeOffset = 5000;
     private String sender;
+    private boolean contractState;
+    private GeoSpatial geoSpatial;
 
-    public Transferor(ProtocolRole protocolRole, Session session) {
+    public Transferor(ProtocolRole protocolRole, Session session, ShippingLabel shippingLabel, DeliveryContract deliveryContract,
+                      SharkPKIComponent sharkPKIComponent) {
         this.protocolRole = protocolRole;
         this.session = session;
+        this.shippingLabel = shippingLabel;
+        this.deliveryContract = deliveryContract;
+        this.sharkPKIComponent = sharkPKIComponent;
+        this.geoSpatial = new GeoSpatial();
         this.optionalMessage = Optional.empty();
     }
 
@@ -58,12 +69,13 @@ public class Transferor implements ProtocolState {
                 handleAffirm((Affirm) message);
                 break;
             case READY_TO_PICK_UP:
-                handleReadyToPickUp((Release) message);
+                handleReadyToPickUp((Ready) message);
                 break;
             case COMPLETE:
                 handleComplete((Complete) message);
                 saveData();
                 this.session.getContractState().nextState();
+                this.protocolRole.changeRole();
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Missing message flag.");
@@ -72,19 +84,6 @@ public class Transferor implements ProtocolState {
         }
         return this.optionalMessage;
     }
-
-    private void handleReadyToPickUp(Release message) {
-        if (this.messageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
-            this.optionalMessage = Optional.of(new Release(Utilities.createUUID(), MessageFlag.READY_TO_PICK_UP,
-                    Utilities.createTimestamp()));
-        }
-    }
-
-    @Override
-    public void changeRole() {
-        this.protocolRole.setProtocolState(this.protocolRole.getTranfereeState());
-    }
-
 
     /**
      * Processes the received Adverntisement message and creates Solocitation message object.
@@ -113,7 +112,10 @@ public class Transferor implements ProtocolState {
         }
     }
 
-
+    /**
+     * Checks the current contrat state and
+     * @param message
+     */
     private void handleConfirm(Confirm message) {
         if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
             this.optionalMessage = checkContractState();
@@ -129,17 +131,31 @@ public class Transferor implements ProtocolState {
     private void handleAffirm(Affirm message) {
         if (MessageList.compareTimestamp(message.getTimestamp(), this.timeOffset)) {
             byte[] signedTransfereeField = message.getDeliveryContract().getTransitRecord().getLastElement().getSignatureTransferee() ;
-            byte[] byteTransitEntry = MessageHandler.objectToByteArray(this.transitRecord.getLastElement());
+            byte[] lastTransitEntry = MessageHandler.objectToByteArray(message.getDeliveryContract().getTransitRecord().getLastElement());
             try {
-                if (ASAPCryptoAlgorithms.verify(signedTransfereeField, byteTransitEntry, sender, this.sharkPKIComponent.getASAPKeyStore())) {
-                    this.signedField = ASAPCryptoAlgorithms.sign(byteTransitEntry, this.sharkPKIComponent);
-                    this.transitRecord.getLastElement().setSignatureTransferor(this.signedField);
+                if (ASAPCryptoAlgorithms.verify(signedTransfereeField, lastTransitEntry, sender, this.sharkPKIComponent.getASAPKeyStore())) {
+                    byte[] signedField = ASAPCryptoAlgorithms.sign(lastTransitEntry, this.sharkPKIComponent);
+                    message.getDeliveryContract().getTransitRecord().getLastElement().setSignatureTransferor(signedField);
                 }
             } catch (ASAPSecurityException e) {
                 System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPSecurityException: " + e.getMessage());
                 throw new RuntimeException(e);
             }
-            this.optionalMessage = Optional.of(new PickUp(Utilities.createUUID(), MessageFlag.PICK_UP, Utilities.createTimestamp(), this.transitRecord));
+            this.optionalMessage = Optional.of(new PickUp(Utilities.createUUID(), MessageFlag.PICK_UP,
+                    Utilities.createTimestamp(), message.getDeliveryContract().getTransitRecord()));
+        }
+    }
+
+    /**
+     * Creates the reply message which signals the transferee that the package is realesed and reday to pick up at the
+     * set pick up location
+     *
+     * @param message    Release message object.
+     */
+    private void handleReadyToPickUp(Ready message) {
+        if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
+            this.optionalMessage = Optional.of(new Release(Utilities.createUUID(), MessageFlag.RELEASE,
+                    Utilities.createTimestamp()));
         }
     }
 
@@ -150,7 +166,7 @@ public class Transferor implements ProtocolState {
      */
     private void handleComplete(Complete message) {
         timeOffset = 30000;
-        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset)) {
+        if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
             // Send a message to the owners email address that a package is handed over to another drone.
             //notificationService.newMessage(DeliveryContract deliveryContract);
 
@@ -224,5 +240,23 @@ public class Transferor implements ProtocolState {
         return Stream.of(message.getUUID(), message.getMessageFlag(), message.getTimestamp(),
                 message.getFlightRange(), message.getMaxFreightWeight(),
                 message.getCurrentLocation()).anyMatch(Objects::nonNull);
+    }
+
+    /**
+     * Updates the TransitRecord object. This method is called after the former Transferee and current Transferor needs
+     * to send the DeliveryContract to the next Transferee device.
+     *
+     * @param receiver    The receiver of the updated TransitRecord object.
+     */
+    private void updateTransitRecord(String receiver) {
+        TransitEntry update = new TransitEntry(this.deliveryContract.getTransitRecord().countUp(),
+                this.deliveryContract.getShippingLabel().getUUID(),
+                AppConstant.PEER_NAME.toString(),
+                receiver, geoSpatial.getCurrentLocation(),
+                Utilities.createTimestamp(),
+                null,
+                null);
+        this.deliveryContract.getTransitRecord().addEntry(update);
+        this.optionalMessage = Optional.of(new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), this.deliveryContract));
     }
 }

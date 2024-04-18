@@ -57,7 +57,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         this.geoSpatial = new GeoSpatial();
         this.userManager = new UserManager();
         this.session = new Session();
-        this.protocolRole = new ProtocolRole(this.session);
+        this.protocolRole = new ProtocolRole(this.session, this.shippingLabel, this.deliveryContract, this.sharkPKIComponent);
         setupComponent();
     }
 
@@ -99,7 +99,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             throw new RuntimeException(e);
         }
         new PKIManager(sharkPKIComponent);
-        this.sessionManager = new SessionManager(this.session, this.protocolRole, this.battery, this.geoSpatial, this.sharkPKIComponent);
+        this.sessionManager = new SessionManager(this.session, this.protocolRole, this.shippingLabel, this.deliveryContract);
         shippingLabel.addObserver((Observer) this.sessionManager);
         deliveryContract.addObserver((Observer) this.sessionManager);
 

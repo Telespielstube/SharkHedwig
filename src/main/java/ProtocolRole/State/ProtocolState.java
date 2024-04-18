@@ -1,19 +1,27 @@
 package ProtocolRole.State;
 
+import DeliveryContract.DeliveryContract;
+import DeliveryContract.ShippingLabel;
 import Message.Message;
 import Message.Messageable;
 
 import java.util.Optional;
 
 /**
- * The initial state of the protocol is Transferee.
- * The state of the device changes to transferer if the user fills out a shipping label.
- * The second possibility of a change of state is when
- * the protocol hands over a carriage to a different device or destination.
- * This would change the state back to transferee.
+ * The interface for the protocol state machine. The defined methods are implemented in the sub-classes Transferee and
+ * Transferor.
  */
 public interface ProtocolState {
 
+    /**
+     * Handles the incoming message based on the current protocol role.
+     *
+     * @param message    Received message object.
+     * @param sender     The sender of the received message.
+     *
+     * @return           An Optional if the message was processed correctly or and empty Optional container if not.
+     */
     Optional<Message> handle(Messageable message, String sender);
-    void changeRole();
+
+
 }

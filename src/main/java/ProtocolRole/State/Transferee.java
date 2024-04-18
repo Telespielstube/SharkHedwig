@@ -2,6 +2,7 @@ package ProtocolRole.State;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
+import DeliveryContract.TransitRecord;
 import Message.Contract.*;
 import Message.Message;
 import Message.Request.Confirm;
@@ -19,6 +20,8 @@ import Session.Session;
 import Setup.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
+import net.sharksystem.pki.SharkPKIComponent;
+
 import java.util.Optional;
 
 /**
@@ -27,12 +30,19 @@ import java.util.Optional;
 public class Transferee implements ProtocolState{
     private final ProtocolRole protocolRole;
     private final Session session;
+    private ShippingLabel shippingLabel;
+    private DeliveryContract deliveryContract;
+    private SharkPKIComponent sharkPKIComponent;
     private Optional<Message> optionalMessage;
     private int timeOffset;
 
-    public Transferee(ProtocolRole protocolRole, Session session) {
+    public Transferee(ProtocolRole protocolRole, Session session, ShippingLabel shippingLabel, DeliveryContract deliveryContract,
+                      SharkPKIComponent sharkPKIComponent) {
         this.protocolRole = protocolRole;
         this.session = session;
+        this.shippingLabel = shippingLabel;
+        this.deliveryContract = deliveryContract;
+        this.sharkPKIComponent = sharkPKIComponent;
         this.timeOffset = 5000;
     }
 
@@ -58,6 +68,7 @@ public class Transferee implements ProtocolState{
             case RELEASE:
                 handleRelease((Release) message);
                 this.session.getContractState().nextState();
+                this.protocolRole.changeRole();
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Message flag was incorrect: " + message.getMessageFlag());
@@ -65,11 +76,6 @@ public class Transferee implements ProtocolState{
                 break;
         }
         return this.optionalMessage;
-    }
-
-    @Override
-    public void changeRole() {
-        this.protocolRole.setProtocolState(this.protocolRole.getTransferorState());
     }
 
     /**
@@ -94,7 +100,7 @@ public class Transferee implements ProtocolState{
      * @param message    The received Solicitation message.
      */
     private void handleSolicitation(Solicitation message) {
-        if (this.messageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getSolicitate()) {
+        if (MessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getSolicitate()) {
             this.optionalMessage = Optional.of(new Offer(Utilities.createUUID(), MessageFlag.OFFER, Utilities.createTimestamp(),
                     this.battery.getCurrentBatteryLevel(), AppConstant.MAX_FREIGHT_WEIGHT.getInt(), this.geoSpatial.getCurrentLocation()));
         }
