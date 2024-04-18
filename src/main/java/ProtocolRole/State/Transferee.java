@@ -87,7 +87,7 @@ public class Transferee implements ProtocolState{
         ShippingLabel label = message.getShippingLabel();
         this.deliveryContract = new DeliveryContract(new ShippingLabel.Builder(label.getUUID(), label.getSender(), label.getOrigin(),
                 label.getPackageOrigin(), label.getRecipient(), label.getDestination(), label.getPackageDestination(),
-                label.getPackageWeight()).build(), new TransitRecord(this.transitRecord.getAllEntries()));
+                label.getPackageWeight()).build(), new TransitRecord(message.getTransitRecord().getAllEntries()));
         this.contractState = ContractState.CREATED.getState();
     }
 
@@ -149,7 +149,7 @@ public class Transferee implements ProtocolState{
                 throw new RuntimeException(e);
             }
             inMemoDeliveryContract(message.getDeliveryContract());
-            this.optionalMessage = Optional.of(new Message.Contract.Affirm(Utilities.createUUID(), MessageFlag.AFFIRM, Utilities.createTimestamp(), this.deliveryContract));
+            this.optionalMessage = Optional.of(new Affirm(Utilities.createUUID(), MessageFlag.AFFIRM, Utilities.createTimestamp(), this.deliveryContract));
         }
     }
 
