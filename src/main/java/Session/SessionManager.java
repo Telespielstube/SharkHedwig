@@ -10,22 +10,33 @@ import Message.Message;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
+import Session.State.ContractState;
+import Session.State.NoSessionState;
+import Session.State.RequestState;
+import Session.State.SessionState;
 import Setup.Channel;
+import net.sharksystem.pki.SharkPKIComponent;
 
 public class SessionManager implements Observer, ISessionManager {
 
     private ProtocolRole protocolRole;
-    private Session session;
     private MessageBuilder messageBuilder;
     private DeliveryContract deliveryContract;
     private ShippingLabel shippingLabel;
     private Optional<Message> optionalMessage;
+    private SessionState currentSessionState;
+    private final SessionState noSessionState;
+    private final SessionState requestState;
+    private final SessionState contractState;
 
-    public SessionManager(Session session, ProtocolRole protocolRole, ShippingLabel shippingLabel, DeliveryContract deliveryContract) {
-        this.session = session;
-        this.protocolRole = protocolRole;
+    public SessionManager(ShippingLabel shippingLabel, DeliveryContract deliveryContract, SharkPKIComponent sharkPKIComponent) {
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
+        this.protocolRole = new ProtocolRole(this, this.shippingLabel, this.deliveryContract, sharkPKIComponent);
+        this.noSessionState = new NoSessionState(this);
+        this.requestState = new RequestState(this);
+        this.contractState = new ContractState(this);
+        this.currentSessionState = this.noSessionState;
     }
 
     @Override
@@ -41,23 +52,46 @@ public class SessionManager implements Observer, ISessionManager {
 
     @Override
     public Optional<MessageBuilder> sessionHandling(Messageable message, String sender) {
-        this.optionalMessage = this.session.getCurrentSessionState().handle(message, this.protocolRole,
+        this.optionalMessage = getCurrentSessionState().handle(message, this.protocolRole,
                 this.shippingLabel, this.deliveryContract, sender);
         if (this.optionalMessage.isPresent()) {
-            if (this.session.getCurrentSessionState().equals(this.session.getNoSessionState())) {
+            if (getCurrentSessionState().equals(getNoSessionState())) {
+                this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.NO_SESSION.getChannel(), sender);
+            }
+            if (getCurrentSessionState().equals(getRequestState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.REQUEST.getChannel(), sender);
             }
-            if (this.session.getCurrentSessionState().equals(this.session.getRequestState())) {
-                this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.REQUEST.getChannel(), sender);
-            }
-            if (this.session.getCurrentSessionState().equals(this.session.getContractState())) {
+            if (getCurrentSessionState().equals(getContractState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.CONTRACT.getChannel(), sender);
             }
             MessageList.addMessageToList(optionalMessage.get());
         } else {
             MessageList.clearMessageList();
-            this.session.getCurrentSessionState().resetState();
+            getCurrentSessionState().resetState();
         }
         return Optional.ofNullable(this.messageBuilder);
+    }
+
+    /**
+     * The following methods are getters and setters to control the session states.
+     */
+    public SessionState getCurrentSessionState() {
+        return this.currentSessionState;
+    }
+
+    public void setSessionState(SessionState sessionState) {
+        this.currentSessionState = sessionState;
+    }
+
+    public SessionState getNoSessionState() {
+        return this.noSessionState;
+    }
+
+    public SessionState getRequestState() {
+        return this.requestState;
+    }
+
+    public SessionState getContractState() {
+        return this.contractState;
     }
 }

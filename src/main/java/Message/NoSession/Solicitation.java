@@ -1,7 +1,7 @@
 package Message.NoSession;
 
-import Message.*;
-
+import Message.Message;
+import Message.MessageFlag;
 import java.util.UUID;
 
 /**
@@ -12,7 +12,6 @@ public class Solicitation extends Message {
 
     public Solicitation(UUID uuid, MessageFlag messageFlag, long timestamp, boolean isSolicitated) {
         super(uuid, messageFlag, timestamp);
-        this.isSolicitated = isSolicitated;
     }
 
     public boolean getSolicitate() {

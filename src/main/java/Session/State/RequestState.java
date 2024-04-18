@@ -1,7 +1,9 @@
 package Session.State;
 
+import DeliveryContract.DeliveryContract;
+import DeliveryContract.ShippingLabel;
 import Message.*;
-import Session.Session;
+import Session.SessionManager;
 import ProtocolRole.*;
 
 import java.util.Optional;
@@ -10,24 +12,25 @@ import java.util.Optional;
  *
  */
 public class RequestState implements SessionState {
-    private final Session session;
+    private final SessionManager sessionManager;
 
-    public RequestState(Session session) {
-        this.session = session;
+    public RequestState(SessionManager sessionManager) {
+        this.sessionManager = sessionManager;
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, ProtocolRole protocolRole, String sender) {
-        return protocolRole.getCurrentProtocolState().handle(message, sender);
+    public Optional<Message> handle(Messageable message, ProtocolRole protocolRole, ShippingLabel shippingLabel,
+                                    DeliveryContract deliveryContract, String sender) {
+        return protocolRole.getCurrentProtocolState().handle(message, this.sessionManager, sender);
     }
 
     @Override
     public void nextState() {
-        this.session.setSessionState(this.session.getContractState());
+        this.sessionManager.setSessionState(this.sessionManager.getContractState());
     }
 
     @Override
     public void resetState() {
-        this.session.setSessionState(this.session.getNoSessionState());
+        this.sessionManager.setSessionState(this.sessionManager.getNoSessionState());
     }
 }

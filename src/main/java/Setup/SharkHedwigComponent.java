@@ -3,7 +3,6 @@ package Setup;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import HedwigUI.UserManager;
-import ProtocolRole.ProtocolRole;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkException;
@@ -27,9 +26,6 @@ import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 
 public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkComponent {
-
-    private ProtocolRole protocolRole;
-    private Session session;
     private ASAPPeer peer;
     private SharkPKIComponent sharkPKIComponent;
     private final MessageHandler messageHandler;
@@ -56,8 +52,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         this.battery = new BatteryManager();
         this.geoSpatial = new GeoSpatial();
         this.userManager = new UserManager();
-        this.session = new Session();
-        this.protocolRole = new ProtocolRole(this.session, this.shippingLabel, this.deliveryContract, this.sharkPKIComponent);
+
         setupComponent();
     }
 
@@ -99,7 +94,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             throw new RuntimeException(e);
         }
         new PKIManager(sharkPKIComponent);
-        this.sessionManager = new SessionManager(this.session, this.protocolRole, this.shippingLabel, this.deliveryContract);
+        this.sessionManager = new SessionManager(this.shippingLabel, this.deliveryContract, this.sharkPKIComponent);
         shippingLabel.addObserver((Observer) this.sessionManager);
         deliveryContract.addObserver((Observer) this.sessionManager);
 

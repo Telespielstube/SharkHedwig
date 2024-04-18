@@ -16,7 +16,7 @@ import Message.NoSession.Solicitation;
 import Misc.Logger;
 import Misc.Utilities;
 import ProtocolRole.ProtocolRole;
-import Session.Session;
+import Session.SessionManager;
 import Setup.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
@@ -29,17 +29,17 @@ import java.util.Optional;
  */
 public class Transferee implements ProtocolState{
     private final ProtocolRole protocolRole;
-    private final Session session;
+    private final SessionManager sessionManager;
     private ShippingLabel shippingLabel;
     private DeliveryContract deliveryContract;
     private SharkPKIComponent sharkPKIComponent;
     private Optional<Message> optionalMessage;
     private int timeOffset;
 
-    public Transferee(ProtocolRole protocolRole, Session session, ShippingLabel shippingLabel, DeliveryContract deliveryContract,
-                      SharkPKIComponent sharkPKIComponent) {
+    public Transferee(ProtocolRole protocolRole, SessionManager sessionManager, ShippingLabel shippingLabel,
+                      DeliveryContract deliveryContract, SharkPKIComponent sharkPKIComponent) {
         this.protocolRole = protocolRole;
-        this.session = session;
+        this.sessionManager = sessionManager;
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
         this.sharkPKIComponent = sharkPKIComponent;
@@ -51,12 +51,12 @@ public class Transferee implements ProtocolState{
         switch(message.getMessageFlag()) {
             case SOLICITATION:
                 handleSolicitation((Solicitation) message);
-                this.session.getNoSessionState().nextState();
+                this.sessionManager.getNoSessionState().nextState();
                 break;
             case OFFER_REPLY:
                 handleOfferReply((OfferReply) message);
                 saveData();
-                this.session.getRequestState().nextState();
+                this.sessionManager.getRequestState().nextState();
                 break;
             case CONTRACT_DOCUMENT:
                 handleContract((ContractDocument) message);
@@ -67,12 +67,12 @@ public class Transferee implements ProtocolState{
                 break;
             case RELEASE:
                 handleRelease((Release) message);
-                this.session.getContractState().nextState();
+                this.sessionManager.getContractState().nextState();
                 this.protocolRole.changeRole();
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Message flag was incorrect: " + message.getMessageFlag());
-                this.session.getCurrentSessionState().resetState();
+                sessionManager.getCurrentSessionState().resetState();
                 break;
         }
         return this.optionalMessage;
@@ -100,7 +100,7 @@ public class Transferee implements ProtocolState{
      * @param message    The received Solicitation message.
      */
     private void handleSolicitation(Solicitation message) {
-        if (MessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && message.getSolicitate()) {
+        if (MessageList.compareTimestamp(message.getTimestamp(), this.timeOffset)) {
             this.optionalMessage = Optional.of(new Offer(Utilities.createUUID(), MessageFlag.OFFER, Utilities.createTimestamp(),
                     this.battery.getCurrentBatteryLevel(), AppConstant.MAX_FREIGHT_WEIGHT.getInt(), this.geoSpatial.getCurrentLocation()));
         }

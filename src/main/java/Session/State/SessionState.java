@@ -11,12 +11,17 @@ public interface SessionState {
     /**
      * Handles the incoming message based on the current protocol role.
      *
-     * @param message    Received message object.
-     * @param sender     The sender of the received message.
+     * @param message             Received message object.
+     * @param protocolRole        Represents the protocol role transferor or transferee.
+     * @param shippingLabel       contains the ShippingLabel object reference.
+     * @param deliveryContract    Contains the DeliveryContract object reference.
+     * @param sender              The sender of the received message.
+     *
      *
      * @return           An Optional if the message was processed correctly or and empty Optional container if not.
      */
-    Optional<Message.Message> handle(Messageable message, ProtocolRole protocolRole, String sender);
+    Optional<Message.Message> handle(Messageable message, ProtocolRole protocolRole, ShippingLabel shippingLabel,
+                                     DeliveryContract deliveryContract, String sender);
 
     /**
      * The current state transitions to the following state.

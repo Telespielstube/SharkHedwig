@@ -5,7 +5,7 @@ import DeliveryContract.ShippingLabel;
 import ProtocolRole.State.ProtocolState;
 import ProtocolRole.State.Transferee;
 import ProtocolRole.State.Transferor;
-import Session.Session;
+import Session.SessionManager;
 import net.sharksystem.pki.SharkPKIComponent;
 
 /**
@@ -17,9 +17,9 @@ public class ProtocolRole {
     private final ProtocolState transfereeState;
     private final ProtocolState transferorState;
 
-    public ProtocolRole(Session session, ShippingLabel shippingLabel, DeliveryContract deliveryContract, SharkPKIComponent sharkPKIComponent) {
-        this.transferorState = new Transferor(this, session, shippingLabel, deliveryContract, sharkPKIComponent);
-        this.transfereeState = new Transferee(this, session, shippingLabel, deliveryContract, sharkPKIComponent);
+    public ProtocolRole(SessionManager sessionManager, ShippingLabel shippingLabel, DeliveryContract deliveryContract, SharkPKIComponent sharkPKIComponent) {
+        this.transferorState = new Transferor(this, sessionManager, shippingLabel, deliveryContract, sharkPKIComponent);
+        this.transfereeState = new Transferee(this, sessionManager, shippingLabel, deliveryContract, sharkPKIComponent);
         this.currentProtocolState = this.transfereeState;
     }
 

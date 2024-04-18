@@ -4,17 +4,21 @@ import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import DeliveryContract.ContractState;
 import DeliveryContract.TransitEntry;
-import Message.*;
 import Message.Contract.*;
-import Message.NoSession.Advertisement;
+import Message.Message;
+import Message.Messageable;
+import Message.MessageList;
+import Message.MessageFlag;
+import Message.MessageHandler;
 import Message.NoSession.Solicitation;
+import Message.NoSession.Advertisement;
 import Message.Request.Confirm;
 import Message.Request.Offer;
 import Message.Request.OfferReply;
 import Location.GeoSpatial;
 import Misc.*;
 import ProtocolRole.ProtocolRole;
-import Session.Session;
+import Session.SessionManager;
 import Setup.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
@@ -29,7 +33,7 @@ import java.util.stream.Stream;
  */
 public class Transferor implements ProtocolState {
     private final ProtocolRole protocolRole;
-    private final Session session;
+    private final SessionManager sessionManager;
     private final SharkPKIComponent sharkPKIComponent;
     private ShippingLabel shippingLabel;
     private DeliveryContract deliveryContract;
@@ -39,10 +43,10 @@ public class Transferor implements ProtocolState {
     private boolean contractState;
     private GeoSpatial geoSpatial;
 
-    public Transferor(ProtocolRole protocolRole, Session session, ShippingLabel shippingLabel, DeliveryContract deliveryContract,
-                      SharkPKIComponent sharkPKIComponent) {
+    public Transferor(ProtocolRole protocolRole, SessionManager sessionManager, ShippingLabel shippingLabel,
+                      DeliveryContract deliveryContract, SharkPKIComponent sharkPKIComponent) {
         this.protocolRole = protocolRole;
-        this.session = session;
+        this.sessionManager = sessionManager;
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
         this.sharkPKIComponent = sharkPKIComponent;
@@ -56,14 +60,14 @@ public class Transferor implements ProtocolState {
         switch (message.getMessageFlag()) {
             case ADVERTISEMENT:
                 handleAdvertisement((Advertisement) message);
-                this.session.getNoSessionState().nextState();
+                this.sessionManager.getNoSessionState().nextState();
             case OFFER:
                 handleOffer((Offer) message, shippingLabel);
                 break;
             case CONFIRM:
                 handleConfirm((Confirm) message);
                 saveData();
-                this.session.getRequestState().nextState();
+                this.sessionManager.getRequestState().nextState();
                 break;
             case AFFIRM:
                 handleAffirm((Affirm) message);
@@ -74,12 +78,12 @@ public class Transferor implements ProtocolState {
             case COMPLETE:
                 handleComplete((Complete) message);
                 saveData();
-                this.session.getContractState().nextState();
+                this.sessionManager.getContractState().nextState();
                 this.protocolRole.changeRole();
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Missing message flag.");
-                this.session.getCurrentSessionState().resetState();
+                this.sessionManager.getCurrentSessionState().resetState();
                 break;
         }
         return this.optionalMessage;

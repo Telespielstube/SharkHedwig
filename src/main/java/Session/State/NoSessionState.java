@@ -1,31 +1,34 @@
 package Session.State;
 
+import DeliveryContract.DeliveryContract;
+import DeliveryContract.ShippingLabel;
 import Message.Messageable;
 import Message.Message;
 import ProtocolRole.ProtocolRole;
-import Session.Session;
+import Session.SessionManager;
 import java.util.Optional;
 
 public class NoSessionState implements SessionState {
-    private final Session session;
+    private final SessionManager sessionManager;
     private ProtocolRole protocolRole;
 
-    public NoSessionState(Session session) {
-        this.session = session;
+    public NoSessionState(SessionManager sessionManager) {
+        this.sessionManager = sessionManager;
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, ProtocolRole protocolRole, String sender) {
+    public Optional<Message> handle(Messageable message, ProtocolRole protocolRole, ShippingLabel shippingLabel,
+                                    DeliveryContract deliveryContract, String sender) {
         return protocolRole.getCurrentProtocolState().handle(message, sender);
     }
 
     @Override
     public void nextState() {
-        this.session.setSessionState(this.session.getRequestState());
+        this.sessionManager.setSessionState(this.sessionManager.getRequestState());
     }
 
     @Override
     public void resetState() {
-        this.session.setSessionState(this.session.getNoSessionState());
+        this.sessionManager.setSessionState(this.sessionManager.getNoSessionState());
     }
 }

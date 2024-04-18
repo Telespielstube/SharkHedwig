@@ -1,7 +1,7 @@
 package Message.NoSession;
 
+import Message.MessageFlag;
 import Message.Message;
-
 import java.util.UUID;
 
 /**
