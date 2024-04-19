@@ -15,8 +15,6 @@ import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import javax.crypto.NoSuchPaddingException;
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +24,6 @@ import java.security.PublicKey;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SharkHedwigComponentTest {
-
-
     private SessionManager sessionManager;
     private SharkPKIComponent sharkPKIComponent;
     private static SharkTestPeerFS sharkTestPeerFS;

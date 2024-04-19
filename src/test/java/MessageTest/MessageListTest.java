@@ -1,9 +1,11 @@
-package SessionTest;
+package MessageTest;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import DeliveryContract.TransitRecord;
+import Message.Contract.Affirm;
 import Message.Contract.ContractDocument;
+import Message.Contract.Ready;
 import Message.MessageFlag;
 import Misc.Utilities;
 import Message.MessageList;
@@ -26,13 +28,7 @@ import java.security.PublicKey;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ReceivedMessageListTest {
-
-    private static Contract contract;
-    private static ContractDocument contractDocument;
-    private static TransitRecord transitRecord;
-    private static DeliveryContract deliveryContract;
-    private static ShippingLabel shippingLabel;
+public class MessageListTest {
     private static MessageList messageList;
     private static String francisID;
     private static SharkPKIComponent sharkPKIComponent;
@@ -50,7 +46,6 @@ public class ReceivedMessageListTest {
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         PublicKey publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
-        contract = new Contract(sharkPKIComponent, messageList);
     }
 
     private static SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException {
@@ -72,22 +67,15 @@ public class ReceivedMessageListTest {
 
     @Test
     public void compareIfTimestampISOutOFRange() {
-        Ack ack = new Ack(Utilities.createUUID(), MessageFlag.ACK, 1705740810, true); // fixed timestamp Saturday, 9:58, 20th 2014
-        messageList.addMessageToList(ack);
+        Ready ready = new Ready(Utilities.createUUID(), MessageFlag.AFFIRM, 1705740810); // fixed timestamp Saturday, 9:58, 20th 2014
+        messageList.addMessageToList(ready);
         assertTrue(messageList.compareTimestamp(1705741000, 300));
     }
 
     @Test
     public void compareIfTimestampIsInRange() {
-        Ack ack = new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true); // fixed timestamp Saturday, 9:58, 20th 2014
-        messageList.addMessageToList(ack);
+        Ready ready = new Ready(Utilities.createUUID(), MessageFlag.READY_TO_PICK_UP, Utilities.createTimestamp()); // fixed timestamp Saturday, 9:58, 20th 2014
+        messageList.addMessageToList(ready);
         assertTrue(messageList.compareTimestamp(Utilities.createTimestamp(), 3000));
-    }
-
-    @Test
-    public void testIfSessionIsSetComplete() {
-        Ack ack = new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true); // fixed timestamp Saturday, 9:58, 20th 2014
-        messageList.addMessageToList(ack);
-        contract.setSessionComplete(true);
     }
 }

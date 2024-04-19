@@ -1,5 +1,6 @@
 package MiscTest;
 
+import Message.Contract.Ready;
 import Message.MessageFlag;
 import Misc.LogEntry;
 import Misc.Logger;
@@ -38,8 +39,8 @@ public class LoggerTest {
 
     @Test
     public void printOutLogEntry() {
-        Ack ack = new Ack(Utilities.createUUID(), MessageFlag.ACK, Utilities.createTimestamp(), true);
-        LogEntry logEntry = new LogEntry(ack.getUUID(), Utilities.formattedTimestamp(), null , true, PEER_NAME.getTestConstant(), "Bobby");
+        Ready ready = new Ready(Utilities.createUUID(), MessageFlag.READY_TO_PICK_UP, Utilities.createTimestamp());
+        LogEntry logEntry = new LogEntry(ready.getUUID(), Utilities.formattedTimestamp(), null , true, PEER_NAME.getTestConstant(), "Bobby");
         System.out.println(logEntry);
     }
 
