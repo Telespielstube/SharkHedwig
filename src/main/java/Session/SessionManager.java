@@ -1,7 +1,9 @@
 package Session;
 
+import Battery.Battery;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
+import Location.GeoSpatial;
 import ProtocolRole.ProtocolRole;
 import Message.MessageBuilder;
 import Message.MessageList;
@@ -29,10 +31,12 @@ public class SessionManager implements Observer, ISessionManager {
     private final SessionState requestState;
     private final SessionState contractState;
 
-    public SessionManager(ShippingLabel shippingLabel, DeliveryContract deliveryContract, SharkPKIComponent sharkPKIComponent) {
+    public SessionManager(ShippingLabel shippingLabel, DeliveryContract deliveryContract, Battery battery,
+                          GeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) {
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
-        this.protocolRole = new ProtocolRole(this, this.shippingLabel, this.deliveryContract, sharkPKIComponent);
+        this.protocolRole = new ProtocolRole(this, this.shippingLabel, this.deliveryContract, battery,
+                geoSpatial, sharkPKIComponent);
         this.noSessionState = new NoSessionState(this);
         this.requestState = new RequestState(this);
         this.contractState = new ContractState(this);

@@ -3,6 +3,7 @@ package Setup;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import HedwigUI.UserManager;
+import Location.Locationable;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkException;
@@ -21,7 +22,7 @@ import Misc.*;
 import Message.*;
 import Session.*;
 import Battery.*;
-import Location.*;
+import Location.GeoSpatial;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 
@@ -37,7 +38,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     private DeliveryContract deliveryContract = new DeliveryContract();
     private final UserManager userManager;
     private Battery battery;
-    private Locationable geoSpatial;
+    private GeoSpatial geoSpatial;
 
     /**
      * The component implements a decentralized protocol that allows drones to transport a physical package from a
@@ -94,7 +95,8 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             throw new RuntimeException(e);
         }
         new PKIManager(sharkPKIComponent);
-        this.sessionManager = new SessionManager(this.shippingLabel, this.deliveryContract, this.sharkPKIComponent);
+        this.sessionManager = new SessionManager(this.shippingLabel, this.deliveryContract, this.battery, this.geoSpatial,
+                this.sharkPKIComponent);
         shippingLabel.addObserver((Observer) this.sessionManager);
         deliveryContract.addObserver((Observer) this.sessionManager);
 

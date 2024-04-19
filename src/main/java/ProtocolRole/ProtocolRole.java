@@ -1,7 +1,9 @@
 package ProtocolRole;
 
+import Battery.Battery;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
+import Location.GeoSpatial;
 import ProtocolRole.State.ProtocolState;
 import ProtocolRole.State.Transferee;
 import ProtocolRole.State.Transferor;
@@ -17,9 +19,11 @@ public class ProtocolRole {
     private final ProtocolState transfereeState;
     private final ProtocolState transferorState;
 
-    public ProtocolRole(SessionManager sessionManager, ShippingLabel shippingLabel, DeliveryContract deliveryContract, SharkPKIComponent sharkPKIComponent) {
+    public ProtocolRole(SessionManager sessionManager, ShippingLabel shippingLabel, DeliveryContract deliveryContract,
+                        Battery battery, GeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) {
         this.transferorState = new Transferor(this, sessionManager, shippingLabel, deliveryContract, sharkPKIComponent);
-        this.transfereeState = new Transferee(this, sessionManager, shippingLabel, deliveryContract, sharkPKIComponent);
+        this.transfereeState = new Transferee(this, sessionManager, shippingLabel, deliveryContract,
+                battery, geoSpatial, sharkPKIComponent);
         this.currentProtocolState = this.transfereeState;
     }
 

@@ -1,8 +1,11 @@
 package ProtocolRole.State;
 
+import Battery.Battery;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import DeliveryContract.TransitRecord;
+import DeliveryContract.ContractState;
+import Location.GeoSpatial;
 import Message.Contract.*;
 import Message.Message;
 import Message.Request.Confirm;
@@ -27,21 +30,28 @@ import java.util.Optional;
 /**
  * The Transferee subclass implements a behavior associated with a state of the ProtocolRole context class.
  */
-public class Transferee implements ProtocolState{
+public class Transferee implements ProtocolState {
     private final ProtocolRole protocolRole;
     private final SessionManager sessionManager;
+    private final Battery battery;
+    private final GeoSpatial geoSpatial;
     private ShippingLabel shippingLabel;
     private DeliveryContract deliveryContract;
     private SharkPKIComponent sharkPKIComponent;
     private Optional<Message> optionalMessage;
+    private TransitRecord transitRecord;
+    private boolean contractState;
     private int timeOffset;
 
     public Transferee(ProtocolRole protocolRole, SessionManager sessionManager, ShippingLabel shippingLabel,
-                      DeliveryContract deliveryContract, SharkPKIComponent sharkPKIComponent) {
+                      DeliveryContract deliveryContract, Battery battery, GeoSpatial geoSpatial,
+                      SharkPKIComponent sharkPKIComponent) {
         this.protocolRole = protocolRole;
         this.sessionManager = sessionManager;
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
+        this.battery = battery;
+        this.geoSpatial = geoSpatial;
         this.sharkPKIComponent = sharkPKIComponent;
         this.timeOffset = 5000;
     }
@@ -81,17 +91,16 @@ public class Transferee implements ProtocolState{
     /**
      * The transferee needs to store the DeliveryContract in memory until the transferor signed the transit record entry too.
      *
-     * @param message    The DeliveryContract object.
+     * @param message    The DeliveryContract object reference.
      */
     private void inMemoDeliveryContract(DeliveryContract message) {
         ShippingLabel label = message.getShippingLabel();
-        this.deliveryContract = new DeliveryContract(new ShippingLabel.Builder(label.getUUID(), label.getSender(), label.getOrigin(),
-                label.getPackageOrigin(), label.getRecipient(), label.getDestination(), label.getPackageDestination(),
-                label.getPackageWeight()).build(), new TransitRecord(message.getTransitRecord().getAllEntries()));
+        this.deliveryContract = new DeliveryContract(new ShippingLabel.Builder(label.getUUID(), label.getSender(),
+                label.getOrigin(), label.getPackageOrigin(), label.getRecipient(), label.getDestination(),
+                label.getPackageDestination(), label.getPackageWeight()).build(),
+                new TransitRecord(message.getTransitRecord().getAllEntries()));
         this.contractState = ContractState.CREATED.getState();
     }
-
-
 
     /**
      * The incoming solicitation message gives the signal to the transferee to create and send out the offer message to the
@@ -115,7 +124,7 @@ public class Transferee implements ProtocolState{
      */
     private void handleOfferReply(OfferReply message) {
         if (MessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && processOfferReplyData(message)) {
-            this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp(), true));
+            this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp()));
         }
     }
 
@@ -126,8 +135,8 @@ public class Transferee implements ProtocolState{
      * @return           True if the transferee is able to deliver, false if not.
      */
     private boolean processOfferReplyData(OfferReply message) {
-        double packageWeight = message.getPackageWeight();
-        Location packageDestination = message.getPackageDestination();
+        //double packageWeight = message.getPackageWeight();
+        //Location packageDestination = message.getPackageDestination();
         // Code to process the received data.
         return true;
     }
@@ -138,18 +147,20 @@ public class Transferee implements ProtocolState{
      * @param message    PickUp message object.
      */
     private void handleContract(ContractDocument message) {
-        if (message.getDeliveryContract() != null) {
+        if (!message.getDeliveryContract().equals(null)) {
+            inMemoDeliveryContract(message.getDeliveryContract());
             this.transitRecord = message.getDeliveryContract().getTransitRecord();
             this.geoSpatial.setPickUpLocation(this.transitRecord.getLastElement().getPickUpLocation());
             try {
-                this.signedField = ASAPCryptoAlgorithms.sign(MessageHandler.objectToByteArray(this.transitRecord.getLastElement()), sharkPKIComponent);
-                this.transitRecord.getLastElement().setSignatureTransferee(this.signedField);
+                byte[] signedField = ASAPCryptoAlgorithms.sign(MessageHandler.objectToByteArray(
+                        this.transitRecord.getLastElement()), sharkPKIComponent);
+                this.transitRecord.getLastElement().setSignatureTransferee(signedField);
             } catch (ASAPSecurityException e) {
                 System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPSecurityException: " + e.getMessage());
                 throw new RuntimeException(e);
             }
-            inMemoDeliveryContract(message.getDeliveryContract());
-            this.optionalMessage = Optional.of(new Affirm(Utilities.createUUID(), MessageFlag.AFFIRM, Utilities.createTimestamp(), this.deliveryContract));
+            this.optionalMessage = Optional.of(new Affirm(Utilities.createUUID(), MessageFlag.AFFIRM,
+                    Utilities.createTimestamp(), this.deliveryContract));
         }
     }
 
@@ -170,7 +181,8 @@ public class Transferee implements ProtocolState{
             } catch (ASAPSecurityException e) {
                 throw new RuntimeException(e);
             }
-            this.optionalMessage = Optional.of(new Ready(Utilities.createUUID(), MessageFlag.READY_TO_PICK_UP, Utilities.createTimestamp()));
+            this.optionalMessage = Optional.of(new Ready(Utilities.createUUID(), MessageFlag.READY_TO_PICK_UP,
+                    Utilities.createTimestamp()));
         }
     }
 
@@ -182,7 +194,8 @@ public class Transferee implements ProtocolState{
      */
     private void handleRelease(Release message)  {
         if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
-            this.optionalMessage = Optional.of(new Complete(Utilities.createUUID(), MessageFlag.COMPLETE, Utilities.createTimestamp()));
+            this.optionalMessage = Optional.of(new Complete(Utilities.createUUID(), MessageFlag.COMPLETE,
+                    Utilities.createTimestamp()));
         }
     }
 

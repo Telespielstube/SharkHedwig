@@ -11,7 +11,7 @@ public enum Parallel {
         this.distance = distance;
     }
 
-    public double getParalelle() {
+    public double getParallel() {
         return this.distance;
     }
 }

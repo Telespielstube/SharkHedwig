@@ -33,9 +33,9 @@ public class GeoSpatial implements Locationable {
      */
     @Override
     public double pointToPointDistance(Location sender, Location recipient) {
-        double dx = Parallel.ParallelOfLatitude.getParalelle() *
+        double dx = Parallel.ParallelOfLatitude.getParallel() *
                 (sender.getLatitude() - recipient.getLatitude());
-        double dy = Parallel.ParallelOfLongitude.getParalelle() *
+        double dy = Parallel.ParallelOfLongitude.getParallel() *
                 (sender.getLongitude() - recipient.getLongitude());
         return sqrt(dx * dx + dy * dy);
     }
