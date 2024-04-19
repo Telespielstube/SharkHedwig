@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class to add a new entry to the list of all previous handovers of this package.
+ * Class to keep a record of all previous successfully completed physical package handovers.
  */
 public class TransitRecord implements Contractable {
 

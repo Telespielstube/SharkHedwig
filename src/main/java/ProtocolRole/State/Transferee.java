@@ -9,7 +9,7 @@ import Location.GeoSpatial;
 import Message.Contract.*;
 import Message.Message;
 import Message.Request.Confirm;
-import Message.MessageList;
+import Message.MessageCache;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import Message.Messageable;
@@ -85,6 +85,11 @@ public class Transferee implements ProtocolState {
                 sessionManager.getCurrentSessionState().resetState();
                 break;
         }
+        if (this.optionalMessage.isPresent() && MessageCache.getMessageCacheSize() <= MessageCache.getTranfereeCacheSize() ) {
+            MessageCache.addMessage(optionalMessage.get());
+        } else {
+            MessageCache.clearMessageList();
+        }
         return this.optionalMessage;
     }
 
@@ -109,7 +114,7 @@ public class Transferee implements ProtocolState {
      * @param message    The received Solicitation message.
      */
     private void handleSolicitation(Solicitation message) {
-        if (MessageList.compareTimestamp(message.getTimestamp(), this.timeOffset)) {
+        if (MessageCache.compareTimestamp(message.getTimestamp(), this.timeOffset)) {
             this.optionalMessage = Optional.of(new Offer(Utilities.createUUID(), MessageFlag.OFFER, Utilities.createTimestamp(),
                     this.battery.getCurrentBatteryLevel(), AppConstant.MAX_FREIGHT_WEIGHT.getInt(), this.geoSpatial.getCurrentLocation()));
         }
@@ -123,7 +128,7 @@ public class Transferee implements ProtocolState {
      * @return           Optional.empty if the calculation did not get verified, or Confirm message if data got verified.
      */
     private void handleOfferReply(OfferReply message) {
-        if (MessageList.compareTimestamp(message.getTimestamp(), this.timeOffset) && processOfferReplyData(message)) {
+        if (MessageCache.compareTimestamp(message.getTimestamp(), this.timeOffset) && processOfferReplyData(message)) {
             this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp()));
         }
     }
@@ -173,7 +178,7 @@ public class Transferee implements ProtocolState {
         byte[] signedTransferorField = message.getTransitRecord().getLastElement().getSignatureTransferor();
         byte[] byteTransitEntry = MessageHandler.objectToByteArray(this.transitRecord.getLastElement());
         // Transferee needs to verify the transferor signature as well!!
-        if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
+        if (MessageCache.compareTimestamp(message.getTimestamp(), timeOffset)) {
             try {
                 if (ASAPCryptoAlgorithms.verify(signedTransferorField, byteTransitEntry, sender, sharkPKIComponent)) {
                     this.transitRecord = message.getTransitRecord();
@@ -193,7 +198,7 @@ public class Transferee implements ProtocolState {
      * @param message    The received AckMessage object.
      */
     private void handleRelease(Release message)  {
-        if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
+        if (MessageCache.compareTimestamp(message.getTimestamp(), timeOffset)) {
             this.optionalMessage = Optional.of(new Complete(Utilities.createUUID(), MessageFlag.COMPLETE,
                     Utilities.createTimestamp()));
         }

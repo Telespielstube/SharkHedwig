@@ -3,7 +3,10 @@ package Setup;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import HedwigUI.UserManager;
-import Location.Locationable;
+import Message.MessageBuilder;
+import Message.MessageHandler;
+import Message.Messageable;
+import Session.SessionManager;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import net.sharksystem.SharkException;
@@ -19,8 +22,7 @@ import java.util.List;
 import java.util.Observer;
 import java.util.Optional;
 import Misc.*;
-import Message.*;
-import Session.*;
+import Session.ISessionManager;
 import Battery.*;
 import Location.GeoSpatial;
 import static java.nio.file.StandardOpenOption.APPEND;
@@ -32,13 +34,12 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     private final MessageHandler messageHandler;
     private ISessionManager sessionManager;
     private final SharkPeerFS sharkPeerFS;
-    private ASAPMessages messages;
-    private ShippingLabel shippingLabel = new ShippingLabel.Builder(null,null,null, null,
+    private final ShippingLabel shippingLabel = new ShippingLabel.Builder(null,null,null, null,
             null, null, null, null).build();
-    private DeliveryContract deliveryContract = new DeliveryContract();
+    private final DeliveryContract deliveryContract = new DeliveryContract();
     private final UserManager userManager;
-    private Battery battery;
-    private GeoSpatial geoSpatial;
+    private final Battery battery;
+    private final GeoSpatial geoSpatial;
 
     /**
      * The component implements a decentralized protocol that allows drones to transport a physical package from a
@@ -48,12 +49,11 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
      * Created by Martina Brüning
      */
     public SharkHedwigComponent() {
-        this.sharkPeerFS = new SharkPeerFS(AppConstant.PEER_NAME.toString(), AppConstant.PEER_FOLDER.toString() + "/" + AppConstant.PEER_NAME.toString() );
+        this.sharkPeerFS = new SharkPeerFS(AppConstant.PEER_NAME.toString(), AppConstant.PEER_FOLDER + "/" + AppConstant.PEER_NAME);
         this.messageHandler = new MessageHandler();
         this.battery = new BatteryManager();
         this.geoSpatial = new GeoSpatial();
         this.userManager = new UserManager();
-
         setupComponent();
     }
 
@@ -117,7 +117,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     }
 
     /**
-     * To make the occuring error messages persistent. Every occuring error is redirected to a file on the device.
+     * To make the occurring error messages persistent. Every occuring error is redirected to a file on the device.
      */
     public void setupErrorStream() throws IOException {
         try {
@@ -146,7 +146,6 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
      * @param messages               a chunk of messages from the encountered device.
      * @param senderE2E              The encountered device.
      * @param list                   A List of all previous hops.
-     * @throws IOException           Is thrown after a read/write error occurs
      *
      */
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) {

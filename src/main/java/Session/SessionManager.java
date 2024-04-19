@@ -6,7 +6,7 @@ import DeliveryContract.ShippingLabel;
 import Location.GeoSpatial;
 import ProtocolRole.ProtocolRole;
 import Message.MessageBuilder;
-import Message.MessageList;
+import Message.MessageCache;
 import Message.Messageable;
 import Message.Message;
 import java.util.Observable;
@@ -62,15 +62,13 @@ public class SessionManager implements Observer, ISessionManager {
             if (getCurrentSessionState().equals(getNoSessionState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.NO_SESSION.getChannel(), sender);
             }
-            if (getCurrentSessionState().equals(getRequestState())) {
+            else if (getCurrentSessionState().equals(getRequestState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.REQUEST.getChannel(), sender);
             }
-            if (getCurrentSessionState().equals(getContractState())) {
+            else if (getCurrentSessionState().equals(getContractState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.CONTRACT.getChannel(), sender);
             }
-            MessageList.addMessageToList(optionalMessage.get());
         } else {
-            MessageList.clearMessageList();
             getCurrentSessionState().resetState();
         }
         return Optional.ofNullable(this.messageBuilder);

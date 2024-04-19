@@ -6,6 +6,9 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.UUID;
 
+/**
+ * TransitEntry represents a single entry in the TransitRecord object.
+ */
 public class TransitEntry implements Serializable {
 
     private int serialNumber = 0;

@@ -1,7 +1,7 @@
 package SetupTest;
 
 import DeliveryContract.ShippingLabel;
-import Message.MessageList;
+import Message.MessageCache;
 import Session.SessionManager;
 import Setup.Channel;
 import Setup.SharkHedwigComponent;
@@ -15,8 +15,6 @@ import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import javax.crypto.NoSuchPaddingException;
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +24,6 @@ import java.security.PublicKey;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SharkHedwigComponentTest {
-
-
     private SessionManager sessionManager;
     private SharkPKIComponent sharkPKIComponent;
     private static SharkTestPeerFS sharkTestPeerFS;
@@ -35,7 +31,7 @@ public class SharkHedwigComponentTest {
     private static String francisID;
     private static PublicKey publicKeyFrancis;
     private static ShippingLabel shippingLabel;
-    private static MessageList messageList;
+    private static MessageCache messageCache;
 
     @BeforeAll
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
