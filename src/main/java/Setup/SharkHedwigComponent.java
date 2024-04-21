@@ -3,9 +3,11 @@ package Setup;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import HedwigUI.UserManager;
+import Message.AdvertisementThread;
 import Message.MessageBuilder;
 import Message.MessageHandler;
 import Message.Messageable;
+import ProtocolRole.ProtocolRole;
 import Session.SessionManager;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
@@ -40,6 +42,8 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     private final UserManager userManager;
     private final Battery battery;
     private final GeoSpatial geoSpatial;
+    private ProtocolRole protocolRole;
+    private AdvertisementThread advertisementThread;
 
     /**
      * The component implements a decentralized protocol that allows drones to transport a physical package from a
@@ -99,7 +103,9 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
                 this.sharkPKIComponent);
         shippingLabel.addObserver((Observer) this.sessionManager);
         deliveryContract.addObserver((Observer) this.sessionManager);
-
+        this.protocolRole = new ProtocolRole((SessionManager) this.sessionManager, this.shippingLabel, this.deliveryContract, battery,
+                geoSpatial, sharkPKIComponent);
+        new AdvertisementThread(this, this.protocolRole).run();
     }
 
     /**
@@ -165,8 +171,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
      *
      * @param messages    received message as byte[] data type.
      * @param senderE2E   The device which sent the received message.
-     * @return
-     * @throws IOException
+     *
      */
     public void processMessages(ASAPMessages messages, String senderE2E) {
         try {
@@ -176,21 +181,29 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
                 }
                 Messageable message = (Messageable) this.messageHandler.parseIncomingMessage(it.next(), senderE2E, sharkPKIComponent);
                 Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(message, senderE2E);
-                messageBuilder.ifPresent(object -> {
-                    byte[] encryptedMessage = messageHandler.buildOutgoingMessage(object.getMessage(), object.getUri(),
-                            object.getSender(), sharkPKIComponent);
-                    try {
-                        this.peer.sendASAPMessage(AppConstant.APP_FORMAT.toString(), AppConstant.SCHEME +
-                                object.getUri(), encryptedMessage);
-                    } catch (ASAPException e) {
-                        System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPException: " + e.getMessage());
-                        throw new RuntimeException(e);
-                    }
-                });
+                outgoingMessage(messageBuilder);
             }
         } catch (IOException e) {
             System.err.println(Utilities.formattedTimestamp() + "Caught an IOException: " + e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     *
+     * @param messageBuilder
+     */
+    public void outgoingMessage(Optional<MessageBuilder> messageBuilder) {
+        messageBuilder.ifPresent(object -> {
+            byte[] encryptedMessage = messageHandler.buildOutgoingMessage(object.getMessage(), object.getUri(),
+                    object.getSender(), sharkPKIComponent);
+            try {
+                this.peer.sendASAPMessage(AppConstant.APP_FORMAT.toString(), AppConstant.SCHEME +
+                        object.getUri(), encryptedMessage);
+            } catch (ASAPException e) {
+                System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPException: " + e.getMessage());
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

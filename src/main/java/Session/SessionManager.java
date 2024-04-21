@@ -35,8 +35,7 @@ public class SessionManager implements Observer, ISessionManager {
                           GeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) {
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
-        this.protocolRole = new ProtocolRole(this, this.shippingLabel, this.deliveryContract, battery,
-                geoSpatial, sharkPKIComponent);
+
         this.noSessionState = new NoSessionState(this);
         this.requestState = new RequestState(this);
         this.contractState = new ContractState(this);
