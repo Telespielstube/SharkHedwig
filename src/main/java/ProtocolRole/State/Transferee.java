@@ -85,6 +85,11 @@ public class Transferee implements ProtocolState {
                 sessionManager.getCurrentSessionState().resetState();
                 break;
         }
+        if (this.optionalMessage.isPresent() && MessageCache.getMessageCacheSize() <= MessageCache.getTranfereeCacheSize() ) {
+            MessageCache.addMessage(optionalMessage.get());
+        } else {
+            MessageCache.clearMessageList();
+        }
         return this.optionalMessage;
     }
 

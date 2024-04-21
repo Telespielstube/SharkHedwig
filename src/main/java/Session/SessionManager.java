@@ -62,15 +62,12 @@ public class SessionManager implements Observer, ISessionManager {
             if (getCurrentSessionState().equals(getNoSessionState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.NO_SESSION.getChannel(), sender);
             }
-            if (getCurrentSessionState().equals(getRequestState())) {
+            else if (getCurrentSessionState().equals(getRequestState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.REQUEST.getChannel(), sender);
             }
-            if (getCurrentSessionState().equals(getContractState())) {
+            else if (getCurrentSessionState().equals(getContractState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.CONTRACT.getChannel(), sender);
             }
-            MessageCache.addMessage(optionalMessage.get());
-        } else {
-            MessageCache.clearMessageList();
             getCurrentSessionState().resetState();
         }
         return Optional.ofNullable(this.messageBuilder);

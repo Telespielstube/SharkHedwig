@@ -86,6 +86,11 @@ public class Transferor implements ProtocolState {
                 this.sessionManager.getCurrentSessionState().resetState();
                 break;
         }
+        if (this.optionalMessage.isPresent() && MessageCache.getMessageCacheSize() <= MessageCache.getTranferorCacheSize() ) {
+            MessageCache.addMessage(optionalMessage.get());
+        } else {
+            MessageCache.clearMessageList();
+        }
         return this.optionalMessage;
     }
 

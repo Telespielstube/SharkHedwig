@@ -10,6 +10,35 @@ public final class MessageCache {
 
     // A TreeMap to cache sent Messages with their timestamp as key and the Message object itself as value.
     private static final SortedMap<Long, Object> messageList = new TreeMap<>();
+    private static final int tranfereeCacheSize = 5;
+    private static final int tranferorCacheSize = 6;
+
+    /**
+     * Getter for current tranferee cache size
+     *
+     * @return    integer value of cache size.
+     */
+    public static int getTranfereeCacheSize() {
+        return tranfereeCacheSize;
+    }
+
+    /**
+     * Getter for current tranferee cache size
+     *
+     * @return    integer value of cache size.
+     */
+    public static int getTranferorCacheSize() {
+        return tranferorCacheSize;
+    }
+
+    /**
+     * Getter for current cache size.
+     *
+     * @return    integer value of cache size.
+     */
+    public static int getMessageCacheSize() {
+        return messageList.size();
+    }
 
     /**
      * Compares to timestamps if the difference is less than the offset of 5 seconds.
