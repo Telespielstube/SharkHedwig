@@ -6,7 +6,7 @@ import DeliveryContract.ShippingLabel;
 import Location.GeoSpatial;
 import ProtocolRole.ProtocolRole;
 import Message.MessageBuilder;
-import Message.MessageList;
+import Message.MessageCache;
 import Message.Messageable;
 import Message.Message;
 import java.util.Observable;
@@ -68,9 +68,9 @@ public class SessionManager implements Observer, ISessionManager {
             if (getCurrentSessionState().equals(getContractState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.CONTRACT.getChannel(), sender);
             }
-            MessageList.addMessageToList(optionalMessage.get());
+            MessageCache.addMessage(optionalMessage.get());
         } else {
-            MessageList.clearMessageList();
+            MessageCache.clearMessageList();
             getCurrentSessionState().resetState();
         }
         return Optional.ofNullable(this.messageBuilder);

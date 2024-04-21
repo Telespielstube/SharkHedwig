@@ -2,41 +2,24 @@ package SessionTest;
 
 import Battery.Battery;
 import DeliveryContract.*;
-import HedwigUI.UserInput;
-import Location.Location;
-import Message.*;
-import Message.NoSession.Advertisement;
-import Message.Request.Offer;
-import Misc.Utilities;
-import Message.MessageList;
+import Message.MessageCache;
 import Session.SessionManager;
-import ProtocolRole.State.ProtocolState;
 import SetupTest.TestConstant;
 import Location.*;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
 import net.sharksystem.SharkPeer;
 import net.sharksystem.SharkTestPeerFS;
-import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class SessionManagerTest {
 
@@ -50,7 +33,7 @@ public class SessionManagerTest {
     private static PublicKey publicKeyFrancis;
     private static ShippingLabel shippingLabel = new ShippingLabel.Builder(null,null,null, null,
             null, null, null, 0.0).build();
-    private static MessageList messageList;
+    private static MessageCache messageCache;
 
     public SessionManagerTest() throws NoSuchPaddingException, NoSuchAlgorithmException {
     }
@@ -59,7 +42,7 @@ public class SessionManagerTest {
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
         SharkTestPeerFS testSharkPeer = new SharkTestPeerFS(TestConstant.PEER_NAME.getTestConstant(), TestConstant.PEER_FOLDER.getTestConstant());
         SharkPKIComponent sharkPKIComponent = setupComponent(testSharkPeer);
-        messageList = new MessageList();
+        messageCache = new MessageCache();
         testSharkPeer.start();
         String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();

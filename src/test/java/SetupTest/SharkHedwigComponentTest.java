@@ -1,7 +1,7 @@
 package SetupTest;
 
 import DeliveryContract.ShippingLabel;
-import Message.MessageList;
+import Message.MessageCache;
 import Session.SessionManager;
 import Setup.Channel;
 import Setup.SharkHedwigComponent;
@@ -31,7 +31,7 @@ public class SharkHedwigComponentTest {
     private static String francisID;
     private static PublicKey publicKeyFrancis;
     private static ShippingLabel shippingLabel;
-    private static MessageList messageList;
+    private static MessageCache messageCache;
 
     @BeforeAll
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {

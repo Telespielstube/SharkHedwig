@@ -7,7 +7,7 @@ import DeliveryContract.TransitEntry;
 import Message.Contract.*;
 import Message.Message;
 import Message.Messageable;
-import Message.MessageList;
+import Message.MessageCache;
 import Message.MessageFlag;
 import Message.MessageHandler;
 import Message.NoSession.Solicitation;
@@ -108,7 +108,7 @@ public class Transferor implements ProtocolState {
      * @return OfferReply object, or and enpty object if data were not verified.
      */
     private void handleOffer(Offer message, ShippingLabel shippingLabel) {
-        if (MessageList.compareTimestamp(message.getTimestamp(), this.timeOffset)
+        if (MessageCache.compareTimestamp(message.getTimestamp(), this.timeOffset)
                 && verifyOfferData(message) && processOfferData(message)) {
             this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY,
                     Utilities.createTimestamp(), shippingLabel.get().getPackageWeight(),
@@ -121,7 +121,7 @@ public class Transferor implements ProtocolState {
      * @param message
      */
     private void handleConfirm(Confirm message) {
-        if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
+        if (MessageCache.compareTimestamp(message.getTimestamp(), timeOffset)) {
             this.optionalMessage = checkContractState();
         }
     }
@@ -133,7 +133,7 @@ public class Transferor implements ProtocolState {
      * @param message    Affirm messge object.
      */
     private void handleAffirm(Affirm message) {
-        if (MessageList.compareTimestamp(message.getTimestamp(), this.timeOffset)) {
+        if (MessageCache.compareTimestamp(message.getTimestamp(), this.timeOffset)) {
             byte[] signedTransfereeField = message.getDeliveryContract().getTransitRecord().getLastElement().getSignatureTransferee() ;
             byte[] lastTransitEntry = MessageHandler.objectToByteArray(message.getDeliveryContract().getTransitRecord().getLastElement());
             try {
@@ -157,7 +157,7 @@ public class Transferor implements ProtocolState {
      * @param message    Release message object.
      */
     private void handleReadyToPickUp(Ready message) {
-        if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
+        if (MessageCache.compareTimestamp(message.getTimestamp(), timeOffset)) {
             this.optionalMessage = Optional.of(new Release(Utilities.createUUID(), MessageFlag.RELEASE,
                     Utilities.createTimestamp()));
         }
@@ -170,7 +170,7 @@ public class Transferor implements ProtocolState {
      */
     private void handleComplete(Complete message) {
         timeOffset = 30000;
-        if (MessageList.compareTimestamp(message.getTimestamp(), timeOffset)) {
+        if (MessageCache.compareTimestamp(message.getTimestamp(), timeOffset)) {
             // Send a message to the owners email address that a package is handed over to another drone.
             //notificationService.newMessage(DeliveryContract deliveryContract);
 

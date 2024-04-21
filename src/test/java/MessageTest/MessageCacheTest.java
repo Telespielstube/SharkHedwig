@@ -1,14 +1,9 @@
 package MessageTest;
 
-import DeliveryContract.DeliveryContract;
-import DeliveryContract.ShippingLabel;
-import DeliveryContract.TransitRecord;
-import Message.Contract.Affirm;
-import Message.Contract.ContractDocument;
 import Message.Contract.Ready;
 import Message.MessageFlag;
 import Misc.Utilities;
-import Message.MessageList;
+import Message.MessageCache;
 import SetupTest.TestConstant;
 import net.sharksystem.SharkComponent;
 import net.sharksystem.SharkException;
@@ -28,8 +23,8 @@ import java.security.PublicKey;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MessageListTest {
-    private static MessageList messageList;
+public class MessageCacheTest {
+    private static MessageCache messageCache;
     private static String francisID;
     private static SharkPKIComponent sharkPKIComponent;
     private static ASAPKeyStore asapKeyStore;
@@ -38,7 +33,7 @@ public class MessageListTest {
     public static void setup() throws SharkException, IOException, NoSuchPaddingException, NoSuchAlgorithmException {
         SharkTestPeerFS testSharkPeer = new SharkTestPeerFS(TestConstant.PEER_NAME.getTestConstant(), TestConstant.PEER_FOLDER.getTestConstant());
         sharkPKIComponent = setupComponent(testSharkPeer);
-        messageList = new MessageList();
+        messageCache = new MessageCache();
         testSharkPeer.start();
 
         String idStart = HelperPKITests.fillWithExampleData(sharkPKIComponent);
@@ -68,14 +63,14 @@ public class MessageListTest {
     @Test
     public void compareIfTimestampISOutOFRange() {
         Ready ready = new Ready(Utilities.createUUID(), MessageFlag.AFFIRM, 1705740810); // fixed timestamp Saturday, 9:58, 20th 2014
-        messageList.addMessageToList(ready);
-        assertTrue(messageList.compareTimestamp(1705741000, 300));
+        messageCache.addMessage(ready);
+        assertTrue(messageCache.compareTimestamp(1705741000, 300));
     }
 
     @Test
     public void compareIfTimestampIsInRange() {
         Ready ready = new Ready(Utilities.createUUID(), MessageFlag.READY_TO_PICK_UP, Utilities.createTimestamp()); // fixed timestamp Saturday, 9:58, 20th 2014
-        messageList.addMessageToList(ready);
-        assertTrue(messageList.compareTimestamp(Utilities.createTimestamp(), 3000));
+        messageCache.addMessage(ready);
+        assertTrue(messageCache.compareTimestamp(Utilities.createTimestamp(), 3000));
     }
 }
