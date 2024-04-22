@@ -74,7 +74,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             this.sharkPKIComponent = (SharkPKIComponent) this.sharkPeerFS.getComponent(SharkPKIComponent.class);
             this.sharkPeerFS.start();
         } catch (SharkException | IOException e) {
-            System.err.println(Utilities.formattedTimestamp() + "Caught an Exception: " + e.getMessage());
+            System.err.println(Utilities.formattedTimestamp() + "Caught an Exception while setting up the SharkComponent: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -116,7 +116,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             try {
                 this.peer.getASAPStorage(AppConstant.APP_FORMAT.toString()).createChannel(type.getChannel());
             } catch (IOException | ASAPException e) {
-                System.err.println(Utilities.formattedTimestamp() + "Caught an Exception: " + e.getMessage());
+                System.err.println(Utilities.formattedTimestamp() + "Caught an Exception while setting up the messaging channels: " + e.getMessage());
                 throw new RuntimeException(e);
             }
         }
@@ -166,11 +166,11 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
                     outgoingMessage(messageBuilder);
                 }
             } catch (IOException e) {
-                System.err.println(Utilities.formattedTimestamp() + "Caught an IOException: " + e.getMessage());
+                System.err.println(Utilities.formattedTimestamp() + "Caught an IOException while iterating trough th messages: " + e.getMessage());
                 throw new RuntimeException(e);
             }
         }
-        System.err.println(Utilities.formattedTimestamp() + "Message has invalid format: " + uri );
+        System.err.println(Utilities.formattedTimestamp() + " Message has invalid uri format: " + uri );
     }
 
     /**
@@ -186,7 +186,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
                 this.peer.sendASAPMessage(AppConstant.APP_FORMAT.toString(), AppConstant.SCHEME +
                         object.getUri(), encryptedMessage);
             } catch (ASAPException e) {
-                System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPException: " + e.getMessage());
+                System.err.println(Utilities.formattedTimestamp() + "Caught an ASAPException while trying to send a message: " + e.getMessage());
                 throw new RuntimeException(e);
             }
         });
