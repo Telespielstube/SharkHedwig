@@ -31,13 +31,12 @@ public class AdvertisementThread implements Runnable {
                 if (MessageCache.getLastValueFromList() instanceof Advertisement) {
                     break;
                 }
-                if (this.protocolRole.equals(this.protocolRole.getTransfereeState())) {
-                    Optional<MessageBuilder> optionalMessage = Optional.of(new MessageBuilder(Optional.of(
-                            new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(),
-                                    true)), Channel.NO_SESSION.getChannel(), AppConstant.PEER_NAME.toString()));
-                    if (optionalMessage.isPresent()) {
-                        sharkHedwigComponent.outgoingMessage(optionalMessage);
-                    }
+                if (this.protocolRole.equals(this.protocolRole.getTransfereeState()) && MessageCache.getMessageCacheSize() == 0) {
+                    Optional<Advertisement> optionalMessage = Optional.of(
+                            new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT, Utilities.createTimestamp(), true));
+                    MessageCache.addMessage(optionalMessage.get());
+                    sharkHedwigComponent.outgoingMessage(Optional.of(
+                            new MessageBuilder(optionalMessage, Channel.NO_SESSION.getChannel(), AppConstant.PEER_NAME.toString())));
                 }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

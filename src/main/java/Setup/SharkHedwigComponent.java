@@ -147,51 +147,36 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     }
 
     /**
-     * If an encounter occurs all messages are being exchanged and this method is called to process them.
+     * If an encounter occurs all messages are being exchanged and this listener method is called to process them.
      *
      * @param messages               a chunk of messages from the encountered device.
      * @param senderE2E              The encountered device.
      * @param list                   A List of all previous hops.
-     *
      */
     public void asapMessagesReceived(ASAPMessages messages, String senderE2E, List<ASAPHop> list) {
         CharSequence uri = messages.getURI();
-        if ( uri.equals(Channel.NO_SESSION.getChannel()) ) {
-            processMessages(messages, senderE2E);
-        } else if (uri.equals(Channel.REQUEST.toString()))  {
-            processMessages(messages, senderE2E);
-        } else if (uri.equals(Channel.CONTRACT.toString()))  {
-            processMessages(messages, senderE2E);
+        if (!uri.equals(Channel.NO_SESSION.getChannel()) || uri.equals(Channel.REQUEST.toString()) || uri.equals(Channel.CONTRACT.toString())) {
+            try {
+                for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
+                    if (!messageHandler.checkRecipient(it.next())) {
+                        continue;
+                    }
+                    Messageable message = (Messageable) this.messageHandler.parseIncomingMessage(it.next(), senderE2E, sharkPKIComponent);
+                    Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(message, senderE2E);
+                    outgoingMessage(messageBuilder);
+                }
+            } catch (IOException e) {
+                System.err.println(Utilities.formattedTimestamp() + "Caught an IOException: " + e.getMessage());
+                throw new RuntimeException(e);
+            }
         }
         System.err.println(Utilities.formattedTimestamp() + "Message has invalid format: " + uri );
     }
 
     /**
-     * The methode parses the byte[] message to a Message object and passes it to the SEssionManager class.
+     * Handles the built message object to be send to peers during the next encounter.
      *
-     * @param messages    received message as byte[] data type.
-     * @param senderE2E   The device which sent the received message.
-     *
-     */
-    public void processMessages(ASAPMessages messages, String senderE2E) {
-        try {
-            for (Iterator<byte[]> it = messages.getMessages(); it.hasNext(); ) {
-                if (!messageHandler.checkRecipient(it.next())) {
-                    continue;
-                }
-                Messageable message = (Messageable) this.messageHandler.parseIncomingMessage(it.next(), senderE2E, sharkPKIComponent);
-                Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(message, senderE2E);
-                outgoingMessage(messageBuilder);
-            }
-        } catch (IOException e) {
-            System.err.println(Utilities.formattedTimestamp() + "Caught an IOException: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     *
-     * @param messageBuilder
+     * @param messageBuilder    MessageBuilder object encapsulated in an Optional container object.
      */
     public void outgoingMessage(Optional<MessageBuilder> messageBuilder) {
         messageBuilder.ifPresent(object -> {
