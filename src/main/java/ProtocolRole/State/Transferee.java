@@ -32,7 +32,6 @@ import java.util.Optional;
  */
 public class Transferee implements ProtocolState {
     private final ProtocolRole protocolRole;
-    private final SessionManager sessionManager;
     private final Battery battery;
     private final GeoSpatial geoSpatial;
     private ShippingLabel shippingLabel;
@@ -43,11 +42,10 @@ public class Transferee implements ProtocolState {
     private boolean contractState;
     private int timeOffset;
 
-    public Transferee(ProtocolRole protocolRole, SessionManager sessionManager, ShippingLabel shippingLabel,
+    public Transferee(ProtocolRole protocolRole, ShippingLabel shippingLabel,
                       DeliveryContract deliveryContract, Battery battery, GeoSpatial geoSpatial,
                       SharkPKIComponent sharkPKIComponent) {
         this.protocolRole = protocolRole;
-        this.sessionManager = sessionManager;
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
         this.battery = battery;
@@ -58,15 +56,14 @@ public class Transferee implements ProtocolState {
 
     @Override
     public Optional<Message> handle(Messageable message, String sender) {
+        this.optionalMessage = Optional.empty();
         switch(message.getMessageFlag()) {
             case SOLICITATION:
                 handleSolicitation((Solicitation) message);
-                this.sessionManager.getNoSessionState().nextState();
                 break;
             case OFFER_REPLY:
                 handleOfferReply((OfferReply) message);
                 saveData();
-                this.sessionManager.getRequestState().nextState();
                 break;
             case CONTRACT_DOCUMENT:
                 handleContract((ContractDocument) message);
@@ -77,12 +74,10 @@ public class Transferee implements ProtocolState {
                 break;
             case RELEASE:
                 handleRelease((Release) message);
-                this.sessionManager.getContractState().nextState();
                 this.protocolRole.changeRole();
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Message flag was incorrect: " + message.getMessageFlag());
-                sessionManager.getCurrentSessionState().resetState();
                 break;
         }
         if (this.optionalMessage.isPresent() && MessageCache.getMessageCacheSize() <= MessageCache.getTranfereeCacheSize() ) {
@@ -128,7 +123,8 @@ public class Transferee implements ProtocolState {
      * @return           Optional.empty if the calculation did not get verified, or Confirm message if data got verified.
      */
     private void handleOfferReply(OfferReply message) {
-        if (MessageCache.compareTimestamp(message.getTimestamp(), this.timeOffset) && processOfferReplyData(message)) {
+        if (MessageCache.compareTimestamp(message.getTimestamp(), this.timeOffset))
+            if (processOfferReplyData(message)) {
             this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp()));
         }
     }

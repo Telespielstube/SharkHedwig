@@ -7,7 +7,6 @@ import Location.GeoSpatial;
 import ProtocolRole.State.ProtocolState;
 import ProtocolRole.State.Transferee;
 import ProtocolRole.State.Transferor;
-import Session.SessionManager;
 import net.sharksystem.pki.SharkPKIComponent;
 
 /**
@@ -19,10 +18,11 @@ public class ProtocolRole {
     private final ProtocolState transfereeState;
     private final ProtocolState transferorState;
 
-    public ProtocolRole(SessionManager sessionManager, ShippingLabel shippingLabel, DeliveryContract deliveryContract,
+    public ProtocolRole(ShippingLabel shippingLabel, DeliveryContract deliveryContract,
                         Battery battery, GeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) {
-        this.transferorState = new Transferor(this, sessionManager, shippingLabel, deliveryContract, sharkPKIComponent);
-        this.transfereeState = new Transferee(this, sessionManager, shippingLabel, deliveryContract,
+        this.transferorState = new Transferor(this, shippingLabel, deliveryContract,
+                sharkPKIComponent);
+        this.transfereeState = new Transferee(this, shippingLabel, deliveryContract,
                 battery, geoSpatial, sharkPKIComponent);
         this.currentProtocolState = this.transfereeState;
     }

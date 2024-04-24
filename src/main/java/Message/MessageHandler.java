@@ -94,6 +94,11 @@ public class MessageHandler implements Handleable {
         return  outputStream.toByteArray();
     }
 
+    /**
+     * Serializes a message object to a byte array message.
+     * @param object
+     * @return
+     */
     public static byte[] objectToByteArray(Object object) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
@@ -105,10 +110,15 @@ public class MessageHandler implements Handleable {
         return outputStream.toByteArray();
     }
 
+    /**
+     * Deserializes an byte array message to a Message object.
+     * @param message
+     * @return
+     */
     public static Object byteArrayToObject(byte[] message) {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(message);
         try {
-            return  new ObjectInputStream(inputStream).readObject();
+            return new ObjectInputStream(inputStream).readObject();
         } catch (IOException | ClassNotFoundException e) {
             System.err.println(Utilities.formattedTimestamp() + "Caught an Exception: " + e.getMessage());
             throw new RuntimeException(e);

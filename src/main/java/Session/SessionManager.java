@@ -6,9 +6,9 @@ import DeliveryContract.ShippingLabel;
 import Location.GeoSpatial;
 import ProtocolRole.ProtocolRole;
 import Message.MessageBuilder;
-import Message.MessageCache;
 import Message.Messageable;
 import Message.Message;
+import Message.MessageFlag;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
@@ -20,7 +20,6 @@ import Setup.Channel;
 import net.sharksystem.pki.SharkPKIComponent;
 
 public class SessionManager implements Observer, ISessionManager {
-
     private ProtocolRole protocolRole;
     private MessageBuilder messageBuilder;
     private DeliveryContract deliveryContract;
@@ -31,11 +30,11 @@ public class SessionManager implements Observer, ISessionManager {
     private final SessionState requestState;
     private final SessionState contractState;
 
-    public SessionManager(ShippingLabel shippingLabel, DeliveryContract deliveryContract, Battery battery,
+    public SessionManager(ShippingLabel shippingLabel, ProtocolRole protocolRole, DeliveryContract deliveryContract, Battery battery,
                           GeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) {
         this.shippingLabel = shippingLabel;
+        this.protocolRole = protocolRole;
         this.deliveryContract = deliveryContract;
-
         this.noSessionState = new NoSessionState(this);
         this.requestState = new RequestState(this);
         this.contractState = new ContractState(this);
@@ -45,7 +44,7 @@ public class SessionManager implements Observer, ISessionManager {
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof ShippingLabel ) {
-            this.protocolRole.setProtocolState(this.protocolRole.getTransfereeState());
+            this.protocolRole.setProtocolState(this.protocolRole.getTransferorState());
             this.shippingLabel = ((ShippingLabel) o).get();
         }
         if (o instanceof DeliveryContract) {
@@ -55,21 +54,33 @@ public class SessionManager implements Observer, ISessionManager {
 
     @Override
     public Optional<MessageBuilder> sessionHandling(Messageable message, String sender) {
-        this.optionalMessage = getCurrentSessionState().handle(message, this.protocolRole,
-                this.shippingLabel, this.deliveryContract, sender);
+        this.optionalMessage = getCurrentSessionState().handle(message, this.protocolRole, sender);
         if (this.optionalMessage.isPresent()) {
             if (getCurrentSessionState().equals(getNoSessionState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.NO_SESSION.getChannel(), sender);
             }
-            else if (getCurrentSessionState().equals(getRequestState())) {
+            if (getCurrentSessionState().equals(getRequestState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.REQUEST.getChannel(), sender);
             }
-            else if (getCurrentSessionState().equals(getContractState())) {
+            if (getCurrentSessionState().equals(getContractState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.CONTRACT.getChannel(), sender);
             }
+            if (checkStateStatus(this.optionalMessage.get().getMessageFlag())) {
+                this.currentSessionState.nextState();
+            }
+        } else {
             getCurrentSessionState().resetState();
         }
         return Optional.ofNullable(this.messageBuilder);
+    }
+
+    private boolean checkStateStatus(MessageFlag messageFlag) {
+        boolean complete = (messageFlag == MessageFlag.ADVERTISEMENT || messageFlag == MessageFlag.SOLICITATION ||
+                messageFlag == MessageFlag.OFFER_REPLY || messageFlag == MessageFlag.CONFIRM || messageFlag == MessageFlag.RELEASE ||
+                messageFlag == MessageFlag.COMPLETE)
+                ? true
+                : false;
+        return complete;
     }
 
     /**
@@ -78,7 +89,6 @@ public class SessionManager implements Observer, ISessionManager {
     public SessionState getCurrentSessionState() {
         return this.currentSessionState;
     }
-
     public void setSessionState(SessionState sessionState) {
         this.currentSessionState = sessionState;
     }

@@ -55,7 +55,7 @@ public final class MessageCache {
      *
      * @return    Last object from TreeMap.
      */
-    public static Object getLastValueFromList() {
+    public static Object getLastElementFromList() {
         return messageList.get(messageList.lastKey());
     }
 

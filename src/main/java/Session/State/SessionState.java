@@ -20,8 +20,7 @@ public interface SessionState {
      *
      * @return           An Optional if the message was processed correctly or and empty Optional container if not.
      */
-    Optional<Message.Message> handle(Messageable message, ProtocolRole protocolRole, ShippingLabel shippingLabel,
-                                     DeliveryContract deliveryContract, String sender);
+    Optional<Message.Message> handle(Messageable message, ProtocolRole protocolRole, String sender);
 
     /**
      * The current state transitions to the following state.

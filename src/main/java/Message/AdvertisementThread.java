@@ -28,7 +28,7 @@ public class AdvertisementThread implements Runnable {
         while (true) {
             try {
                 Thread.sleep(100000);
-                if (MessageCache.getLastValueFromList() instanceof Advertisement) {
+                if (MessageCache.getLastElementFromList() instanceof Advertisement) {
                     break;
                 }
                 if (this.protocolRole.equals(this.protocolRole.getTransfereeState()) && MessageCache.getMessageCacheSize() == 0) {

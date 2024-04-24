@@ -17,8 +17,7 @@ public class NoSessionState implements SessionState {
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, ProtocolRole protocolRole, ShippingLabel shippingLabel,
-                                    DeliveryContract deliveryContract, String sender) {
+    public Optional<Message> handle(Messageable message, ProtocolRole protocolRole, String sender) {
         return protocolRole.getCurrentProtocolState().handle(message, sender);
     }
 
@@ -30,5 +29,10 @@ public class NoSessionState implements SessionState {
     @Override
     public void resetState() {
         this.sessionManager.setSessionState(this.sessionManager.getNoSessionState());
+    }
+
+    @Override
+    public String toString() {
+        return "NoSession";
     }
 }

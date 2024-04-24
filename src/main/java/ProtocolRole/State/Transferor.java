@@ -33,7 +33,6 @@ import java.util.stream.Stream;
  */
 public class Transferor implements ProtocolState {
     private final ProtocolRole protocolRole;
-    private final SessionManager sessionManager;
     private final SharkPKIComponent sharkPKIComponent;
     private ShippingLabel shippingLabel;
     private DeliveryContract deliveryContract;
@@ -43,10 +42,9 @@ public class Transferor implements ProtocolState {
     private boolean contractState;
     private GeoSpatial geoSpatial;
 
-    public Transferor(ProtocolRole protocolRole, SessionManager sessionManager, ShippingLabel shippingLabel,
+    public Transferor(ProtocolRole protocolRole, ShippingLabel shippingLabel,
                       DeliveryContract deliveryContract, SharkPKIComponent sharkPKIComponent) {
         this.protocolRole = protocolRole;
-        this.sessionManager = sessionManager;
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
         this.sharkPKIComponent = sharkPKIComponent;
@@ -60,14 +58,13 @@ public class Transferor implements ProtocolState {
         switch (message.getMessageFlag()) {
             case ADVERTISEMENT:
                 handleAdvertisement((Advertisement) message);
-                this.sessionManager.getNoSessionState().nextState();
+                break;
             case OFFER:
-                handleOffer((Offer) message, shippingLabel);
+                handleOffer((Offer) message);
                 break;
             case CONFIRM:
                 handleConfirm((Confirm) message);
                 saveData();
-                this.sessionManager.getRequestState().nextState();
                 break;
             case AFFIRM:
                 handleAffirm((Affirm) message);
@@ -78,12 +75,10 @@ public class Transferor implements ProtocolState {
             case COMPLETE:
                 handleComplete((Complete) message);
                 saveData();
-                this.sessionManager.getContractState().nextState();
                 this.protocolRole.changeRole();
                 break;
             default:
                 System.err.println(Utilities.formattedTimestamp() + "Missing message flag.");
-                this.sessionManager.getCurrentSessionState().resetState();
                 break;
         }
         if (this.optionalMessage.isPresent() && MessageCache.getMessageCacheSize() <= MessageCache.getTranferorCacheSize() ) {
@@ -95,12 +90,12 @@ public class Transferor implements ProtocolState {
     }
 
     /**
-     * Processes the received Adverntisement message and creates Solocitation message object.
+     * Processes the received Advertisement message and creates Solicitation message object.
      *
      * @param message    message object.
      */
     private void handleAdvertisement(Advertisement message) {
-        if (message.getAdTag()) {
+        if (MessageCache.getMessageCacheSize() == 0) {
             this.optionalMessage = Optional.of(new Solicitation(Utilities.createUUID(), MessageFlag.SOLICITATION,
                     Utilities.createTimestamp(), true));
         }
@@ -112,12 +107,12 @@ public class Transferor implements ProtocolState {
      * @param message Offer message object.
      * @return OfferReply object, or and enpty object if data were not verified.
      */
-    private void handleOffer(Offer message, ShippingLabel shippingLabel) {
+    private void handleOffer(Offer message) {
         if (MessageCache.compareTimestamp(message.getTimestamp(), this.timeOffset)
                 && verifyOfferData(message) && processOfferData(message)) {
             this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY,
-                    Utilities.createTimestamp(), shippingLabel.get().getPackageWeight(),
-                    shippingLabel.get().getPackageDestination()));
+                    Utilities.createTimestamp(), this.shippingLabel.get().getPackageWeight(),
+                    this.shippingLabel.get().getPackageDestination()));
         }
     }
 
