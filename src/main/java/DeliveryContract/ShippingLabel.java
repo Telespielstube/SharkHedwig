@@ -31,8 +31,9 @@ public class ShippingLabel extends Observable implements Contractable {
         this.destination = builder.destination;
         this.locationDestination = builder.locationDestination;
         this.packageWeight = builder.packageWeight;
+        this.isCreated = true;
         setChanged();
-        notifyObservers();
+        notifyObservers(this);
     }
 
     @Override
@@ -129,6 +130,7 @@ public class ShippingLabel extends Observable implements Contractable {
             this.destination = destination;
             this.locationOrigin = locationOrigin;
             this.locationDestination = locationDestination;
+
         }
 
         /**

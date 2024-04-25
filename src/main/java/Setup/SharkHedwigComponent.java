@@ -3,10 +3,7 @@ package Setup;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import HedwigUI.UserManager;
-import Message.AdvertisementThread;
-import Message.MessageBuilder;
-import Message.MessageHandler;
-import Message.Messageable;
+import Message.*;
 import ProtocolRole.ProtocolRole;
 import Session.SessionManager;
 import net.sharksystem.SharkComponent;
@@ -100,7 +97,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         }
         new PKIManager(sharkPKIComponent);
         this.protocolRole = new ProtocolRole(this.shippingLabel, this.deliveryContract, battery,
-                geoSpatial, sharkPKIComponent);
+                geoSpatial, this.sharkPKIComponent);
         this.sessionManager = new SessionManager(this.shippingLabel, this.protocolRole, this.deliveryContract, this.battery, this.geoSpatial,
                 this.sharkPKIComponent);
         shippingLabel.addObserver((Observer) this.sessionManager);
@@ -163,8 +160,8 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
                         continue;
                     }
                     Messageable message = (Messageable) this.messageHandler.parseIncomingMessage(it.next(), senderE2E, sharkPKIComponent);
-                    Optional<MessageBuilder> messageBuilder = sessionManager.sessionHandling(message, senderE2E);
-                    outgoingMessage(messageBuilder);
+//                    Optional<MessageBuilder> messageBuilder = this.sessionManager.sessionHandling(message, senderE2E);
+                //    outgoingMessage(messageBuilder);
                 }
             } catch (IOException e) {
                 System.err.println(Utilities.formattedTimestamp() + "Caught an IOException while iterating trough th messages: " + e.getMessage());
@@ -174,6 +171,10 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         System.err.println(Utilities.formattedTimestamp() + " Message has invalid uri format: " + uri );
     }
 
+    public Optional<MessageBuilder> testMethod(Messageable message, String senderE2E) {
+        return this.sessionManager.sessionHandling(message, senderE2E);
+
+    }
     /**
      * Handles the built message object to be send to peers during the next encounter.
      *
