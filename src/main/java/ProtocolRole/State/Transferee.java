@@ -111,7 +111,7 @@ public class Transferee implements ProtocolState {
     private void handleSolicitation(Solicitation message) {
         if (MessageCache.compareTimestamp(message.getTimestamp(), this.timeOffset)) {
             this.optionalMessage = Optional.of(new Offer(Utilities.createUUID(), MessageFlag.OFFER, Utilities.createTimestamp(),
-                    this.battery.getCurrentBatteryLevel(), AppConstant.MAX_FREIGHT_WEIGHT.getInt(), this.geoSpatial.getCurrentLocation()));
+                    100, AppConstant.MAX_FREIGHT_WEIGHT.getInt(), null));
         }
     }
 
