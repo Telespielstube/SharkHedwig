@@ -22,7 +22,7 @@ public interface ProtocolState {
      *
      * @return           An Optional if the message was processed correctly or and empty Optional container if not.
      */
-    Optional<Message> handle(Messageable message, String sender);
+    Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract, String sender);
 
 
 }

@@ -54,7 +54,7 @@ public class SessionManager implements Observer, ISessionManager {
 
     @Override
     public Optional<MessageBuilder> sessionHandling(Messageable message, String sender) {
-        this.optionalMessage = getCurrentSessionState().handle(message, this.protocolRole, sender);
+        this.optionalMessage = getCurrentSessionState().handle(message, this.protocolRole, this.shippingLabel, this.deliveryContract, sender);
         if (this.optionalMessage.isPresent()) {
             if (getCurrentSessionState().equals(getNoSessionState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.NO_SESSION.getChannel(), sender);

@@ -25,6 +25,8 @@ import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;
 
 import java.util.Objects;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -42,19 +44,19 @@ public class Transferor implements ProtocolState {
     private boolean contractState;
     private GeoSpatial geoSpatial;
 
-    public Transferor(ProtocolRole protocolRole, ShippingLabel shippingLabel,
-                      DeliveryContract deliveryContract, SharkPKIComponent sharkPKIComponent) {
+    public Transferor(ProtocolRole protocolRole, SharkPKIComponent sharkPKIComponent) {
         this.protocolRole = protocolRole;
-        this.shippingLabel = shippingLabel;
-        this.deliveryContract = deliveryContract;
         this.sharkPKIComponent = sharkPKIComponent;
         this.geoSpatial = new GeoSpatial();
         this.optionalMessage = Optional.empty();
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, String sender) {
+    public Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract, String sender) {
+        this.shippingLabel = shippingLabel;
+        this.deliveryContract = deliveryContract;
         this.sender = sender;
+
         switch (message.getMessageFlag()) {
             case ADVERTISEMENT:
                 handleAdvertisement((Advertisement) message);
@@ -112,7 +114,7 @@ public class Transferor implements ProtocolState {
                 && verifyOfferData(message) && processOfferData(message)) {
             this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY,
                     Utilities.createTimestamp(), this.shippingLabel.get().getPackageWeight(),
-                    this.shippingLabel.get().getPackageDestination()));
+                    this.shippingLabel.get().getPackageDestination(), true));
         }
     }
 
@@ -216,8 +218,7 @@ public class Transferor implements ProtocolState {
         if (this.optionalMessage.isPresent()) {
             LogEntry logEntry = new LogEntry(this.optionalMessage.get().getUUID(), Utilities.formattedTimestamp(),
                     this.deliveryContract.getShippingLabel().getPackageDestination(), true, AppConstant.PEER_NAME.toString(), sender);
-            Logger.writeLog(logEntry.toString(), AppConstant.REQUEST_LOG_PATH.toString() +
-                    this.optionalMessage.get().getUUID());
+            Logger.writeLog(logEntry.toString(), String.valueOf(this.optionalMessage.get().getUUID()));
         }
     }
 

@@ -20,10 +20,8 @@ public class ProtocolRole {
 
     public ProtocolRole(ShippingLabel shippingLabel, DeliveryContract deliveryContract,
                         Battery battery, GeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) {
-        this.transferorState = new Transferor(this, shippingLabel, deliveryContract,
-                sharkPKIComponent);
-        this.transfereeState = new Transferee(this, shippingLabel, deliveryContract,
-                battery, geoSpatial, sharkPKIComponent);
+        this.transferorState = new Transferor(this, sharkPKIComponent);
+        this.transfereeState = new Transferee(this, battery, geoSpatial, sharkPKIComponent);
         this.currentProtocolState = this.transfereeState;
     }
 

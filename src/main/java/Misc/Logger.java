@@ -16,7 +16,7 @@ public class Logger {
     /**
      * Creates the logging folder for request and contract sessions.
      *
-     * @param directory    Path to log directory,
+     * @param directory Path to log directory,
      * @throws IOException is thrown when something is wrong in creating the folder.
      */
     public static void createLogDirectory(String directory) {
@@ -36,10 +36,10 @@ public class Logger {
      * @return true if writing was successful.
      */
     public static boolean writeLog(String entry, String file) {
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(file), StandardCharsets.UTF_8, StandardOpenOption.CREATE)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(file), StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW)) {
             writer.write(entry);
         } catch (IOException e) {
-            System.err.println(Utilities.formattedTimestamp() + "Caught an exception while writing log data: " + e.getMessage());
+            System.err.println(Utilities.formattedTimestamp() + " Caught an exception while writing log data: " + e.getMessage());
             throw new RuntimeException(e);
         }
         return true;

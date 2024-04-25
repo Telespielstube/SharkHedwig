@@ -13,12 +13,12 @@ import java.util.Optional;
  * This thread manages the Advertisement message management. Every 10 min the thread checks if an andvertisemnt message
  * is stored in the message cache and depending in the role a message is created and sent.
  */
-public class AdvertisementThread implements Runnable {
+public class Advertiser implements Runnable {
 
     private final ProtocolRole protocolRole;
     private final SharkHedwigComponent sharkHedwigComponent;
 
-    public AdvertisementThread(SharkHedwigComponent sharkHedwigComponent, ProtocolRole protocolRole) {
+    public Advertiser(SharkHedwigComponent sharkHedwigComponent, ProtocolRole protocolRole) {
         this.protocolRole = protocolRole;
         this.sharkHedwigComponent = sharkHedwigComponent;
     }

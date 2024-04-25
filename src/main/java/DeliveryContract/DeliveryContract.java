@@ -3,6 +3,8 @@ package DeliveryContract;
 import Location.Locationable;
 import Misc.Utilities;
 import Setup.AppConstant;
+
+import java.io.Serializable;
 import java.util.Observable;
 
 public class DeliveryContract extends Observable implements Contractable {
@@ -79,6 +81,6 @@ public class DeliveryContract extends Observable implements Contractable {
      */
     public String getString() {
         return "DeliveryContract\n-----------------\n\n" + "Shipping label\n--------------\n" + getShippingLabel().getString() +
-                "\n\n" + "Transit record\n--------------\n" + getTransitRecord().getString() + "\n";
+                "\n\n" + "Transit record\n--------------\n" + getTransitRecord().getString();
     }
 }

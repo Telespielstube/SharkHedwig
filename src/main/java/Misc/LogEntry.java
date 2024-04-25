@@ -28,6 +28,7 @@ public class LogEntry {
         this.transferee = transferee;
     }
 
+
     @Override
     public String toString() {
         return ("PackageUUID :" + this.packageUUID + "; Message created: " + this.timestamp + "; Handover: " + this.pickup

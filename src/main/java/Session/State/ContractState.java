@@ -20,8 +20,8 @@ public class ContractState implements SessionState {
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, ProtocolRole protocolRole, String sender) {
-        return protocolRole.getCurrentProtocolState().handle(message, sender);
+    public Optional<Message> handle(Messageable message, ProtocolRole protocolRole, ShippingLabel shippingLabel, DeliveryContract deliveryContract, String sender) {
+        return protocolRole.getCurrentProtocolState().handle(message, shippingLabel, deliveryContract, sender);
     }
 
     @Override

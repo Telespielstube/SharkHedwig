@@ -13,7 +13,6 @@ import Message.Request.Offer;
 import Message.Request.OfferReply;
 import Misc.Utilities;
 import ProtocolRole.ProtocolRole;
-import ProtocolRole.State.Transferor;
 import Session.SessionManager;
 import Session.State.SessionState;
 import Setup.SharkHedwigComponent;
@@ -35,7 +34,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -136,6 +134,7 @@ public class SessionManagerTest {
          * Component setup
          */
         SharkHedwigComponent sharkHedwigComponent = new SharkHedwigComponent();
+        sharkHedwigComponent.setupLogger();
         Field sessionManagerField = sharkHedwigComponent.getClass().getDeclaredField("sessionManager");
         sessionManagerField.setAccessible(true);
         sessionManagerField.set(sharkHedwigComponent, new SessionManager(shippingLabel, protocolRole, deliveryContract, null, null, sharkPKIComponent));
@@ -150,25 +149,25 @@ public class SessionManagerTest {
                 Utilities.createTimestamp(), true);
         Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT,
                 Utilities.createTimestamp(), true);
-        OfferReply offerReply = new OfferReply(Utilities.createUUID(), MessageFlag.ADVERTISEMENT,
+        OfferReply offerReply = new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY,
                 Utilities.createTimestamp(),100.0, new Location
                 (57.5654645, 77.345345));
-        ContractDocument contractDocument = new ContractDocument(Utilities.createUUID(), MessageFlag.ADVERTISEMENT,
+        ContractDocument contractDocument = new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT,
                 Utilities.createTimestamp(),deliveryContract);
-        PickUp pickUp = new PickUp(Utilities.createUUID(), MessageFlag.ADVERTISEMENT,
+        PickUp pickUp = new PickUp(Utilities.createUUID(), MessageFlag.PICK_UP,
                 Utilities.createTimestamp(),transitRecord);
-        Release release = new Release(Utilities.createUUID(), MessageFlag.ADVERTISEMENT,
+        Release release = new Release(Utilities.createUUID(), MessageFlag.RELEASE,
                 Utilities.createTimestamp());
 
         /**
-         * Processing
+         * Processing of received messages
          */
         MessageCache.addMessage(advertisement);
-        Optional<MessageBuilder> offer = sharkHedwigComponent.testMethod(solicitation, "Marta");
-        Optional<MessageBuilder> confirm = sharkHedwigComponent.testMethod(offerReply, "Marta");
-        Optional<MessageBuilder> affirm = sharkHedwigComponent.testMethod(contractDocument, "Marta");
-        Optional<MessageBuilder> ready = sharkHedwigComponent.testMethod(pickUp,"Marta");
-        Optional<MessageBuilder> complete = sharkHedwigComponent.testMethod(release, "Marta");
+        Optional<MessageBuilder> offer = sharkHedwigComponent.testHelperMethod(solicitation, "Marta");
+        Optional<MessageBuilder> confirm = sharkHedwigComponent.testHelperMethod(offerReply, "Marta");
+        Optional<MessageBuilder> affirm = sharkHedwigComponent.testHelperMethod(contractDocument, "Marta");
+        Optional<MessageBuilder> ready = sharkHedwigComponent.testHelperMethod(pickUp,"Marta");
+        Optional<MessageBuilder> complete = sharkHedwigComponent.testHelperMethod(release, "Marta");
     }
 
     @Test
@@ -187,6 +186,7 @@ public class SessionManagerTest {
 
         // Component and field setup
         SharkHedwigComponent sharkHedwigComponent = new SharkHedwigComponent();
+
         Field sessionManagerField = sharkHedwigComponent.getClass().getDeclaredField("sessionManager");
         sessionManagerField.setAccessible(true);
         sessionManagerField.set(sharkHedwigComponent, new SessionManager(shippingLabel, protocolRole, deliveryContract, null, null, sharkPKIComponent));
@@ -210,8 +210,8 @@ public class SessionManagerTest {
 //        roleField.setAccessible(true);
 //        roleField.set(protocolRole, new Transferor(null, shippingLabel, deliveryContract, sharkPKIComponent));
 
-        Optional<MessageBuilder> solicitation = sharkHedwigComponent.testMethod(advertisement, "Marta");
-        Optional<MessageBuilder> offerReply = sharkHedwigComponent.testMethod(offer, "Marta");
+        Optional<MessageBuilder> solicitation = sharkHedwigComponent.testHelperMethod(advertisement, "Marta");
+        Optional<MessageBuilder> offerReply = sharkHedwigComponent.testHelperMethod(offer, "Marta");
 //
 //        Optional<MessageBuilder> solicitation = sessionManager.sessionHandling(advertisement, "Marta");
 //        Optional<MessageBuilder> offerReply = sessionManager.sessionHandling(offer, "Marta");

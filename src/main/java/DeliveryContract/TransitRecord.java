@@ -90,11 +90,12 @@ public class TransitRecord implements Contractable {
     }
 
     /**
-     * Formats the list entries to a nice readlable String format.
+     * Formats the list entries to a nice readable String format.
      *
      * @return    Formatted list entries.
      */
     public String getString() {
         return this.entryList.toString().replace("[","").replace("]","").replace(", ", "");
     }
+
 }

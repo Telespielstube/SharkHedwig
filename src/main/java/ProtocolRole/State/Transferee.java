@@ -19,7 +19,6 @@ import Message.NoSession.Solicitation;
 import Misc.Logger;
 import Misc.Utilities;
 import ProtocolRole.ProtocolRole;
-import Session.SessionManager;
 import Setup.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
@@ -42,12 +41,10 @@ public class Transferee implements ProtocolState {
     private boolean contractState;
     private int timeOffset;
 
-    public Transferee(ProtocolRole protocolRole, ShippingLabel shippingLabel,
-                      DeliveryContract deliveryContract, Battery battery, GeoSpatial geoSpatial,
+    public Transferee(ProtocolRole protocolRole, Battery battery, GeoSpatial geoSpatial,
                       SharkPKIComponent sharkPKIComponent) {
         this.protocolRole = protocolRole;
-        this.shippingLabel = shippingLabel;
-        this.deliveryContract = deliveryContract;
+
         this.battery = battery;
         this.geoSpatial = geoSpatial;
         this.sharkPKIComponent = sharkPKIComponent;
@@ -55,22 +52,25 @@ public class Transferee implements ProtocolState {
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, String sender) {
+    public Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract, String sender) {
+        this.shippingLabel = shippingLabel;
+        this.deliveryContract = deliveryContract;
         this.optionalMessage = Optional.empty();
+
         switch(message.getMessageFlag()) {
             case SOLICITATION:
                 handleSolicitation((Solicitation) message);
                 break;
             case OFFER_REPLY:
                 handleOfferReply((OfferReply) message);
-                saveData();
+                saveData(AppConstant.REQUEST_LOG_PATH, message);
                 break;
             case CONTRACT_DOCUMENT:
                 handleContract((ContractDocument) message);
                 break;
             case PICK_UP:
                 handlePickUp((PickUp) message, sender);
-                saveData();
+                saveData(AppConstant.DELIVERY_CONTRACT_LOG_PATH);
                 break;
             case RELEASE:
                 handleRelease((Release) message);
@@ -125,7 +125,7 @@ public class Transferee implements ProtocolState {
     private void handleOfferReply(OfferReply message) {
         if (MessageCache.compareTimestamp(message.getTimestamp(), this.timeOffset))
             if (processOfferReplyData(message)) {
-            this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp()));
+                this.optionalMessage = Optional.of(new Confirm(Utilities.createUUID(), MessageFlag.CONFIRM, Utilities.createTimestamp()));
         }
     }
 
@@ -203,11 +203,11 @@ public class Transferee implements ProtocolState {
     /**
      * Saves the important session data to the give path constant.
      */
-    private void saveData() {
-        if (this.optionalMessage.isPresent()) {
-            String saveFile = AppConstant.DELIVERY_CONTRACT_LOG_PATH.toString()
-                    + this.deliveryContract.getShippingLabel().getUUID();
-            Logger.writeLog(this.deliveryContract.toString(), saveFile);
+    private void saveData(AppConstant logPath, Messageable message) {
+        if (this.optionalMessage.isPresent() && message instanceof OfferReply) {
+            String path = logPath.toString();
+            String file = message. .getUUID() + ".txt";
+            Logger.writeLog(this.deliveryContract.getString(), path + "/" + file);
         }
     }
 }
