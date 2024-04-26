@@ -1,16 +1,18 @@
 package DeliveryContract;
 
+import DeliveryContract.State.ContractState;
+import DeliveryContract.State.DeliveryContractState;
 import Location.Locationable;
 import Misc.Utilities;
 import Setup.AppConstant;
 
-import java.io.Serializable;
 import java.util.Observable;
 
 public class DeliveryContract extends Observable implements Contractable, Cloneable {
 
     private TransitRecord transitRecord;
     private ShippingLabel shippingLabel;
+    private final ContractState deliveryContractState;
     private boolean isCreated = ContractState.NOT_CREATED.getState();
 
     public DeliveryContract(String receiver, ShippingLabel shippingLabel, Locationable geoSpatial) {
@@ -37,7 +39,9 @@ public class DeliveryContract extends Observable implements Contractable, Clonea
         notifyObservers(this);
     }
 
-    public DeliveryContract() {}
+    public DeliveryContract() {
+        this.deliveryContractState = new DeliveryContractState(this);
+    }
 
     @Override
     public DeliveryContract get() {

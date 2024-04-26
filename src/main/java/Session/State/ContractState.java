@@ -13,11 +13,9 @@ import java.util.Optional;
 
 public class ContractState implements SessionState {
     private final SessionManager sessionManager;
-    private boolean isComplete;
 
     public ContractState(SessionManager sessionManager) {
         this.sessionManager = sessionManager;
-        this.isComplete = false;
     }
 
     @Override

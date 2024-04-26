@@ -88,7 +88,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         this.peer.addASAPMessageReceivedListener(AppConstant.APP_FORMAT.toString(), this);
         try {
             this.peer.setASAPRoutingAllowed(AppConstant.APP_FORMAT.toString(), true);
-            setupChannel();
+            setupChannel(AppConstant.APP_FORMAT.toString());
             this.peer.getASAPStorage(AppConstant.APP_FORMAT.toString()).getOwner();
             setupLogger();
         } catch (IOException | ASAPException e) {
@@ -108,10 +108,10 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     /**
      * Setting up all component channels. Multiple channels allow us to control incoming and outgoing messages much better.
      */
-    public void setupChannel()  {
+    public void setupChannel(String channelName)  {
         for (Channel type : Channel.values()) {
             try {
-                this.peer.getASAPStorage(AppConstant.APP_FORMAT.toString()).createChannel(type.getChannel());
+                this.peer.getASAPStorage(channelName).createChannel(type.getChannel());
             } catch (IOException | ASAPException e) {
                 System.err.println(Utilities.formattedTimestamp() + "Caught an Exception while setting up the messaging channels: " + e.getMessage());
                 throw new RuntimeException(e);

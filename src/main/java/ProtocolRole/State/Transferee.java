@@ -4,7 +4,6 @@ import Battery.Battery;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import DeliveryContract.TransitRecord;
-import DeliveryContract.ContractState;
 import Location.GeoSpatial;
 import Message.Contract.*;
 import Message.Message;

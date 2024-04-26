@@ -2,7 +2,7 @@ package ProtocolRole.State;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
-import DeliveryContract.ContractState;
+import DeliveryContract.State.ContractState;
 import DeliveryContract.TransitEntry;
 import Message.Contract.*;
 import Message.Message;
