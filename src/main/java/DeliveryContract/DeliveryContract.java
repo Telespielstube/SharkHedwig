@@ -13,8 +13,8 @@ public class DeliveryContract extends Observable implements Contractable, Clonea
     private ShippingLabel shippingLabel;
     private boolean isCreated = ContractState.NOT_CREATED.getState();
 
-    public DeliveryContract(String receiver, Locationable geoSpatial) {
-        this.shippingLabel = getShippingLabel();
+    public DeliveryContract(String receiver, ShippingLabel shippingLabel, Locationable geoSpatial) {
+        this.shippingLabel = shippingLabel;
         this.transitRecord = new TransitRecord();
         this.transitRecord.addEntry(new TransitEntry(this.transitRecord.countUp(),
                 this.shippingLabel.getUUID(),

@@ -12,7 +12,7 @@ public class TransitRecord implements Contractable {
 
     private final List<TransitEntry> entryList;
     private boolean isCreated = false;
-    private int serialNumber = 0;
+    private int serialNumber = 1;
 
     /**
      * The TransitRecord object is a dynamic vector where TransitEntry objects are added.

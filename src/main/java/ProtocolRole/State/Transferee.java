@@ -204,12 +204,16 @@ public class Transferee implements ProtocolState {
     private void saveData(AppConstant logPath, Messageable message) {
         String path = logPath.toString();
         String file = this.sender + Utilities.formattedTimestamp() + ".txt";
-        if (this.optionalMessage.isPresent()) {
-            if (message instanceof OfferReply) {
-                Logger.writeLog(new LogEntry(this.sender, AppConstant.PEER_NAME.toString(), Utilities.formattedTimestamp(), ((OfferReply) message).getPackageWeight(), ((OfferReply) message).getPackageDestination(), true).getRequestLogEntry(), path + "/" + file);
-            } else {
-                Logger.writeLog(new LogEntry(this.deliveryContract).getDeliveryContractLogEntry(), file);
-            }
+        if (this.optionalMessage.isPresent() && this.optionalMessage.get() instanceof Confirm) {
+            Logger.writeLog(new LogEntry(
+                    this.sender, AppConstant.PEER_NAME.toString(),
+                    Utilities.formattedTimestamp(),
+                    ((OfferReply) message).getPackageWeight(),
+                    ((OfferReply) message).getPackageDestination(),
+                    true)
+                    .getRequestLogEntry(), path + "/" + file);
+        } else {
+            Logger.writeLog(new LogEntry(this.deliveryContract).getDeliveryContractLogEntry(), file);
         }
     }
 }
