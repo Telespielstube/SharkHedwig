@@ -8,10 +8,10 @@ import java.util.UUID;
 
 public class OfferReply extends Message {
 
-    private double packageWeight = 0.0;
-    private Location packageDestination = null;
+    private double packageWeight;
+    private Location packageDestination;
 
-    public OfferReply(UUID uuid, MessageFlag messageFlag, long timestamp, double packageWeight, Location packageDestination ) {
+    public OfferReply(UUID uuid, MessageFlag messageFlag, long timestamp, double packageWeight, Location packageDestination) {
         super(uuid, messageFlag, timestamp);
         this.packageWeight = packageWeight;
         this.packageDestination = packageDestination;

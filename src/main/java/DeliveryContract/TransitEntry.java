@@ -93,7 +93,8 @@ public class TransitEntry implements Serializable {
      *
      * @return    String object of  all attributes.
      */
-    public String getString() {
+    @Override
+    public String toString() {
         return String.format("S/N: " + this.serialNumber + "; PackageUUID: " + this.packageUUID + "; Transferor: " +
                 this.transferor + "; Transferee: " + this.transferee + "; Pick up Location: " +
                 this.pickUpLocation + "; Timestamp: " + this.timestamp + "; Signature Transferee: " +

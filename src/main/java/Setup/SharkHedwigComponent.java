@@ -40,7 +40,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     private final Battery battery;
     private final GeoSpatial geoSpatial;
     private ProtocolRole protocolRole;
-    private AdvertisementThread advertisementThread;
+    private Advertiser advertisementThread;
 
     /**
      * The component implements a decentralized protocol that allows drones to transport a physical package from a
@@ -96,14 +96,20 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
             throw new RuntimeException(e);
         }
         new PKIManager(sharkPKIComponent);
+<<<<<<< HEAD
         this.protocolRole = new ProtocolRole(this.shippingLabel, this.deliveryContract, battery,
                 geoSpatial, this.sharkPKIComponent);
         this.sessionManager = new SessionManager(this.shippingLabel, this.protocolRole, this.deliveryContract, this.battery, this.geoSpatial,
                 this.sharkPKIComponent);
+=======
+        this.protocolRole = new ProtocolRole(this.shippingLabel, this.deliveryContract, this.battery,
+                this.geoSpatial, this.sharkPKIComponent);
+        this.sessionManager = new SessionManager(this.shippingLabel, this.protocolRole, this.deliveryContract);
+>>>>>>> testing
         shippingLabel.addObserver((Observer) this.sessionManager);
         deliveryContract.addObserver((Observer) this.sessionManager);
 
-        new AdvertisementThread(this, this.protocolRole).run();
+        new Advertiser(this, this.protocolRole).run();
     }
 
     /**
@@ -160,8 +166,13 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
                         continue;
                     }
                     Messageable message = (Messageable) this.messageHandler.parseIncomingMessage(it.next(), senderE2E, sharkPKIComponent);
+<<<<<<< HEAD
 //                    Optional<MessageBuilder> messageBuilder = this.sessionManager.sessionHandling(message, senderE2E);
                 //    outgoingMessage(messageBuilder);
+=======
+                    Optional<MessageBuilder> messageBuilder = this.sessionManager.sessionHandling(message, senderE2E);
+                    outgoingMessage(messageBuilder);
+>>>>>>> testing
                 }
             } catch (IOException e) {
                 System.err.println(Utilities.formattedTimestamp() + "Caught an IOException while iterating trough th messages: " + e.getMessage());
@@ -175,6 +186,18 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         return this.sessionManager.sessionHandling(message, senderE2E);
 
     }
+    /**
+     * This is only a little helper method to bypass the non-functioning parseIncomingMessage().
+     * Needs to be deleted as soon as the mentioned method works.
+     * @param message
+     * @param senderE2E
+     * @return
+     */
+    public Optional<MessageBuilder> testHelperMethod(Messageable message, String senderE2E) {
+        return this.sessionManager.sessionHandling(message, senderE2E);
+
+    }
+
     /**
      * Handles the built message object to be send to peers during the next encounter.
      *

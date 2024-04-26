@@ -2,6 +2,7 @@ package Session.State;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
+import Location.GeoSpatial;
 import Message.Messageable;
 import Message.Message;
 import ProtocolRole.ProtocolRole;
@@ -17,8 +18,9 @@ public class NoSessionState implements SessionState {
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, ProtocolRole protocolRole, String sender) {
-        return protocolRole.getCurrentProtocolState().handle(message, sender);
+    public Optional<Message> handle(Messageable message, ProtocolRole protocolRole, ShippingLabel shippingLabel,
+                                    DeliveryContract deliveryContract, String sender) {
+        return protocolRole.getCurrentProtocolState().handle(message, shippingLabel, deliveryContract, sender);
     }
 
     @Override

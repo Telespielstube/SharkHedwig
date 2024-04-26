@@ -28,8 +28,16 @@ public final class Utilities {
      * @return    timestamp as human readable String object.
      */
     public static String formattedTimestamp() {
-        Date date = new Date();
-        return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss").format(date);
+        return new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss").format(new Date());
+    }
+
+    /**
+     * Creates a shortened timestamp for file naming.
+     *
+     * @return    shortened timestamp as String.
+     */
+    public static String shortTimestamp() {
+        return new SimpleDateFormat("dd-MM-yyyy").format(new Date());
     }
 
     /**

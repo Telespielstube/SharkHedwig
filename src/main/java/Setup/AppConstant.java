@@ -4,7 +4,7 @@ public enum AppConstant {
     // Component related constants
     APP_FORMAT("sharkHedwig"),
     PEER_FOLDER("hedwigStorage"),
-    PEER_NAME("hedwig123"),
+    PEER_NAME("hedwig"),
     MAX_FREIGHT_WEIGHT(3000),
     CA_ID("certificateAuthority"),
     SCHEME("sn2://"),

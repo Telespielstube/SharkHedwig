@@ -1,5 +1,7 @@
 package DeliveryContract;
 
+import Misc.Utilities;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,7 @@ public class TransitRecord implements Contractable {
 
     private final List<TransitEntry> entryList;
     private boolean isCreated = false;
-    private int serialNumber = 0;
+    private int serialNumber = 1;
 
     /**
      * The TransitRecord object is a dynamic vector where TransitEntry objects are added.
@@ -90,11 +92,13 @@ public class TransitRecord implements Contractable {
     }
 
     /**
-     * Formats the list entries to a nice readlable String format.
+     * Formats the list entries to a nice readable String format.
      *
      * @return    Formatted list entries.
      */
-    public String getString() {
+    @Override
+    public String toString() {
         return this.entryList.toString().replace("[","").replace("]","").replace(", ", "");
     }
+
 }

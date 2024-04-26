@@ -2,6 +2,7 @@ package ProtocolRole.State;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
+import Location.GeoSpatial;
 import Message.Message;
 import Message.Messageable;
 import Session.SessionManager;
@@ -22,7 +23,7 @@ public interface ProtocolState {
      *
      * @return           An Optional if the message was processed correctly or and empty Optional container if not.
      */
-    Optional<Message> handle(Messageable message, String sender);
+    Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract, String sender);
 
 
 }

@@ -18,7 +18,6 @@ import Message.Request.OfferReply;
 import Location.GeoSpatial;
 import Misc.*;
 import ProtocolRole.ProtocolRole;
-import Session.SessionManager;
 import Setup.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
@@ -42,19 +41,21 @@ public class Transferor implements ProtocolState {
     private boolean contractState;
     private GeoSpatial geoSpatial;
 
-    public Transferor(ProtocolRole protocolRole, ShippingLabel shippingLabel,
-                      DeliveryContract deliveryContract, SharkPKIComponent sharkPKIComponent) {
+    public Transferor(ProtocolRole protocolRole, DeliveryContract deliveryContract, GeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) {
         this.protocolRole = protocolRole;
-        this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
         this.sharkPKIComponent = sharkPKIComponent;
-        this.geoSpatial = new GeoSpatial();
+        this.geoSpatial = geoSpatial;
         this.optionalMessage = Optional.empty();
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, String sender) {
+    public Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract, String sender) {
+        this.shippingLabel = shippingLabel;
+        this.deliveryContract = deliveryContract;
+        this.optionalMessage = Optional.empty();
         this.sender = sender;
+
         switch (message.getMessageFlag()) {
             case ADVERTISEMENT:
                 handleAdvertisement((Advertisement) message);
@@ -64,7 +65,7 @@ public class Transferor implements ProtocolState {
                 break;
             case CONFIRM:
                 handleConfirm((Confirm) message);
-                saveData();
+                saveData(AppConstant.REQUEST_LOG_PATH);
                 break;
             case AFFIRM:
                 handleAffirm((Affirm) message);
@@ -74,7 +75,7 @@ public class Transferor implements ProtocolState {
                 break;
             case COMPLETE:
                 handleComplete((Complete) message);
-                saveData();
+                saveData(AppConstant.DELIVERY_CONTRACT_LOG_PATH);
                 this.protocolRole.changeRole();
                 break;
             default:
@@ -122,7 +123,7 @@ public class Transferor implements ProtocolState {
      */
     private void handleConfirm(Confirm message) {
         if (MessageCache.compareTimestamp(message.getTimestamp(), timeOffset)) {
-            this.optionalMessage = checkContractState();
+            checkContractState();
         }
     }
 
@@ -181,43 +182,51 @@ public class Transferor implements ProtocolState {
     }
 
     /**
-     * Checks the state of the contract. This method is called from the request session. To initiate the contract session
+     * Checks the state of the contract. This method is called from the request session to initiate the contract session
      * and sending the correct contract.
      *
      * @return    Optional message ContractDocument containing the DeliveryContract.
      */
-    public Optional<Message> checkContractState() {
+    public void checkContractState() {
         // Check object state to make sure to send the contract documents only once.
         if (!this.contractState) {
-            createDeliveryContract(this.sender);
+            createDeliveryContract();
         } else if (this.deliveryContract.getTransitRecord().getListSize() > 1
                 && !this.deliveryContract.getTransitRecord().getLastElement().getTransferor().equals(AppConstant.PEER_NAME)) {
             updateTransitRecord(this.sender);
         }
-        return this.optionalMessage;
     }
 
     /**
      * Creates the contract document object. The ShippingLabel object is already in memory and the TransitRecord object
      * gets created now.
-     *
-     * @param receiver The sender of the message is the receiver of the newly created DeliveryContract object.
      */
-    private void createDeliveryContract(String receiver) {
-        this.deliveryContract = new DeliveryContract(receiver, geoSpatial);
+    private void createDeliveryContract() {
+        this.deliveryContract = new DeliveryContract(this.sender, this.shippingLabel, geoSpatial);
         this.contractState = ContractState.CREATED.getState();
-        this.optionalMessage = Optional.of(new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), this.deliveryContract));
+        this.optionalMessage = Optional.of(new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT,
+                Utilities.createTimestamp(), this.deliveryContract));
     }
 
     /**
      * Saves the important session data to the give path constant.
      */
-    private void saveData() {
-        if (this.optionalMessage.isPresent()) {
-            LogEntry logEntry = new LogEntry(this.optionalMessage.get().getUUID(), Utilities.formattedTimestamp(),
-                    this.deliveryContract.getShippingLabel().getPackageDestination(), true, AppConstant.PEER_NAME.toString(), sender);
-            Logger.writeLog(logEntry.toString(), AppConstant.REQUEST_LOG_PATH.toString() +
-                    this.optionalMessage.get().getUUID());
+    private void saveData(AppConstant logPath) {
+        LogEntry logEntry = null;
+        String path = logPath.toString();
+        String file = this.sender + Utilities.formattedTimestamp() + ".txt";
+        if (this.optionalMessage.isPresent() && this.optionalMessage.get() instanceof ContractDocument) {
+            Logger.writeLog(new LogEntry(
+                    this.sender,
+                    AppConstant.PEER_NAME.toString(),
+                    Utilities.formattedTimestamp(),
+                    this.deliveryContract.getShippingLabel().getPackageWeight(),
+                    this.deliveryContract.getShippingLabel().getPackageDestination(),
+                    true)
+                    .getRequestLogEntry(), path + "/" + file);
+        } else {
+            Logger.writeLog(new LogEntry(
+                    this.deliveryContract).getDeliveryContractLogEntry(), path + "/" + file);
         }
     }
 
@@ -256,7 +265,7 @@ public class Transferor implements ProtocolState {
         TransitEntry update = new TransitEntry(this.deliveryContract.getTransitRecord().countUp(),
                 this.deliveryContract.getShippingLabel().getUUID(),
                 AppConstant.PEER_NAME.toString(),
-                receiver, geoSpatial.getCurrentLocation(),
+                receiver, this.geoSpatial.getCurrentLocation(),
                 Utilities.createTimestamp(),
                 null,
                 null);

@@ -3,16 +3,18 @@ package DeliveryContract;
 import Location.Locationable;
 import Misc.Utilities;
 import Setup.AppConstant;
+
+import java.io.Serializable;
 import java.util.Observable;
 
-public class DeliveryContract extends Observable implements Contractable {
+public class DeliveryContract extends Observable implements Contractable, Cloneable {
 
     private TransitRecord transitRecord;
     private ShippingLabel shippingLabel;
     private boolean isCreated = ContractState.NOT_CREATED.getState();
 
-    public DeliveryContract(String receiver, Locationable geoSpatial) {
-        this.shippingLabel = getShippingLabel();
+    public DeliveryContract(String receiver, ShippingLabel shippingLabel, Locationable geoSpatial) {
+        this.shippingLabel = shippingLabel;
         this.transitRecord = new TransitRecord();
         this.transitRecord.addEntry(new TransitEntry(this.transitRecord.countUp(),
                 this.shippingLabel.getUUID(),
@@ -24,7 +26,7 @@ public class DeliveryContract extends Observable implements Contractable {
                 null));
         this.isCreated = ContractState.CREATED.getState();
         setChanged();
-        notifyObservers();
+        notifyObservers(this);
     }
 
     public DeliveryContract(ShippingLabel shippingLabel, TransitRecord transitRecord) {
@@ -32,7 +34,7 @@ public class DeliveryContract extends Observable implements Contractable {
         this.transitRecord = transitRecord;
         this.isCreated = ContractState.CREATED.getState();
         setChanged();
-        notifyObservers();
+        notifyObservers(this);
     }
 
     public DeliveryContract() {}
@@ -45,6 +47,18 @@ public class DeliveryContract extends Observable implements Contractable {
     @Override
     public boolean getIsCreated() {
         return this.isCreated;
+    }
+
+    @Override
+    public DeliveryContract clone()  {
+        DeliveryContract deliveryContract;
+        try {
+            deliveryContract = (DeliveryContract) super.clone();
+        } catch (CloneNotSupportedException e) {
+            System.err.println(Utilities.createTimestamp() + ": " + e.getMessage() );
+            throw new RuntimeException(e);
+        }
+        return deliveryContract;
     }
 
     /**
@@ -70,15 +84,5 @@ public class DeliveryContract extends Observable implements Contractable {
      */
     public TransitRecord getTransitRecord() {
         return this.transitRecord.get();
-    }
-
-    /**
-     * Formats the DeliveryContract object
-     *
-     * @return    String representation of this object.
-     */
-    public String getString() {
-        return "DeliveryContract\n-----------------\n\n" + "Shipping label\n--------------\n" + getShippingLabel().getString() +
-                "\n\n" + "Transit record\n--------------\n" + getTransitRecord().getString() + "\n";
     }
 }
