@@ -41,19 +41,18 @@ public class Transferor implements ProtocolState {
     private boolean contractState;
     private GeoSpatial geoSpatial;
 
-    public Transferor(ProtocolRole protocolRole, SharkPKIComponent sharkPKIComponent) {
+    public Transferor(ProtocolRole protocolRole, GeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) {
         this.protocolRole = protocolRole;
         this.sharkPKIComponent = sharkPKIComponent;
-        this.geoSpatial = new GeoSpatial();
+        this.geoSpatial = geoSpatial;
         this.optionalMessage = Optional.empty();
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract,
-                                    GeoSpatial geoSpatial, String sender) {
+    public Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract, String sender) {
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
-        this.geoSpatial = geoSpatial;
+        this.optionalMessage = Optional.empty();
         this.sender = sender;
 
         switch (message.getMessageFlag()) {
@@ -182,7 +181,7 @@ public class Transferor implements ProtocolState {
     }
 
     /**
-     * Checks the state of the contract. This method is called from the request session. To initiate the contract session
+     * Checks the state of the contract. This method is called from the request session to initiate the contract session
      * and sending the correct contract.
      *
      * @return    Optional message ContractDocument containing the DeliveryContract.
@@ -202,12 +201,14 @@ public class Transferor implements ProtocolState {
      * Creates the contract document object. The ShippingLabel object is already in memory and the TransitRecord object
      * gets created now.
      *
-     * @param receiver The sender of the message is the receiver of the newly created DeliveryContract object.
+     * @param receiver The sender of the incoming message is the receiver of the newly created DeliveryContract
+     *                 object containing the delivery contract..
      */
     private void createDeliveryContract(String receiver) {
         this.deliveryContract = new DeliveryContract(receiver, geoSpatial);
         this.contractState = ContractState.CREATED.getState();
-        this.optionalMessage = Optional.of(new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT, Utilities.createTimestamp(), this.deliveryContract));
+        this.optionalMessage = Optional.of(new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT,
+                Utilities.createTimestamp(), this.deliveryContract));
     }
 
     /**

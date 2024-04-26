@@ -54,11 +54,9 @@ public class Transferee implements ProtocolState {
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract,
-                                    GeoSpatial geoSpatial, String sender) {
+    public Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract, String sender) {
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
-        this.geoSpatial = geoSpatial;
         this.sender = sender;
         this.optionalMessage = Optional.empty();
 

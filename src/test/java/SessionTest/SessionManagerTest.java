@@ -1,6 +1,6 @@
 package SessionTest;
 
-import Battery.Battery;
+import Battery.*;
 import DeliveryContract.*;
 import Message.Contract.*;
 import Message.MessageBuilder;
@@ -13,6 +13,7 @@ import Message.Request.Offer;
 import Message.Request.OfferReply;
 import Misc.Utilities;
 import ProtocolRole.ProtocolRole;
+import ProtocolRole.State.Transferor;
 import Session.SessionManager;
 import Session.State.SessionState;
 import Setup.SharkHedwigComponent;
@@ -42,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SessionManagerTest {
 
     private static SessionManager sessionManager;
+    private static BatteryManager batteryManager;
     private static ProtocolRole protocolRole;
     private DeliveryContract deliveryContract;
     private TransitRecord transitRecord;
@@ -68,8 +70,8 @@ public class SessionManagerTest {
         asapKeyStore = sharkPKIComponent.getASAPKeyStore();
         francisID = HelperPKITests.getPeerID(idStart, HelperPKITests.FRANCIS_NAME);
         publicKeyFrancis = asapKeyStore.getPublicKey(francisID);
-        protocolRole = new ProtocolRole(null, null, null , null,sharkPKIComponent);
-        sessionManager = new SessionManager(null, protocolRole, null, null, null, sharkPKIComponent);
+        protocolRole = new ProtocolRole(null, null, new BatteryManager() , new GeoSpatial(), sharkPKIComponent);
+        sessionManager = new SessionManager(null, protocolRole, null);
     }
 
     private static SharkPKIComponent setupComponent(SharkPeer sharkPeer) throws SharkException, NoSuchPaddingException, NoSuchAlgorithmException {
@@ -137,10 +139,11 @@ public class SessionManagerTest {
         sharkHedwigComponent.setupLogger();
         Field sessionManagerField = sharkHedwigComponent.getClass().getDeclaredField("sessionManager");
         sessionManagerField.setAccessible(true);
-        sessionManagerField.set(sharkHedwigComponent, new SessionManager(shippingLabel, protocolRole, deliveryContract, null, null, sharkPKIComponent));
+        sessionManagerField.set(sharkHedwigComponent, new SessionManager(shippingLabel, protocolRole, deliveryContract));
         Field protocolRoleField = sharkHedwigComponent.getClass().getDeclaredField("protocolRole");
         protocolRoleField.setAccessible(true);
-        protocolRoleField.set(sharkHedwigComponent, new ProtocolRole(shippingLabel, deliveryContract, null,null, sharkPKIComponent));
+        protocolRoleField.set(sharkHedwigComponent, new ProtocolRole(shippingLabel, deliveryContract, new BatteryManager() ,
+                new GeoSpatial(), sharkPKIComponent));
 
         /**
          * Received Messages
@@ -169,6 +172,11 @@ public class SessionManagerTest {
         // Doesn not work because of some signing/verifying issues!!
         //Optional<MessageBuilder> ready = sharkHedwigComponent.testHelperMethod(pickUp,"Marta");
         Optional<MessageBuilder> complete = sharkHedwigComponent.testHelperMethod(release, "Marta");
+
+        assertInstanceOf(Offer.class, offer.get().getMessage());
+        assertInstanceOf(Confirm.class, confirm.get().getMessage());
+        assertInstanceOf(Affirm.class, affirm.get().getMessage());
+        assertInstanceOf(Complete.class, complete.get().getMessage());
     }
 
     @Test
@@ -190,10 +198,10 @@ public class SessionManagerTest {
 
         Field sessionManagerField = sharkHedwigComponent.getClass().getDeclaredField("sessionManager");
         sessionManagerField.setAccessible(true);
-        sessionManagerField.set(sharkHedwigComponent, new SessionManager(shippingLabel, protocolRole, deliveryContract, null, null, sharkPKIComponent));
+        sessionManagerField.set(sharkHedwigComponent, new SessionManager(shippingLabel, protocolRole, deliveryContract));
         Field protocolRoleField = sharkHedwigComponent.getClass().getDeclaredField("protocolRole");
         protocolRoleField.setAccessible(true);
-        protocolRoleField.set(sharkHedwigComponent, new ProtocolRole(shippingLabel, deliveryContract, null,null, sharkPKIComponent));
+        protocolRoleField.set(sharkHedwigComponent, new ProtocolRole(shippingLabel, deliveryContract, null,new GeoSpatial(), sharkPKIComponent));
 
         // Messages
         Advertisement advertisement = new Advertisement(Utilities.createUUID(), MessageFlag.ADVERTISEMENT,
@@ -206,26 +214,20 @@ public class SessionManagerTest {
         Ready ready = new Ready(Utilities.createUUID(), MessageFlag.AFFIRM, Utilities.createTimestamp());
         Complete complete = new Complete(Utilities.createUUID(), MessageFlag.AFFIRM, Utilities.createTimestamp());
 
-//        protocolRole.setProtocolState(protocolRole.getTransferorState());
-//        Field roleField = protocolRole.getClass().getDeclaredField("transferorState");
-//        roleField.setAccessible(true);
-//        roleField.set(protocolRole, new Transferor(null, shippingLabel, deliveryContract, sharkPKIComponent));
+        protocolRole.setProtocolState(protocolRole.getTransferorState());
 
+        // Simulateted message exchange
         Optional<MessageBuilder> solicitation = sharkHedwigComponent.testHelperMethod(advertisement, "Marta");
         Optional<MessageBuilder> offerReply = sharkHedwigComponent.testHelperMethod(offer, "Marta");
-//
-//        Optional<MessageBuilder> solicitation = sessionManager.sessionHandling(advertisement, "Marta");
-//        Optional<MessageBuilder> offerReply = sessionManager.sessionHandling(offer, "Marta");
-//        Optional<MessageBuilder> contractDocument = sessionManager.sessionHandling(confirm, "Marta");
-//        Optional<MessageBuilder> pickUp = sessionManager.sessionHandling(affirm, "Marta");
-//        Optional<MessageBuilder> release = sessionManager.sessionHandling(ready, "Marta");
-//        Optional<MessageBuilder> finished = sessionManager.sessionHandling(complete, "Marta");
+        Optional<MessageBuilder> contractDocument = sessionManager.sessionHandling(confirm, "Marta");
+        Optional<MessageBuilder> pickUp = sessionManager.sessionHandling(affirm, "Marta");
+        Optional<MessageBuilder> release = sessionManager.sessionHandling(ready, "Marta");
+        Optional<MessageBuilder> finished = sessionManager.sessionHandling(complete, "Marta");
 
         assertInstanceOf(Solicitation.class, solicitation.get().getMessage());
-//        assertInstanceOf(OfferReply.class, offerReply.get().getMessage());
-//        assertInstanceOf(ContractDocument.class, contractDocument.get().getMessage());
-//        assertInstanceOf(PickUp.class, pickUp.get().getMessage());
-//        assertInstanceOf(Release.class, release.get().getMessage());
-
+        assertInstanceOf(OfferReply.class, offerReply.get().getMessage());
+        assertInstanceOf(ContractDocument.class, contractDocument.get().getMessage());
+        assertInstanceOf(PickUp.class, pickUp.get().getMessage());
+        assertInstanceOf(Release.class, release.get().getMessage());
     }
 }

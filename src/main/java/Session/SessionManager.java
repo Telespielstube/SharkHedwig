@@ -1,9 +1,6 @@
 package Session;
-
-import Battery.Battery;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
-import Location.GeoSpatial;
 import ProtocolRole.ProtocolRole;
 import Message.MessageBuilder;
 import Message.Messageable;
@@ -12,16 +9,10 @@ import Message.MessageFlag;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
-import Session.State.ContractState;
-import Session.State.NoSessionState;
-import Session.State.RequestState;
-import Session.State.SessionState;
+import Session.State.*;
 import Setup.Channel;
-import net.sharksystem.pki.SharkPKIComponent;
 
 public class SessionManager implements Observer, ISessionManager {
-    private final Battery battery;
-    private final GeoSpatial geoSpatial;
     private ProtocolRole protocolRole;
     private MessageBuilder messageBuilder;
     private DeliveryContract deliveryContract;
@@ -32,13 +23,10 @@ public class SessionManager implements Observer, ISessionManager {
     private final SessionState requestState;
     private final SessionState contractState;
 
-    public SessionManager(ShippingLabel shippingLabel, ProtocolRole protocolRole, DeliveryContract deliveryContract, Battery battery,
-                          GeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) {
+    public SessionManager(ShippingLabel shippingLabel, ProtocolRole protocolRole, DeliveryContract deliveryContract) {
         this.shippingLabel = shippingLabel;
         this.protocolRole = protocolRole;
         this.deliveryContract = deliveryContract;
-        this.battery = battery;
-        this.geoSpatial =geoSpatial;
         this.noSessionState = new NoSessionState(this);
         this.requestState = new RequestState(this);
         this.contractState = new ContractState(this);
@@ -58,7 +46,7 @@ public class SessionManager implements Observer, ISessionManager {
 
     @Override
     public Optional<MessageBuilder> sessionHandling(Messageable message, String sender) {
-        this.optionalMessage = getCurrentSessionState().handle(message, this.protocolRole, this.shippingLabel, this.deliveryContract, this.geoSpatial, sender);
+        this.optionalMessage = getCurrentSessionState().handle(message, this.protocolRole, this.shippingLabel, this.deliveryContract, sender);
         if (this.optionalMessage.isPresent()) {
             if (getCurrentSessionState().equals(getNoSessionState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.NO_SESSION.getChannel(), sender);
@@ -79,12 +67,18 @@ public class SessionManager implements Observer, ISessionManager {
     }
 
     private boolean checkStateStatus(MessageFlag messageFlag) {
-        boolean complete = (messageFlag == MessageFlag.ADVERTISEMENT || messageFlag == MessageFlag.SOLICITATION ||
-                messageFlag == MessageFlag.OFFER_REPLY || messageFlag == MessageFlag.CONFIRM || messageFlag == MessageFlag.RELEASE ||
-                messageFlag == MessageFlag.COMPLETE)
-                ? true
-                : false;
-        return complete;
+        if (protocolRole.getCurrentProtocolState().equals(protocolRole.getTransferorState())
+                && messageFlag == MessageFlag.ADVERTISEMENT
+                || messageFlag == MessageFlag.CONFIRM
+                || messageFlag == MessageFlag.COMPLETE) {
+            return true;
+        } else if (protocolRole.getCurrentProtocolState().equals(protocolRole.getTransfereeState())
+                && messageFlag == MessageFlag.SOLICITATION
+                || messageFlag == MessageFlag.OFFER_REPLY
+                || messageFlag == MessageFlag.RELEASE) {
+            return true;
+        }
+        return false;
     }
 
     /**
