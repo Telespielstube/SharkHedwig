@@ -114,7 +114,7 @@ public class Transferor implements ProtocolState {
                 && verifyOfferData(message) && processOfferData(message)) {
             this.optionalMessage = Optional.of(new OfferReply(Utilities.createUUID(), MessageFlag.OFFER_REPLY,
                     Utilities.createTimestamp(), this.shippingLabel.get().getPackageWeight(),
-                    this.shippingLabel.get().getPackageDestination(), true));
+                    this.shippingLabel.get().getPackageDestination()));
         }
     }
 
@@ -216,8 +216,8 @@ public class Transferor implements ProtocolState {
      */
     private void saveData() {
         if (this.optionalMessage.isPresent()) {
-            LogEntry logEntry = new LogEntry(this.optionalMessage.get().getUUID(), Utilities.formattedTimestamp(),
-                    this.deliveryContract.getShippingLabel().getPackageDestination(), true, AppConstant.PEER_NAME.toString(), sender);
+            LogEntry logEntry = new LogEntry(this.sender, AppConstant.PEER_NAME.toString(), Utilities.formattedTimestamp(),
+                    this.deliveryContract.getShippingLabel().getPackageWeight(), this.deliveryContract.getShippingLabel().getPackageDestination(), true);
             Logger.writeLog(logEntry.toString(), String.valueOf(this.optionalMessage.get().getUUID()));
         }
     }

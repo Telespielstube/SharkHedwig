@@ -26,7 +26,7 @@ public class DeliveryContract extends Observable implements Contractable {
                 null));
         this.isCreated = ContractState.CREATED.getState();
         setChanged();
-        notifyObservers();
+        notifyObservers(this);
     }
 
     public DeliveryContract(ShippingLabel shippingLabel, TransitRecord transitRecord) {
@@ -34,7 +34,7 @@ public class DeliveryContract extends Observable implements Contractable {
         this.transitRecord = transitRecord;
         this.isCreated = ContractState.CREATED.getState();
         setChanged();
-        notifyObservers();
+        notifyObservers(this);
     }
 
     public DeliveryContract() {}
@@ -72,15 +72,5 @@ public class DeliveryContract extends Observable implements Contractable {
      */
     public TransitRecord getTransitRecord() {
         return this.transitRecord.get();
-    }
-
-    /**
-     * Formats the DeliveryContract object
-     *
-     * @return    String representation of this object.
-     */
-    public String getString() {
-        return "DeliveryContract\n-----------------\n\n" + "Shipping label\n--------------\n" + getShippingLabel().getString() +
-                "\n\n" + "Transit record\n--------------\n" + getTransitRecord().getString();
     }
 }

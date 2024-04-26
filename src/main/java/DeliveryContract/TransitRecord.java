@@ -94,7 +94,8 @@ public class TransitRecord implements Contractable {
      *
      * @return    Formatted list entries.
      */
-    public String getString() {
+    @Override
+    public String toString() {
         return this.entryList.toString().replace("[","").replace("]","").replace(", ", "");
     }
 

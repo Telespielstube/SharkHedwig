@@ -16,6 +16,7 @@ import Message.Messageable;
 import Message.Request.Offer;
 import Message.Request.OfferReply;
 import Message.NoSession.Solicitation;
+import Misc.LogEntry;
 import Misc.Logger;
 import Misc.Utilities;
 import ProtocolRole.ProtocolRole;
@@ -33,6 +34,7 @@ public class Transferee implements ProtocolState {
     private final ProtocolRole protocolRole;
     private final Battery battery;
     private final GeoSpatial geoSpatial;
+    private String sender;
     private ShippingLabel shippingLabel;
     private DeliveryContract deliveryContract;
     private SharkPKIComponent sharkPKIComponent;
@@ -56,6 +58,7 @@ public class Transferee implements ProtocolState {
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
         this.optionalMessage = Optional.empty();
+        this.sender = sender;
 
         switch(message.getMessageFlag()) {
             case SOLICITATION:
@@ -70,7 +73,7 @@ public class Transferee implements ProtocolState {
                 break;
             case PICK_UP:
                 handlePickUp((PickUp) message, sender);
-                saveData(AppConstant.DELIVERY_CONTRACT_LOG_PATH);
+                saveData(AppConstant.DELIVERY_CONTRACT_LOG_PATH, message);
                 break;
             case RELEASE:
                 handleRelease((Release) message);
@@ -204,10 +207,14 @@ public class Transferee implements ProtocolState {
      * Saves the important session data to the give path constant.
      */
     private void saveData(AppConstant logPath, Messageable message) {
-        if (this.optionalMessage.isPresent() && message instanceof OfferReply) {
-            String path = logPath.toString();
-            String file = message. .getUUID() + ".txt";
-            Logger.writeLog(this.deliveryContract.getString(), path + "/" + file);
+        String path = logPath.toString();
+        String file = this.sender + Utilities.formattedTimestamp() + ".txt";
+        if (this.optionalMessage.isPresent()) {
+            if (message instanceof OfferReply) {
+                Logger.writeLog(new LogEntry(this.sender, AppConstant.PEER_NAME.toString(), Utilities.formattedTimestamp(), ((OfferReply) message).getPackageWeight(), ((OfferReply) message).getPackageDestination(), true).getRequestLogEntry(), path + "/" + file);
+            } else {
+                Logger.writeLog(new LogEntry(this.deliveryContract).getDeliveryContractLogEntry(), file);
+            }
         }
     }
 }

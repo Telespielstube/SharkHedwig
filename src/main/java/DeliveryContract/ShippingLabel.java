@@ -89,7 +89,8 @@ public class ShippingLabel extends Observable implements Contractable {
      *
      * @return Formatted string representation of object.
      */
-    public String getString() {
+    @Override
+    public String toString() {
         return String.format("PackageUUID: " + this.packageUUID + ";\nSender: " + this.sender + ";\nOrigin: " + this.origin +
                 ";\nOrigin coordinates: " + this.locationOrigin + ";\nRecipient: " + this.recipient + ";\nDestination: " +
                 this.destination + ";\nDestination coordinates: " + this.locationDestination + ";\nPackage weight: " + this.packageWeight + ";\n");

@@ -35,9 +35,9 @@ public class Logger {
      * @param file  File where the LogEntry should be written to.
      * @return true if writing was successful.
      */
-    public static boolean writeLog(String entry, String file) {
+    public static boolean writeLog(String logEntry, String file) {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(file), StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW)) {
-            writer.write(entry);
+            writer.write(logEntry);
         } catch (IOException e) {
             System.err.println(Utilities.formattedTimestamp() + " Caught an exception while writing log data: " + e.getMessage());
             throw new RuntimeException(e);
