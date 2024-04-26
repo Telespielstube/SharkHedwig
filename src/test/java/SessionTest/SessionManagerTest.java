@@ -16,6 +16,7 @@ import ProtocolRole.ProtocolRole;
 import ProtocolRole.State.Transferor;
 import Session.SessionManager;
 import Session.State.SessionState;
+import Setup.AppConstant;
 import Setup.SharkHedwigComponent;
 import SetupTest.TestConstant;
 import Location.*;
@@ -27,14 +28,20 @@ import net.sharksystem.asap.crypto.ASAPKeyStore;
 import net.sharksystem.pki.HelperPKITests;
 import net.sharksystem.pki.SharkPKIComponent;
 import net.sharksystem.pki.SharkPKIComponentFactory;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.NoSuchPaddingException;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -119,7 +126,7 @@ public class SessionManagerTest {
     }
 
     @Test
-    public void testIfTransfereeSessionHandlingRunsTroughAllSessions() throws NoSuchFieldException, IllegalAccessException {
+    public void testIfTransfereeSessionHandlingRunsTroughAllSessions() throws NoSuchFieldException, IllegalAccessException, IOException {
         shippingLabel = new ShippingLabel.Builder(UUID.randomUUID(), "Alice", "HTW-Berlin",
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",
                 new Location(52.5105, 13.4346), 1.2).build();
@@ -177,10 +184,11 @@ public class SessionManagerTest {
         assertInstanceOf(Confirm.class, confirm.get().getMessage());
         assertInstanceOf(Affirm.class, affirm.get().getMessage());
         assertInstanceOf(Complete.class, complete.get().getMessage());
+        clear();
     }
 
     @Test
-    public void testIfTransferorSessionHandlingRunsTroughAllSessions() throws NoSuchFieldException, IllegalAccessException {
+    public void testIfTransferorSessionHandlingRunsTroughAllSessions() throws NoSuchFieldException, IllegalAccessException, IOException {
         shippingLabel = new ShippingLabel.Builder(UUID.randomUUID(), "Alice", "HTW-Berlin",
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",
                 new Location(52.5105, 13.4346), 1.2).build();
@@ -230,5 +238,11 @@ public class SessionManagerTest {
         assertInstanceOf(ContractDocument.class, contractDocument.get().getMessage());
         //assertInstanceOf(PickUp.class, pickUp.get().getMessage());
         assertInstanceOf(Release.class, release.get().getMessage());
+        clear();
+    }
+
+    @AfterAll
+    public static void clear() throws IOException {
+        Files.walk(Paths.get(AppConstant.PEER_FOLDER.toString())).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
     }
 }
