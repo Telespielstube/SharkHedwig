@@ -182,6 +182,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         return this.sessionManager.sessionHandling(message, senderE2E);
 
     }
+
     /**
      * Handles the built message object to be send to peers during the next encounter.
      *

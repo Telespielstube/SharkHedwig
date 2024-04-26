@@ -1,6 +1,8 @@
 package DeliveryContract;
 
 import Location.Location;
+import Misc.Utilities;
+
 import java.util.Observable;
 import java.util.UUID;
 

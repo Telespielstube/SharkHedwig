@@ -7,7 +7,7 @@ import Setup.AppConstant;
 import java.io.Serializable;
 import java.util.Observable;
 
-public class DeliveryContract extends Observable implements Contractable {
+public class DeliveryContract extends Observable implements Contractable, Cloneable {
 
     private TransitRecord transitRecord;
     private ShippingLabel shippingLabel;
@@ -47,6 +47,18 @@ public class DeliveryContract extends Observable implements Contractable {
     @Override
     public boolean getIsCreated() {
         return this.isCreated;
+    }
+
+    @Override
+    public DeliveryContract clone()  {
+        DeliveryContract deliveryContract;
+        try {
+            deliveryContract = (DeliveryContract) super.clone();
+        } catch (CloneNotSupportedException e) {
+            System.err.println(Utilities.createTimestamp() + ": " + e.getMessage() );
+            throw new RuntimeException(e);
+        }
+        return deliveryContract;
     }
 
     /**

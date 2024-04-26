@@ -32,8 +32,8 @@ import java.util.Optional;
  */
 public class Transferee implements ProtocolState {
     private final ProtocolRole protocolRole;
-    private final Battery battery;
-    private final GeoSpatial geoSpatial;
+    private Battery battery;
+    private GeoSpatial geoSpatial;
     private String sender;
     private ShippingLabel shippingLabel;
     private DeliveryContract deliveryContract;
@@ -54,11 +54,13 @@ public class Transferee implements ProtocolState {
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract, String sender) {
+    public Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract,
+                                    GeoSpatial geoSpatial, String sender) {
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
-        this.optionalMessage = Optional.empty();
+        this.geoSpatial = geoSpatial;
         this.sender = sender;
+        this.optionalMessage = Optional.empty();
 
         switch(message.getMessageFlag()) {
             case SOLICITATION:
@@ -92,17 +94,12 @@ public class Transferee implements ProtocolState {
     }
 
     /**
-     * The transferee needs to store the DeliveryContract in memory until the transferor signed the transit record entry too.
+     * The transferee needs to store the DeliveryContract in memory too.
      *
      * @param message    The DeliveryContract object reference.
      */
     private void inMemoDeliveryContract(DeliveryContract message) {
-        ShippingLabel label = message.getShippingLabel();
-        this.deliveryContract = new DeliveryContract(new ShippingLabel.Builder(label.getUUID(), label.getSender(),
-                label.getOrigin(), label.getPackageOrigin(), label.getRecipient(), label.getDestination(),
-                label.getPackageDestination(), label.getPackageWeight()).build(),
-                new TransitRecord(message.getTransitRecord().getAllEntries()));
-        this.contractState = ContractState.CREATED.getState();
+        this.deliveryContract = (DeliveryContract) message.clone();
     }
 
     /**
@@ -151,7 +148,7 @@ public class Transferee implements ProtocolState {
      * @param message    PickUp message object.
      */
     private void handleContract(ContractDocument message) {
-        if (!message.getDeliveryContract().equals(null)) {
+        if (message.getDeliveryContract() != null) {
             inMemoDeliveryContract(message.getDeliveryContract());
             this.transitRecord = message.getDeliveryContract().getTransitRecord();
             this.geoSpatial.setPickUpLocation(this.transitRecord.getLastElement().getPickUpLocation());

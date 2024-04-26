@@ -20,6 +20,8 @@ import Setup.Channel;
 import net.sharksystem.pki.SharkPKIComponent;
 
 public class SessionManager implements Observer, ISessionManager {
+    private final Battery battery;
+    private final GeoSpatial geoSpatial;
     private ProtocolRole protocolRole;
     private MessageBuilder messageBuilder;
     private DeliveryContract deliveryContract;
@@ -35,6 +37,8 @@ public class SessionManager implements Observer, ISessionManager {
         this.shippingLabel = shippingLabel;
         this.protocolRole = protocolRole;
         this.deliveryContract = deliveryContract;
+        this.battery = battery;
+        this.geoSpatial =geoSpatial;
         this.noSessionState = new NoSessionState(this);
         this.requestState = new RequestState(this);
         this.contractState = new ContractState(this);
@@ -54,7 +58,7 @@ public class SessionManager implements Observer, ISessionManager {
 
     @Override
     public Optional<MessageBuilder> sessionHandling(Messageable message, String sender) {
-        this.optionalMessage = getCurrentSessionState().handle(message, this.protocolRole, this.shippingLabel, this.deliveryContract, sender);
+        this.optionalMessage = getCurrentSessionState().handle(message, this.protocolRole, this.shippingLabel, this.deliveryContract, this.geoSpatial, sender);
         if (this.optionalMessage.isPresent()) {
             if (getCurrentSessionState().equals(getNoSessionState())) {
                 this.messageBuilder = new MessageBuilder(this.optionalMessage.get(), Channel.NO_SESSION.getChannel(), sender);

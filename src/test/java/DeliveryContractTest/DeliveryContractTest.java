@@ -15,6 +15,23 @@ public class DeliveryContractTest {
     private static TransitRecord transitRecord;
 
     @Test
+    public void testIfDeliveryContractGEtsCloned() {
+        shippingLabel = new ShippingLabel.Builder(UUID.randomUUID(), "Alice", "HTW-Berlin",
+                new Location(80.67, 90.56), "Bob", "Ostbahnhof",
+                new Location(52.5105, 13.4346), 1.2).build();
+        transitRecord = new TransitRecord();
+        transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PEER_NAME.name(), "Peter", new Location
+                (57.5654645, 77.345345), 56563456, null, null));
+        transitRecord.addEntry(new TransitEntry(2, null, TestConstant.PEER_NAME.name(), "Peter", new Location
+                (55.5654645, 76.345345), 54863456, null, null));
+        transitRecord.addEntry(new TransitEntry(4, null, TestConstant.PEER_NAME.name(), "Bob", new Location
+                (55.5654645, 76.345345), 54566456, null, null));
+        deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
+        DeliveryContract deliveryContract1 = (DeliveryContract)deliveryContract.clone();
+
+        assertEquals(deliveryContract1.get().getShippingLabel().getUUID(), deliveryContract.get().getShippingLabel().getUUID());
+    }
+    @Test
     public void getShippingLabelAndTransitRecord() {
         shippingLabel = new ShippingLabel.Builder(UUID.randomUUID(), "Alice", "HTW-Berlin",
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",

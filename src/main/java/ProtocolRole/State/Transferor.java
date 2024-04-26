@@ -18,15 +18,12 @@ import Message.Request.OfferReply;
 import Location.GeoSpatial;
 import Misc.*;
 import ProtocolRole.ProtocolRole;
-import Session.SessionManager;
 import Setup.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;
 
 import java.util.Objects;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -52,9 +49,11 @@ public class Transferor implements ProtocolState {
     }
 
     @Override
-    public Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract, String sender) {
+    public Optional<Message> handle(Messageable message, ShippingLabel shippingLabel, DeliveryContract deliveryContract,
+                                    GeoSpatial geoSpatial, String sender) {
         this.shippingLabel = shippingLabel;
         this.deliveryContract = deliveryContract;
+        this.geoSpatial = geoSpatial;
         this.sender = sender;
 
         switch (message.getMessageFlag()) {
@@ -257,7 +256,7 @@ public class Transferor implements ProtocolState {
         TransitEntry update = new TransitEntry(this.deliveryContract.getTransitRecord().countUp(),
                 this.deliveryContract.getShippingLabel().getUUID(),
                 AppConstant.PEER_NAME.toString(),
-                receiver, geoSpatial.getCurrentLocation(),
+                receiver, this.geoSpatial.getCurrentLocation(),
                 Utilities.createTimestamp(),
                 null,
                 null);
