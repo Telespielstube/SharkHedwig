@@ -66,6 +66,13 @@ public class SessionManager implements Observer, ISessionManager {
         return Optional.ofNullable(this.messageBuilder);
     }
 
+    /**
+     * The seeion progress is checked using the message flag.
+     *
+     * @param messageFlag    Unique message identifier.
+     *
+     * @return               boolean value true if the condition is true or false if not.
+     */
     private boolean checkStateStatus(MessageFlag messageFlag) {
         if (protocolRole.getCurrentProtocolState().equals(protocolRole.getTransferorState())
                 && messageFlag == MessageFlag.ADVERTISEMENT

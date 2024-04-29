@@ -1,7 +1,5 @@
 package DeliveryContract;
 
-import DeliveryContract.State.ContractState;
-import DeliveryContract.State.DeliveryContractState;
 import Location.Locationable;
 import Misc.Utilities;
 import Setup.AppConstant;
@@ -12,8 +10,7 @@ public class DeliveryContract extends Observable implements Contractable, Clonea
 
     private TransitRecord transitRecord;
     private ShippingLabel shippingLabel;
-    private final ContractState deliveryContractState;
-    private boolean isCreated = ContractState.NOT_CREATED.getState();
+    private boolean isCreated;
 
     public DeliveryContract(String receiver, ShippingLabel shippingLabel, Locationable geoSpatial) {
         this.shippingLabel = shippingLabel;
@@ -26,7 +23,7 @@ public class DeliveryContract extends Observable implements Contractable, Clonea
                 Utilities.createTimestamp(),
                 null,
                 null));
-        this.isCreated = ContractState.CREATED.getState();
+        setIsCreated(true);
         setChanged();
         notifyObservers(this);
     }
@@ -34,14 +31,12 @@ public class DeliveryContract extends Observable implements Contractable, Clonea
     public DeliveryContract(ShippingLabel shippingLabel, TransitRecord transitRecord) {
         this.shippingLabel = shippingLabel;
         this.transitRecord = transitRecord;
-        this.isCreated = ContractState.CREATED.getState();
+        setIsCreated(true);
         setChanged();
         notifyObservers(this);
     }
 
-    public DeliveryContract() {
-        this.deliveryContractState = new DeliveryContractState(this);
-    }
+    public DeliveryContract() {}
 
     @Override
     public DeliveryContract get() {
@@ -49,8 +44,13 @@ public class DeliveryContract extends Observable implements Contractable, Clonea
     }
 
     @Override
-    public boolean getIsCreated() {
-        return this.isCreated;
+    public void setIsCreated(boolean isCreated) {
+        this.isCreated = isCreated;
+    }
+
+    @Override
+    public boolean isCreated() {
+        return this.isCreated();
     }
 
     @Override

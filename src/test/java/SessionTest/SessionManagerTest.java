@@ -1,7 +1,10 @@
 package SessionTest;
 
 import Battery.*;
-import DeliveryContract.*;
+import DeliveryContract.DeliveryContract;
+import DeliveryContract.ShippingLabel;
+import DeliveryContract.TransitEntry;
+import DeliveryContract.TransitRecord;
 import Message.Contract.*;
 import Message.MessageBuilder;
 import Message.MessageCache;
@@ -13,7 +16,6 @@ import Message.Request.Offer;
 import Message.Request.OfferReply;
 import Misc.Utilities;
 import ProtocolRole.ProtocolRole;
-import ProtocolRole.State.Transferor;
 import Session.SessionManager;
 import Session.State.SessionState;
 import Setup.AppConstant;

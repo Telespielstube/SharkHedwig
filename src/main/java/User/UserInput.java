@@ -1,4 +1,4 @@
-package HedwigUI;
+package User;
 
 /**
  * This is just filling up the object constructor with the input data. This object mainly serves for testing purposes.

@@ -2,7 +2,7 @@ package Setup;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
-import HedwigUI.UserManager;
+import User.UserManager;
 import Message.*;
 import ProtocolRole.ProtocolRole;
 import Session.SessionManager;

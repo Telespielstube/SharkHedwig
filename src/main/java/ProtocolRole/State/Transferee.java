@@ -194,6 +194,8 @@ public class Transferee implements ProtocolState {
         if (MessageCache.compareTimestamp(message.getTimestamp(), timeOffset)) {
             this.optionalMessage = Optional.of(new Complete(Utilities.createUUID(), MessageFlag.COMPLETE,
                     Utilities.createTimestamp()));
+            protocolRole.changeRole();
+
         }
     }
 

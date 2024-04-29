@@ -1,7 +1,8 @@
 package Message.Contract;
 
 import java.util.UUID;
-import DeliveryContract.*;
+
+import DeliveryContract.DeliveryContract;
 import Message.Message;
 import Message.MessageFlag;
 

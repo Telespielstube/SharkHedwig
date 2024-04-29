@@ -4,6 +4,7 @@ import Battery.Battery;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import Location.GeoSpatial;
+import Notification.NotificationService;
 import ProtocolRole.State.ProtocolState;
 import ProtocolRole.State.Transferee;
 import ProtocolRole.State.Transferor;
@@ -17,11 +18,14 @@ public class ProtocolRole {
     private ProtocolState currentProtocolState;
     private final ProtocolState transfereeState;
     private final ProtocolState transferorState;
+    private final NotificationService notificationService;
 
     public ProtocolRole(ShippingLabel shippingLabel, DeliveryContract deliveryContract,
                         Battery battery, GeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) {
+        this.notificationService = notificationService;
         this.transferorState = new Transferor(this, deliveryContract, geoSpatial, sharkPKIComponent);
         this.transfereeState = new Transferee(this, battery, geoSpatial, sharkPKIComponent);
+
         this.currentProtocolState = this.transfereeState;
     }
 

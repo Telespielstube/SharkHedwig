@@ -2,7 +2,6 @@ package Session.State;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
-import Location.GeoSpatial;
 import Message.Messageable;
 import Message.Message;
 import ProtocolRole.ProtocolRole;

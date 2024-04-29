@@ -2,7 +2,6 @@ package ProtocolRole.State;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
-import DeliveryContract.State.ContractState;
 import DeliveryContract.TransitEntry;
 import Message.Contract.*;
 import Message.Message;
@@ -172,9 +171,8 @@ public class Transferor implements ProtocolState {
     private void handleComplete(Complete message) {
         timeOffset = 30000;
         if (MessageCache.compareTimestamp(message.getTimestamp(), timeOffset)) {
-            // Send a message to the owners email address that a package is handed over to another drone.
-            //notificationService.newMessage(DeliveryContract deliveryContract);
-
+           protocolRole.changeRole();;
+           // If email service is setup send a notification message to the owner.
         } else {
             // Send a message to the owners email address that a package is lost
             //notificationService.newMessage(DeliveryContract deliveryContract);
@@ -203,7 +201,7 @@ public class Transferor implements ProtocolState {
      */
     private void createDeliveryContract() {
         this.deliveryContract = new DeliveryContract(this.sender, this.shippingLabel, geoSpatial);
-        this.contractState = ContractState.CREATED.getState();
+        this.contractState = this.deliveryContract.isCreated();
         this.optionalMessage = Optional.of(new ContractDocument(Utilities.createUUID(), MessageFlag.CONTRACT_DOCUMENT,
                 Utilities.createTimestamp(), this.deliveryContract));
     }

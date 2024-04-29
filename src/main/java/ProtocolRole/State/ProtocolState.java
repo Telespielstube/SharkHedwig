@@ -2,10 +2,8 @@ package ProtocolRole.State;
 
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
-import Location.GeoSpatial;
 import Message.Message;
 import Message.Messageable;
-import Session.SessionManager;
 
 import java.util.Optional;
 

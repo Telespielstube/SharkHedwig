@@ -1,7 +1,6 @@
 package DeliveryContract;
 
 import Location.Location;
-import Misc.Utilities;
 
 import java.util.Observable;
 import java.util.UUID;
@@ -14,7 +13,6 @@ import java.util.UUID;
 public class ShippingLabel extends Observable implements Contractable {
 
     // Every field has to be an object because the validate methode checks for not null objects.
-    private boolean isCreated;
     private final UUID packageUUID;
     private final String sender;
     private final String origin;
@@ -23,6 +21,7 @@ public class ShippingLabel extends Observable implements Contractable {
     private final String destination;
     private final Location locationOrigin;
     private final Location locationDestination;
+    private boolean isCreated;
 
     private ShippingLabel(Builder builder) {
         this.packageUUID = builder.packageUUID;
@@ -33,7 +32,7 @@ public class ShippingLabel extends Observable implements Contractable {
         this.destination = builder.destination;
         this.locationDestination = builder.locationDestination;
         this.packageWeight = builder.packageWeight;
-        this.isCreated = true;
+        setIsCreated(true);
         setChanged();
         notifyObservers(this);
     }
@@ -44,12 +43,20 @@ public class ShippingLabel extends Observable implements Contractable {
     }
 
     @Override
-    public boolean getIsCreated() {
+    public void setIsCreated(boolean isCreated) {
+        this.isCreated = isCreated;
+    }
+
+    @Override
+    public boolean isCreated() {
         return this.isCreated;
     }
 
-    public void setIsCreated(boolean isCreated) {
-        this.isCreated = isCreated;
+    /**
+     * After the hand-over is complete the former transferor has to reset all DeliveryContract states to the initial states.
+     */
+    public void resetContractState() {
+        clearChanged();
     }
 
     // Getter methods to get the value of the Object field. No setters because the attriibute values where set

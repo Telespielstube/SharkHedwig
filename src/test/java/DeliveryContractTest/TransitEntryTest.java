@@ -3,7 +3,6 @@ package DeliveryContractTest;
 import DeliveryContract.TransitEntry;
 import Location.Location;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 
 import java.util.UUID;

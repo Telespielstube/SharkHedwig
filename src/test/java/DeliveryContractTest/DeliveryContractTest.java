@@ -1,6 +1,9 @@
 package DeliveryContractTest;
 
-import DeliveryContract.*;
+import DeliveryContract.DeliveryContract;
+import DeliveryContract.ShippingLabel;
+import DeliveryContract.TransitEntry;
+import DeliveryContract.TransitRecord;
 import Location.Location;
 import java.util.UUID;
 
@@ -57,7 +60,7 @@ public class DeliveryContractTest {
         transitRecord = new TransitRecord();
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         assertNotNull(deliveryContract);
-        assertTrue(deliveryContract.getIsCreated());
+        assertTrue(deliveryContract.isCreated());
         assertNotNull(transitRecord.getClass());
     }
 
@@ -67,12 +70,12 @@ public class DeliveryContractTest {
         transitRecord = new TransitRecord();
         deliveryContract = new DeliveryContract(shippingLabel, transitRecord);
         assertNotNull(transitRecord.get());
-        assertThrowsExactly(NullPointerException.class, () -> shippingLabel.getIsCreated());
+        assertThrowsExactly(NullPointerException.class, () -> shippingLabel.isCreated());
     }
     @Test
     public void returnTrueIfContractSetMethodIsCalled() {
         assertNotNull(deliveryContract = new DeliveryContract(shippingLabel, transitRecord));
-        assertTrue(deliveryContract.getIsCreated());
+        assertTrue(deliveryContract.isCreated());
     }
 
     @Test

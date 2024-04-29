@@ -12,9 +12,15 @@ public interface Contractable extends Serializable {
   Object get();
 
   /**
-   * Returns a boolean value of the DeliveryContract component state if it is already created or not.
-   *
-   * @return    Boolean value of component state.
+   * Sets the current created state for a delivery contract component.
+   * @param isCreated
    */
-  boolean getIsCreated();
+  void setIsCreated(boolean isCreated);
+
+  /**
+   * Returns the state of the delivery contract and its two components.
+   *
+   * @return    boolean value true if it is created or false if not.
+   */
+  boolean isCreated();
 }

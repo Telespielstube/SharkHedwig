@@ -2,7 +2,6 @@ package Misc;
 
 import DeliveryContract.DeliveryContract;
 import Location.Location;
-import java.util.UUID;
 
 public class LogEntry {
     private double packageWeight;

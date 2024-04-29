@@ -1,8 +1,4 @@
-package HedwigUI;
-
-import DeliveryContract.ShippingLabel;
-
-import java.util.Optional;
+package User;
 
 /** Functional interface for user generated shipping label.
  *

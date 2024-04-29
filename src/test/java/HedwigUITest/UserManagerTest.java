@@ -1,6 +1,6 @@
 package HedwigUITest;
 
-import HedwigUI.UserInput;
+import User.UserInput;
 import net.sharksystem.SharkException;
 import net.sharksystem.pki.SharkPKIComponent;
 import org.junit.jupiter.api.Test;

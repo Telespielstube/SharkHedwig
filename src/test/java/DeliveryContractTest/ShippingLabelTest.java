@@ -1,20 +1,11 @@
 package DeliveryContractTest;
 
-import DeliveryContract.*;
-import HedwigUI.UserInput;
-import HedwigUI.UserManager;
+import DeliveryContract.ShippingLabel;
+import User.UserInput;
+import User.UserManager;
 import Location.Location;
 import Misc.Utilities;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class ShippingLabelTest {
 

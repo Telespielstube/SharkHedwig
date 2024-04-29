@@ -1,7 +1,5 @@
 package DeliveryContract;
 
-import Misc.Utilities;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +53,11 @@ public class TransitRecord implements Contractable {
 
     public void setIsCreated(boolean isCreated) {
         this.isCreated = isCreated;
+    }
+
+    @Override
+    public boolean isCreated() {
+        return this.isCreated;
     }
 
     /**

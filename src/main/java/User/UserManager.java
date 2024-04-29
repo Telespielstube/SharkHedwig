@@ -1,4 +1,4 @@
-package HedwigUI;
+package User;
 
 import DeliveryContract.ShippingLabel;
 import Location.Location;
