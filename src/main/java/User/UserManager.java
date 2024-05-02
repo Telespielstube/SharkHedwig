@@ -5,26 +5,39 @@ import Location.Location;
 import Misc.Utilities;
 import Notification.EmailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
  * The UserManager class is responsible for managing everything the user is able to interact with the SharkHedwigComponent.
  */
 public class UserManager implements Manageable {
+    private ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-    private ObjectMapper mapper = new ObjectMapper();
-//    private final String json = "{ \"sender\" : \"Marta\", \"origin\" : \"HTW-Berlin\", \"latitudeOrigin\" : \"80.0\", " +
-//            "\"longitudeOrigin\" : \"90.0\" , \"recipient\" : \"Peter\", \"destination\" : \"Ostbahnhof\", " +
-//            "\"latitudeDest\" : \"44.0\", \"longitudeDest\" : \"67.0\", \"packageWeight\" : \"100\"}";
+    /**
+     * Validates the received JSON data for further processing.
+     * @param jsonData
+     * @return
+     */
+    private boolean isValid(String jsonData) {
+        try {
+            mapper.readTree(jsonData);
+        } catch (JsonProcessingException e) {
+            return false;
+        }
+        return true;
+    }
 
     @Override
-    public void getJson(String jsonData) {
+    public void processJson(String jsonData) {
         try {
-            create(mapper.readValue(jsonData, UserInput.class));
+            if (isValid(jsonData)) {
+                UserInput data = mapper.readValue(jsonData, UserInput.class);
+                create(data);
+            }
         } catch (JsonProcessingException e) {
             System.err.println(Utilities.formattedTimestamp() + "Caught an Exception while trying to parse JSON file: " + e.getMessage());
             throw new RuntimeException(e);
@@ -42,7 +55,7 @@ public class UserManager implements Manageable {
                      data.getRecipient(),
                      data.getDestination(),
                      new Location(data.getLatitudeDest(), data.getLongitudeDest()),
-                     data.getPackageWeight()).build());
+                     data.getPackageWeight()).build();
         }
     }
 

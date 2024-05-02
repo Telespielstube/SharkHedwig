@@ -80,7 +80,7 @@ public class BluetoothServer implements Runnable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        userManager.getJson(shippingLabel);
+        userManager.processJson(shippingLabel);
     }
 
     /**

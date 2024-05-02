@@ -12,7 +12,7 @@ public interface Manageable {
      *
      * @param jsonData    String object of the received json file.
      */
-    void getJson(String jsonData);
+    void processJson(String jsonData);
     /**
      * Creates the ShippingLabel object.
      *
