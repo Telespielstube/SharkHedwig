@@ -59,6 +59,10 @@ public final class MessageCache {
         return messageList.get(messageList.lastKey());
     }
 
+    public static long getLasElementKey() {
+        return messageList.lastKey();
+    }
+
     /**
      * Adds a message object to the TreeMap.
      */

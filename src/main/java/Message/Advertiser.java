@@ -27,7 +27,7 @@ public class Advertiser implements Runnable {
     public void run() {
         while (true) {
             try {
-                Thread.sleep(100000);
+                Thread.sleep(10000);
                 if (MessageCache.getLastElementFromList() instanceof Advertisement) {
                     break;
                 }

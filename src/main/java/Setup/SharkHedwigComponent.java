@@ -104,12 +104,10 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         shippingLabel.addObserver((Observer) this.sessionManager);
         deliveryContract.addObserver((Observer) this.sessionManager);
 
+        // Instantiating threads.
+        new MessageCacheCleaner((SessionManager) this.sessionManager);
         new Advertiser(this, this.protocolRole).run();
-        try {
-            new BluetoothServer().init();
-        } catch (BluetoothStateException e) {
-            throw new RuntimeException(e);
-        }
+        new BluetoothServer(userManager).register();
     }
 
     /**

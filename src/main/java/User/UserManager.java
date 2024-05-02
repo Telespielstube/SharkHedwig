@@ -17,21 +17,24 @@ import java.util.stream.Stream;
 public class UserManager implements Manageable {
 
     private ObjectMapper mapper = new ObjectMapper();
-    private final String json = "{ \"sender\" : \"Marta\", \"origin\" : \"HTW-Berlin\", \"latitudeOrigin\" : \"80.0\", " +
-            "\"longitudeOrigin\" : \"90.0\" , \"recipient\" : \"Peter\", \"destination\" : \"Ostbahnhof\", " +
-            "\"latitudeDest\" : \"44.0\", \"longitudeDest\" : \"67.0\", \"packageWeight\" : \"100\"}";
+//    private final String json = "{ \"sender\" : \"Marta\", \"origin\" : \"HTW-Berlin\", \"latitudeOrigin\" : \"80.0\", " +
+//            "\"longitudeOrigin\" : \"90.0\" , \"recipient\" : \"Peter\", \"destination\" : \"Ostbahnhof\", " +
+//            "\"latitudeDest\" : \"44.0\", \"longitudeDest\" : \"67.0\", \"packageWeight\" : \"100\"}";
 
-    public void getJson() {
+    @Override
+    public void getJson(String jsonData) {
         try {
-            create(mapper.readValue(json, UserInput.class));
+            create(mapper.readValue(jsonData, UserInput.class));
         } catch (JsonProcessingException e) {
+            System.err.println(Utilities.formattedTimestamp() + "Caught an Exception while trying to parse JSON file: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public void create(UserInput data) {
-        Optional<ShippingLabel> shippingLabel = validate(data) ? Optional.of(new ShippingLabel.Builder(
+        if (validate(data)) {
+            new ShippingLabel.Builder(
                      Utilities.createUUID(),
                      data.getSender(),
                      data.getOrigin(),
@@ -39,9 +42,8 @@ public class UserManager implements Manageable {
                      data.getRecipient(),
                      data.getDestination(),
                      new Location(data.getLatitudeDest(), data.getLongitudeDest()),
-                     data.getPackageWeight()).build())
-        : Optional.empty();
-        shippingLabel.ifPresent(v -> v.setIsCreated(true));
+                     data.getPackageWeight()).build());
+        }
     }
 
     /**
