@@ -3,6 +3,10 @@ package User;
 import DeliveryContract.ShippingLabel;
 import Location.Location;
 import Misc.Utilities;
+import Notification.EmailService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -12,10 +16,22 @@ import java.util.stream.Stream;
  */
 public class UserManager implements Manageable {
 
+    private ObjectMapper mapper = new ObjectMapper();
+    private final String json = "{ \"sender\" : \"Marta\", \"origin\" : \"HTW-Berlin\", \"latitudeOrigin\" : \"80.0\", " +
+            "\"longitudeOrigin\" : \"90.0\" , \"recipient\" : \"Peter\", \"destination\" : \"Ostbahnhof\", " +
+            "\"latitudeDest\" : \"44.0\", \"longitudeDest\" : \"67.0\", \"packageWeight\" : \"100\"}";
+
+    public void getJson() {
+        try {
+            create(mapper.readValue(json, UserInput.class));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void create(UserInput data) {
-        Optional<ShippingLabel> shippingLabel = Optional.empty();
-        shippingLabel = validate(data) ? Optional.of(new ShippingLabel.Builder(
+        Optional<ShippingLabel> shippingLabel = validate(data) ? Optional.of(new ShippingLabel.Builder(
                      Utilities.createUUID(),
                      data.getSender(),
                      data.getOrigin(),
@@ -46,18 +62,7 @@ public class UserManager implements Manageable {
     }
 
     @Override
-    public void setupEmailService() {
-    }
+    public void setupEmailService(EmailService data) {
 
-    @Override
-    public void loginToService() {
-    }
-
-    @Override
-    public void newMessage() {
-    }
-
-    @Override
-    public void sendMessage() {
     }
 }

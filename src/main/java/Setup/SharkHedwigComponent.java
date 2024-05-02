@@ -24,6 +24,9 @@ import Misc.*;
 import Session.ISessionManager;
 import Battery.*;
 import Location.GeoSpatial;
+
+import javax.bluetooth.BluetoothStateException;
+
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 
@@ -40,7 +43,6 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     private final Battery battery;
     private final GeoSpatial geoSpatial;
     private ProtocolRole protocolRole;
-    private Advertiser advertisementThread;
 
     /**
      * The component implements a decentralized protocol that allows drones to transport a physical package from a
@@ -50,12 +52,12 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
      * Created by Martina Brüning
      */
     public SharkHedwigComponent() {
+        setupComponent();
         this.sharkPeerFS = new SharkPeerFS(AppConstant.PEER_NAME.toString(), AppConstant.PEER_FOLDER + "/" + AppConstant.PEER_NAME);
         this.messageHandler = new MessageHandler();
         this.battery = new BatteryManager();
         this.geoSpatial = new GeoSpatial();
         this.userManager = new UserManager();
-        setupComponent();
     }
 
     /**
@@ -103,6 +105,11 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         deliveryContract.addObserver((Observer) this.sessionManager);
 
         new Advertiser(this, this.protocolRole).run();
+        try {
+            new BluetoothServer().init();
+        } catch (BluetoothStateException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

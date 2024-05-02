@@ -18,11 +18,11 @@ public class ProtocolRole {
     private ProtocolState currentProtocolState;
     private final ProtocolState transfereeState;
     private final ProtocolState transferorState;
-    private final NotificationService notificationService;
+   // private final NotificationService notificationService;
 
     public ProtocolRole(ShippingLabel shippingLabel, DeliveryContract deliveryContract,
                         Battery battery, GeoSpatial geoSpatial, SharkPKIComponent sharkPKIComponent) {
-        this.notificationService = notificationService;
+       // this.notificationService = notificationService;
         this.transferorState = new Transferor(this, deliveryContract, geoSpatial, sharkPKIComponent);
         this.transfereeState = new Transferee(this, battery, geoSpatial, sharkPKIComponent);
 
