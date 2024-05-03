@@ -4,8 +4,7 @@ import Misc.Utilities;
 import User.UserManager;
 import javax.bluetooth.*;
 import javax.microedition.io.*;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * The BluetoothServer class sets up an object that allow the component to receive the shipping label data from a nearby
@@ -23,12 +22,13 @@ public class BluetoothServer implements Runnable {
     private LocalDevice localDevice; // local Bluetooth Manager
     private DiscoveryAgent discoveryAgent; // discovery agent
     private StreamConnectionNotifier streamConnectionNotifier;
-    StreamConnection streamConnection;
+    private StreamConnection streamConnection;
     private static final String serviceName = "SharkHedwigService";
     private static final String serviceUUID = "f06b2657-0175-49f6-9dcc-8fc159661c6a";
-    private final UUID MYSERVICEUUID_UUID = new UUID(serviceUUID, false);
-    private String connURL = "btspp://localhost:" + MYSERVICEUUID_UUID.toString() + ";name=" + serviceName;
+    private final UUID UUID = new UUID(serviceUUID, false);
+    private String connURL = "btspp://localhost:" + UUID.toString() + ";name=" + serviceName;
     private DataInputStream dataInputStream;
+    private DataOutputStream dataOutputStream;
 
     public BluetoothServer(UserManager userManager) {
         this.userManager = userManager;
@@ -72,21 +72,40 @@ public class BluetoothServer implements Runnable {
     /**
      * Reads the incoming byte file as UTF-8 encoded string and sends it over to the UserManager for further processing.
      */
-    public void read() {
+    public boolean read() {
         String shippingLabel = null;
         try {
             this.dataInputStream = this.streamConnection.openDataInputStream();
-            shippingLabel = dataInputStream.readUTF();
+            shippingLabel = this.dataInputStream.readUTF();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println(Utilities.formattedTimestamp() + "Caught an Exception while reading the incoming " +
+                    "shipping label data: " + e.getMessage());
+            return false;
         }
+        close();
         userManager.processJson(shippingLabel);
+        return true;
     }
 
     /**
-     * closes a no longer needed bluetooth connection.
+     * Send a short information text to the sender of the shipping label data. Its
+     * just an information that the crucial data was received.
      */
-    public void close() {
+    public void write() {
+        try {
+            this.dataOutputStream = this.streamConnection.openDataOutputStream();
+            this.dataOutputStream.writeBytes("Got shipping label data");
+            this.dataOutputStream.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        close();
+    }
+
+    /**
+     * Closes a no longer needed bluetooth connection.
+     */
+    private void close() {
         try {
             this.streamConnection.close();
         } catch (IOException e) {
@@ -101,7 +120,9 @@ public class BluetoothServer implements Runnable {
     public void run() {
         while (true) {
             connect();
-            read();
+            if (read()) {
+                write();
+            }
         }
     }
 
