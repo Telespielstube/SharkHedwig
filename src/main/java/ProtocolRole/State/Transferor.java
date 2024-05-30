@@ -78,7 +78,7 @@ public class Transferor implements ProtocolState {
                 this.protocolRole.changeRole();
                 break;
             default:
-                System.err.println(Utilities.formattedTimestamp() + "Missing message flag.");
+                System.err.println(Utilities.formattedTimestamp() + "Message flag was incorrect: " + message.getMessageFlag());
                 break;
         }
         if (this.optionalMessage.isPresent() && MessageCache.getMessageCacheSize() <= MessageCache.getTranferorCacheSize() ) {

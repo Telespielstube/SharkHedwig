@@ -25,8 +25,6 @@ import Session.ISessionManager;
 import Battery.*;
 import Location.GeoSpatial;
 
-import javax.bluetooth.BluetoothStateException;
-
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 
@@ -107,7 +105,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         // Instantiating threads.
         new MessageCacheCleaner((SessionManager) this.sessionManager);
         new Advertiser(this, this.protocolRole).run();
-        new BluetoothServer(userManager).register();
+       // new HttpServer(userManager).run();
     }
 
     /**

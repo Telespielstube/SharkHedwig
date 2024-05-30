@@ -3,9 +3,6 @@ package Setup;
 import Message.MessageCache;
 import Misc.Utilities;
 import Session.SessionManager;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class MessageCacheCleaner implements Runnable {
