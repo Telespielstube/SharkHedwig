@@ -50,8 +50,8 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
      * Created by Martina Brüning
      */
     public SharkHedwigComponent() {
-        setupComponent();
         this.sharkPeerFS = new SharkPeerFS(AppConstant.PEER_NAME.toString(), AppConstant.PEER_FOLDER + "/" + AppConstant.PEER_NAME);
+        setupComponent();
         this.messageHandler = new MessageHandler();
         this.battery = new BatteryManager();
         this.geoSpatial = new GeoSpatial();
@@ -105,7 +105,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         // Instantiating threads.
         new MessageCacheCleaner((SessionManager) this.sessionManager);
         new Advertiser(this, this.protocolRole).run();
-       // new HttpServer(userManager).run();
+
     }
 
     /**

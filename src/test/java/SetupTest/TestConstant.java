@@ -3,7 +3,7 @@ package SetupTest;
 public enum TestConstant {
     APP_FORMAT("hedwigTest"),
     PEER_FOLDER("./src/test/resources/TestStorage"),
-    PEER_NAME("hedwig123Test"),
+    PEER_NAME("hedwigTestPeer"),
     CA_ID("caID"),
     SCHEME("sn2://"),
     LOG_FOLDER("LogTest"),
