@@ -1,8 +1,8 @@
 package Setup;
 
+import Connection.ServerSocket;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
-import User.UserManager;
 import Message.*;
 import ProtocolRole.ProtocolRole;
 import Session.SessionManager;
@@ -34,10 +34,9 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     private final MessageHandler messageHandler;
     private ISessionManager sessionManager;
     private final SharkPeerFS sharkPeerFS;
-    private final ShippingLabel shippingLabel = new ShippingLabel.Builder(null,null,null, null,
-            null, null, null, null).build();
+    private final ShippingLabel shippingLabel = new ShippingLabel(null,null,null, null,
+            null, null, null, null);
     private final DeliveryContract deliveryContract = new DeliveryContract();
-    private final UserManager userManager;
     private final Battery battery;
     private final GeoSpatial geoSpatial;
     private ProtocolRole protocolRole;
@@ -55,7 +54,6 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         this.messageHandler = new MessageHandler();
         this.battery = new BatteryManager();
         this.geoSpatial = new GeoSpatial();
-        this.userManager = new UserManager();
     }
 
     /**
@@ -79,8 +77,8 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
     /**
      * This methode is called from within the methode SharkPeerFS.start() to get the component
      * and its setup process started.
-     * <p>
-     * ASAPPeer  Describes the actual Peer
+     *
+     * @param asapPeer    Refers to the peer.
      */
     @Override
     public void onStart(ASAPPeer asapPeer)  {
@@ -103,13 +101,18 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         deliveryContract.addObserver((Observer) this.sessionManager);
 
         // Instantiating threads.
-        new MessageCacheCleaner((SessionManager) this.sessionManager);
+        new MessageCacheCleaner((SessionManager) this.sessionManager).run();
         new Advertiser(this, this.protocolRole).run();
 
+        // There needs to be a check if the mobile drone is connected to the owners local network.
+        // Otherwise it does not make sense to let the thread running.
+        new ServerSocket(1234).run();
     }
 
     /**
      * Setting up all component channels. Multiple channels allow us to control incoming and outgoing messages much better.
+     *
+     * @param    channelName    The channel refers to the session.
      */
     public void setupChannel(String channelName)  {
         for (Channel type : Channel.values()) {

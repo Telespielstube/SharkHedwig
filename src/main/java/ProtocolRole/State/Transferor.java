@@ -17,7 +17,7 @@ import Message.Request.OfferReply;
 import Location.GeoSpatial;
 import Misc.*;
 import ProtocolRole.ProtocolRole;
-import Setup.AppConstant;
+import Misc.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;

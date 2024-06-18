@@ -1,17 +1,16 @@
 package Misc;
 
-import javax.rmi.CORBA.Util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
 /**
- * The Utilities class is a collection of small small useful methods like
- * CheckDroneID()
+ * The Utilities class is a collection of small useful methods. The keyword 'final' marks the class as a non-inheritable.
  */
 public final class Utilities {
 
     private Utilities() {}
+
     /**
      * Creates a Version 4 (randomly generated) UUID which is an identifier that is
      * unique across both space and time
@@ -32,7 +31,7 @@ public final class Utilities {
     }
 
     /**
-     * Creates a shortened timestamp for file naming.
+     * Creates a shortened human-readable timestamp mainly for file naming.
      *
      * @return    shortened timestamp as String.
      */
@@ -47,5 +46,9 @@ public final class Utilities {
      */
     public static long createTimestamp() {
         return System.currentTimeMillis();
+    }
+
+    public static void verify() {
+
     }
 }

@@ -19,7 +19,7 @@ import Misc.LogEntry;
 import Misc.Logger;
 import Misc.Utilities;
 import ProtocolRole.ProtocolRole;
-import Setup.AppConstant;
+import Misc.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.pki.SharkPKIComponent;

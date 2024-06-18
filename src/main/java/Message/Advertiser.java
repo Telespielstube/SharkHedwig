@@ -3,7 +3,7 @@ package Message;
 import Message.NoSession.Advertisement;
 import Misc.Utilities;
 import ProtocolRole.ProtocolRole;
-import Setup.AppConstant;
+import Misc.AppConstant;
 import Setup.Channel;
 import Setup.SharkHedwigComponent;
 

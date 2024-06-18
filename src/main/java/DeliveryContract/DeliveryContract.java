@@ -2,7 +2,7 @@ package DeliveryContract;
 
 import Location.Locationable;
 import Misc.Utilities;
-import Setup.AppConstant;
+import Misc.AppConstant;
 
 import java.util.Observable;
 

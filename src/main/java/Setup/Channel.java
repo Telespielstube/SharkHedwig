@@ -1,5 +1,7 @@
 package Setup;
 
+import Misc.AppConstant;
+
 /**
  * An enumeration of all channels the protocols needs to go through before a package is exchange.
  *

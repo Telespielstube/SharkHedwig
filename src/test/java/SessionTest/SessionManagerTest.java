@@ -18,7 +18,7 @@ import Misc.Utilities;
 import ProtocolRole.ProtocolRole;
 import Session.SessionManager;
 import Session.State.SessionState;
-import Setup.AppConstant;
+import Misc.AppConstant;
 import Setup.SharkHedwigComponent;
 import SetupTest.TestConstant;
 import Location.*;
@@ -62,8 +62,8 @@ public class SessionManagerTest {
     private static ASAPKeyStore asapKeyStore;
     private static String francisID;
     private static PublicKey publicKeyFrancis;
-    private static ShippingLabel shippingLabel = new ShippingLabel.Builder(null,null,null, null,
-            null, null, null, 0.0).build();
+    private static ShippingLabel shippingLabel = new ShippingLabel(null,null,null, null,
+            null, null, null, 0.0);
     private static MessageCache messageCache;
 
     public SessionManagerTest() throws NoSuchPaddingException, NoSuchAlgorithmException {
@@ -129,9 +129,9 @@ public class SessionManagerTest {
 
     @Test
     public void testIfTransfereeSessionHandlingRunsTroughAllSessions() throws NoSuchFieldException, IllegalAccessException, IOException {
-        shippingLabel = new ShippingLabel.Builder(UUID.randomUUID(), "Alice", "HTW-Berlin",
+        shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",
-                new Location(52.5105, 13.4346), 1.2).build();
+                new Location(52.5105, 13.4346), 1.2);
         transitRecord = new TransitRecord();
         transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PEER_NAME.name(), "Peter", new Location
                 (57.5654645, 77.345345), 56563456, null, null));
@@ -191,9 +191,9 @@ public class SessionManagerTest {
 
     @Test
     public void testIfTransferorSessionHandlingRunsTroughAllSessions() throws NoSuchFieldException, IllegalAccessException, IOException {
-        shippingLabel = new ShippingLabel.Builder(UUID.randomUUID(), "Alice", "HTW-Berlin",
+        shippingLabel = new ShippingLabel(UUID.randomUUID(), "Alice", "HTW-Berlin",
                 new Location(80.67, 90.56), "Bob", "Ostbahnhof",
-                new Location(52.5105, 13.4346), 1.2).build();
+                new Location(52.5105, 13.4346), 1.2);
         transitRecord = new TransitRecord();
         transitRecord.addEntry(new TransitEntry(0, null, TestConstant.PEER_NAME.name(), "Peter", new Location
                 (57.5654645, 77.345345), 56563456, null, null));

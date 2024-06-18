@@ -36,7 +36,7 @@ public class TransitRecord implements Contractable {
     /**
      * Just adds 1 tho the serialNumber.
      *
-     * @return    serial number plus 1.
+     * @return    Current serial number plus 1.
      */
     public int countUp() {
         return this.serialNumber++;

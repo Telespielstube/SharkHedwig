@@ -25,7 +25,5 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="jakarta.mail.api" level="project" />
-    <orderEntry type="library" name="fasterxml.jackson.core.databind" level="project" />
-    <orderEntry type="library" name="fasterxml.jackson.module.parameter.names" level="project" />
   </component>
 </module>

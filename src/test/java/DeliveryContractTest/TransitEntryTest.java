@@ -13,7 +13,6 @@ public class TransitEntryTest {
 
     private static TransitEntry transitEntry;
     private int serialNumber;
-    private UUID packageUUID;
     private String transferor;
     private String transferee;
     private Location handoverLocation;

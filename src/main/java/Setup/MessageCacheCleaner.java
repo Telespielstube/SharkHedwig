@@ -5,11 +5,15 @@ import Misc.Utilities;
 import Session.SessionManager;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * The MessageCacheCleaner works as a thread in the background. It allows to clean the stored messages after a specified time offset (in this case 2 min).
+ * This regular checking of orphaned messages is intended to prevent an endless waiting loop in case a response message is lost while transferring.
+ */
 public class MessageCacheCleaner implements Runnable {
 
     private final SessionManager sessionManager;
     private ReentrantReadWriteLock lock;
-    private long timeOffset = 60000; // one minute
+    private long timeOffset = 120000; // one minute
 
     public MessageCacheCleaner(SessionManager sessionManager) {
         this.sessionManager = sessionManager;

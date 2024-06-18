@@ -1,4 +1,4 @@
-package Setup;
+package Misc;
 
 public enum AppConstant {
     // Component related constants

@@ -1,5 +1,6 @@
 package Setup;
 
+import Misc.AppConstant;
 import net.sharksystem.asap.ASAPSecurityException;
 import net.sharksystem.asap.pki.ASAPCertificate;
 import net.sharksystem.pki.SharkPKIComponent;

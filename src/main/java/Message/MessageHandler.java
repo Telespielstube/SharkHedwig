@@ -1,7 +1,7 @@
 package Message;
 
 import Misc.Utilities;
-import Setup.AppConstant;
+import Misc.AppConstant;
 import net.sharksystem.asap.*;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms;
 import net.sharksystem.asap.crypto.ASAPCryptoAlgorithms.EncryptedMessagePackage;
@@ -96,24 +96,27 @@ public class MessageHandler implements Handleable {
 
     /**
      * Serializes a message object to a byte array message.
-     * @param object
-     * @return
+     * @param object    Object which nedds to be converted to a byte[].
+     *
+     * @return          The Object converted as byte[].
      */
     public static byte[] objectToByteArray(Object object) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             new ObjectOutputStream(outputStream).writeObject(object);
+            return outputStream.toByteArray();
         } catch (IOException e) {
             System.err.println(Utilities.formattedTimestamp() + "Caught an IOException: " + e.getMessage());
             throw new RuntimeException(e);
         }
-        return outputStream.toByteArray();
     }
 
     /**
      * Deserializes an byte array message to a Message object.
-     * @param message
-     * @return
+     *
+     * @param message    Received byte message.
+     *
+     * @return           The byte[] converted to an object.
      */
     public static Object byteArrayToObject(byte[] message) {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(message);
