@@ -4,7 +4,7 @@ import Battery.Battery;
 import DeliveryContract.DeliveryContract;
 import DeliveryContract.ShippingLabel;
 import Location.GeoSpatial;
-import Notification.NotificationService;
+
 import ProtocolRole.State.ProtocolState;
 import ProtocolRole.State.Transferee;
 import ProtocolRole.State.Transferor;

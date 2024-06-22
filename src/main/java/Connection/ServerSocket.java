@@ -20,8 +20,8 @@ import java.nio.channels.*;
  */
 public class ServerSocket implements Runnable {
 
-    private AsynchronousServerSocketChannel serverSocket;
-    private ByteBuffer byteBuffer;
+    private AsynchronousServerSocketChannel serverSocket; //An asynchronous channel for stream-oriented listening sockets.
+    private ByteBuffer byteBuffer; // A like a builder it creates a byte[] but it offers methods to manipulate the byte[].
 
     public ServerSocket(int port) {
         try {
@@ -68,7 +68,7 @@ public class ServerSocket implements Runnable {
      * @param socketChannel    Channel the byte stream from the client is sent.
      */
     private void readFromChannel(AsynchronousSocketChannel socketChannel) {
-        byteBuffer = ByteBuffer.allocate(1024);
+        byteBuffer = ByteBuffer.allocate(512);
         socketChannel.read(byteBuffer);
     }
 }
