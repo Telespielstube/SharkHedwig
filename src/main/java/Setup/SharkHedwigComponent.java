@@ -104,9 +104,7 @@ public class SharkHedwigComponent implements ASAPMessageReceivedListener, SharkC
         new MessageCacheCleaner((SessionManager) this.sessionManager).run();
         new Advertiser(this, this.protocolRole).run();
 
-        // There needs to be a check if the mobile drone is connected to the owners local network.
-        // Otherwise it does not make sense to let the thread running.
-        new ServerSocket(1234).run();
+        //new ServerSocket(1234).run();
     }
 
     /**

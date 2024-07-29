@@ -21,18 +21,22 @@ import java.nio.channels.*;
 public class ServerSocket implements Runnable {
 
     private AsynchronousServerSocketChannel serverSocket; //An asynchronous channel for stream-oriented listening sockets.
-    private ByteBuffer byteBuffer; // A like a builder it creates a byte[] but it offers methods to manipulate the byte[].
+    private ByteBuffer byteBuffer; // Like a builder it creates a byte[] but it offers methods to manipulate the byte[] received from a I/O component like a channel.
 
     public ServerSocket(int port) {
         try {
             serverSocket = AsynchronousServerSocketChannel.open().bind(new InetSocketAddress(port));
 
         } catch (IOException e) {
-            System.err.println(Utilities.formattedTimestamp() + "An error occurred while setting up the socket port for receiving shipping label data: " + e.getMessage());
+            System.err.println(Utilities.formattedTimestamp()
+                    + "An error occurred while setting up the socket port for receiving shipping label data: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
+
+    // There needs to be a check if the mobile drone is connected to the owners local network.
+    // Otherwise it does not make sense to let the thread running.
     @Override
     public void run() {
         while (true) {
