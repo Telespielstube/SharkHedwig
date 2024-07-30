@@ -8,7 +8,7 @@ used for encrypted message exchange to enable mobile transport drones to physica
 
 ## Quick Start
 Clone the repository to your preferred local working directory. It is recommended to use [IntelliJ](https://www.jetbrains.com/idea/?var=1) 
-or [VSCode](https://code.visualstudio.com) just because they offer a excellent language integration or they support the Java JDK.
+or [VSCode](https://code.visualstudio.com) just because they offer an excellent language integration.
 
 After cloning into the project you can start by running all test cases from the ```src/test/java/TestRunner``` file.
 The ```public class TestRunner {}``` suite runs all test cases automatically and gives a first insight into the workflow 
