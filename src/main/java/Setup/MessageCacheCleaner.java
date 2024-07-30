@@ -13,7 +13,7 @@ public class MessageCacheCleaner implements Runnable {
 
     private final SessionManager sessionManager;
     private ReentrantReadWriteLock lock;
-    private long timeOffset = 120000; // one minute
+    private long timeOffset = 60000; // one minute
 
     public MessageCacheCleaner(SessionManager sessionManager) {
         this.sessionManager = sessionManager;
